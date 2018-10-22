@@ -1,0 +1,11 @@
+googletest-*/
+*.pc
+bin/
+lib/
+CMakeFiles/
+*.cmake
+CMakeCache.txt
+build/googletest/CMakeLists.txt
+build/googletest/Makefile
+build/Makefile
+CTestCostData.txt

@@ -1,0 +1,394 @@
+Start testing: Oct 22 02:52 CEST
+----------------------------------------------------------
+1/15 Testing: Array.initializeAndRetrieve
+1/15 Test: Array.initializeAndRetrieve
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Array.initializeAndRetrieve" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Array.initializeAndRetrieve" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Array.initializeAndRetrieve
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Array
+[ RUN      ] Array.initializeAndRetrieve
+[       OK ] Array.initializeAndRetrieve (0 ms)
+[----------] 1 test from Array (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Array.initializeAndRetrieve" end time: Oct 22 02:52 CEST
+"Array.initializeAndRetrieve" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/15 Testing: Array.initializeAndRetrieveConst
+2/15 Test: Array.initializeAndRetrieveConst
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Array.initializeAndRetrieveConst" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Array.initializeAndRetrieveConst" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Array.initializeAndRetrieveConst
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Array
+[ RUN      ] Array.initializeAndRetrieveConst
+[       OK ] Array.initializeAndRetrieveConst (0 ms)
+[----------] 1 test from Array (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Array.initializeAndRetrieveConst" end time: Oct 22 02:52 CEST
+"Array.initializeAndRetrieveConst" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/15 Testing: Array.write
+3/15 Test: Array.write
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Array.write" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Array.write" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Array.write
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Array
+[ RUN      ] Array.write
+[       OK ] Array.write (0 ms)
+[----------] 1 test from Array (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Array.write" end time: Oct 22 02:52 CEST
+"Array.write" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/15 Testing: Array.rangeFor
+4/15 Test: Array.rangeFor
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Array.rangeFor" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Array.rangeFor" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Array.rangeFor
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Array
+[ RUN      ] Array.rangeFor
+[       OK ] Array.rangeFor (0 ms)
+[----------] 1 test from Array (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Array.rangeFor" end time: Oct 22 02:52 CEST
+"Array.rangeFor" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/15 Testing: Array.rangeForConst
+5/15 Test: Array.rangeForConst
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Array.rangeForConst" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Array.rangeForConst" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Array.rangeForConst
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Array
+[ RUN      ] Array.rangeForConst
+[       OK ] Array.rangeForConst (0 ms)
+[----------] 1 test from Array (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Array.rangeForConst" end time: Oct 22 02:52 CEST
+"Array.rangeForConst" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/15 Testing: Array.equality
+6/15 Test: Array.equality
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Array.equality" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Array.equality" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Array.equality
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Array
+[ RUN      ] Array.equality
+[       OK ] Array.equality (0 ms)
+[----------] 1 test from Array (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Array.equality" end time: Oct 22 02:52 CEST
+"Array.equality" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/15 Testing: generateArray.simple
+7/15 Test: generateArray.simple
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=generateArray.simple" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"generateArray.simple" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = generateArray.simple
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from generateArray
+[ RUN      ] generateArray.simple
+[       OK ] generateArray.simple (0 ms)
+[----------] 1 test from generateArray (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (1 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"generateArray.simple" end time: Oct 22 02:52 CEST
+"generateArray.simple" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/15 Testing: DoPri.euler
+8/15 Test: DoPri.euler
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=DoPri.euler" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"DoPri.euler" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = DoPri.euler
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from DoPri
+[ RUN      ] DoPri.euler
+e = 2.7182818284590455
+[       OK ] DoPri.euler (1 ms)
+[----------] 1 test from DoPri (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (1 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"DoPri.euler" end time: Oct 22 02:52 CEST
+"DoPri.euler" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/15 Testing: Matrix.equals
+9/15 Test: Matrix.equals
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Matrix.equals" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Matrix.equals" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Matrix.equals
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Matrix
+[ RUN      ] Matrix.equals
+[       OK ] Matrix.equals (0 ms)
+[----------] 1 test from Matrix (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (1 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Matrix.equals" end time: Oct 22 02:52 CEST
+"Matrix.equals" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/15 Testing: Matrix.notEquals
+10/15 Test: Matrix.notEquals
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Matrix.notEquals" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Matrix.notEquals" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Matrix.notEquals
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Matrix
+[ RUN      ] Matrix.notEquals
+[       OK ] Matrix.notEquals (0 ms)
+[----------] 1 test from Matrix (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Matrix.notEquals" end time: Oct 22 02:52 CEST
+"Matrix.notEquals" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/15 Testing: Matrix.multiply
+11/15 Test: Matrix.multiply
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Matrix.multiply" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Matrix.multiply" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Matrix.multiply
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Matrix
+[ RUN      ] Matrix.multiply
+[       OK ] Matrix.multiply (0 ms)
+[----------] 1 test from Matrix (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Matrix.multiply" end time: Oct 22 02:52 CEST
+"Matrix.multiply" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/15 Testing: Matrix.scalarMultiply
+12/15 Test: Matrix.scalarMultiply
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Matrix.scalarMultiply" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Matrix.scalarMultiply" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Matrix.scalarMultiply
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Matrix
+[ RUN      ] Matrix.scalarMultiply
+[       OK ] Matrix.scalarMultiply (0 ms)
+[----------] 1 test from Matrix (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Matrix.scalarMultiply" end time: Oct 22 02:52 CEST
+"Matrix.scalarMultiply" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/15 Testing: Matrix.diag
+13/15 Test: Matrix.diag
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Matrix.diag" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Matrix.diag" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Matrix.diag
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Matrix
+[ RUN      ] Matrix.diag
+[       OK ] Matrix.diag (0 ms)
+[----------] 1 test from Matrix (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Matrix.diag" end time: Oct 22 02:52 CEST
+"Matrix.diag" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/15 Testing: Matrix.add
+14/15 Test: Matrix.add
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Matrix.add" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Matrix.add" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Matrix.add
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Matrix
+[ RUN      ] Matrix.add
+[       OK ] Matrix.add (0 ms)
+[----------] 1 test from Matrix (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Matrix.add" end time: Oct 22 02:52 CEST
+"Matrix.add" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/15 Testing: Matrix.subtract
+15/15 Test: Matrix.subtract
+Command: "/home/pieter/Random/Cpp/EAGLE/build/bin/tests" "--gtest_filter=Matrix.subtract" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/Random/Cpp/EAGLE/build
+"Matrix.subtract" start time: Oct 22 02:52 CEST
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Matrix.subtract
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Matrix
+[ RUN      ] Matrix.subtract
+[       OK ] Matrix.subtract (0 ms)
+[----------] 1 test from Matrix (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Matrix.subtract" end time: Oct 22 02:52 CEST
+"Matrix.subtract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 22 02:52 CEST
