@@ -3,6 +3,8 @@
 #include <utility>  // pair
 #include <vector>   // vector
 
+#pragma once
+
 namespace DormandPrinceConstants {
 
 constexpr double a21 = 1.0 / 5.0;
@@ -50,8 +52,7 @@ constexpr double b7p = 1.0 / 40.0;
 
 }  // namespace DormandPrinceConstants
 
-template <class T>
-double norm(const T &x) {
+double norm(double x) {
     return fabs(x);
 }
 
