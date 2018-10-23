@@ -26,6 +26,7 @@ TEST(DoPri, euler) {
 TEST(DoPri, eulerVector) {
     using Type = ColVector<double, 3>;
     auto func  = [](double t, Type x) {
+        (void) t;
         return x;
     };  // x'(t) = x(t) → x(t) = e^t
     double t0      = 0;

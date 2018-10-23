@@ -153,6 +153,20 @@ std::ostream &operator<<(std::ostream &os, const Matrix<T, R, C> &matrix) {
 
 // -----------------------------------------------------------------------------
 
+/**
+ * @brief   Calculates u × v, where u, v ⊆ ℝ³.
+ */
+template <class T>
+ColVector<T, 3> cross(const ColVector<T, 3> &u, const ColVector<T, 3> &v) {
+    return {{
+        {u[1][0] * v[2][0] - u[2][0] * v[1][0]},
+        {u[2][0] * v[0][0] - u[0][0] * v[2][0]},
+        {u[0][0] * v[1][0] - u[1][0] * v[0][0]},
+    }};
+}
+
+// -----------------------------------------------------------------------------
+
 template <class T, size_t R, size_t C, size_t RR_sz, size_t CC_sz,
           size_t RR_offset, size_t CC_offset>
 struct MatrixAssignmentHelper {
@@ -171,5 +185,22 @@ template <size_t Rstart, size_t Rend, size_t Cstart, size_t Cend, class T,
 inline MatrixAssignmentHelper<T, R, C, Rend - Rstart, Cend - Cstart, Rstart,
                               Cstart>
 assignBlock(Matrix<T, R, C> &matrix) {
+    static_assert(Rstart < R && Rend <= R, "Error: Row indices out of bounds");
+    static_assert(Cstart < C && Cend <= C,
+                  "Error: Column indices out of bounds");
     return {matrix};
+}
+
+template <size_t Rstart, size_t Rend, size_t Cstart, size_t Cend, class T,
+          size_t R, size_t C>
+inline Matrix<T, Rend - Rstart, Cend - Cstart>
+getBlock(const Matrix<T, R, C> &matrix) {
+    static_assert(Rstart < R && Rend <= R, "Error: Row indices out of bounds");
+    static_assert(Cstart < C && Cend <= C,
+                  "Error: Column indices out of bounds");
+    Matrix<T, Rend - Rstart, Cend - Cstart> result = {};
+    for (size_t r = 0; r < Rend - Rstart; ++r)
+        for (size_t c = 0; c < Cend - Cstart; ++c)
+            result[r][c] = matrix[r + Rstart][c + Cstart];
+    return result;
 }

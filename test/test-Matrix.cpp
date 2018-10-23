@@ -1,9 +1,9 @@
 #include <Matrix.hpp>
 #include <gtest/gtest.h>
 
+using Matrices::T;
 using std::cout;
 using std::endl;
-using Matrices::T;
 
 TEST(Matrix, equals) {
     Matrix<int, 3, 2> a = {{
@@ -158,7 +158,6 @@ TEST(Matrix, assignBlock) {
         {101, 102},
         {103, 104},
     }};
-    ;
     Matrix<int, 4, 5> expected = {{
         {11, 12, 13, 14, 15},
         {21, 22, 101, 102, 25},
@@ -166,4 +165,19 @@ TEST(Matrix, assignBlock) {
         {41, 42, 43, 44, 45},
     }};
     ASSERT_EQ(m, expected);
+}
+
+TEST(Matrix, getBlock) {
+    Matrix<int, 4, 5> m        = {{
+        {11, 12, 13, 14, 15},
+        {21, 22, 23, 24, 25},
+        {31, 32, 33, 34, 35},
+        {41, 42, 43, 44, 45},
+    }};
+    Matrix<int, 2, 2> result   = getBlock<1, 3, 2, 4>(m);
+    Matrix<int, 2, 2> expected = {{
+        {23, 24},
+        {33, 34},
+    }};
+    ASSERT_EQ(result, expected);
 }

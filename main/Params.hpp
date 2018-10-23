@@ -1,6 +1,8 @@
 #include "Matrix.hpp"
 #include <cmath>
 
+#pragma once
+
 struct Params {
     // QUAT_PARAMS returns the nomimal parameters of the quadcopter in a
     // structure.
@@ -58,17 +60,17 @@ struct Params {
     double g    = 9.81;   // m/s2 .... gravitational acceleration
 
     // propellers
-    double ct = 0.1;              // - ....... thrust coefficient
-    double cp = 0.04;             // - ....... power coefficient
-    double mp = 20 / 1000;        // kg ...... propeller mass (20g)
-    double Dp = 11 * 2.54 / 100;  // m ....... propeller diameter (11")
+    double ct = 0.1;                // - ....... thrust coefficient
+    double cp = 0.04;               // - ....... power coefficient
+    double mp = 20.0 / 1000;        // kg ...... propeller mass (20g)
+    double Dp = 11.0 * 2.54 / 100;  // m ....... propeller diameter (11")
 
     // motors
-    double Kv    = 700;         // rpm/V ... motor speed constant
-    double tau_m = 35 / 1000;   // s ....... motor's time constant (35ms)
-    double mr    = 42 / 1000;   // kg ...... rotor mass (moving parts) (42g)
-    double mm    = 102 / 1000;  // kg ...... motor total mass (102g)
-    double rr    = 1.9 / 100;   // m ....... rotor radius (1.9cm)
+    double Kv    = 700.0;         // rpm/V ... motor speed constant
+    double tau_m = 35.0 / 1000;   // s ....... motor's time constant (35ms)
+    double mr    = 42.0 / 1000;   // kg ...... rotor mass (moving parts) (42g)
+    double mm    = 102.0 / 1000;  // kg ...... motor total mass (102g)
+    double rr    = 1.9 / 100;     // m ....... rotor radius (1.9cm)
 
     // Moments of intertia
     double Ixx = 0.0321;  // kgm2 .... Ixx moment of inertia
@@ -77,28 +79,43 @@ struct Params {
 
     // ---- Computed Quantities ----
 
-    double nh =  // rps ... hovering n
-        sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
+    double nh;  // rps ... hovering n
+
+    Params() { compute(); }
+
+    void compute() {
+        nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
+
+        Ip = mp * pow(Dp, 2) / 12;
+        Im = mr * pow(rr, 2);
+        I  = diag<double, 3>({Ixx, Iyy, Izz});
+
+        k1 = Kv * (Vmax - Vmin) / 60;
+        k2 = 1.0 / tau_m;
+        k3 = diag<double, 3>(
+            {2.0 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Ixx,
+             2.0 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Iyy,
+             2.0 * cp * rho * nh * pow(Dp, 5) * Nm / (2.0 * M_PI * Izz)});
+        k4 = diag<double, 3>({0, 0, 2.0 * M_PI * Nm * (Im + Ip) / Izz});
+
+        gamma_n = k3 - k2 * k4;
+        gamma_u = diag<double, 3>({0, 0, k4[2][2] * k2 * k1});
+    }
 
     // Very rough estimation of moments of inertia
-    double Ip = mp * pow(Dp, 2) / 12;  // kgm2 .... propeller moment of inertia
-    double Im = mr * pow(rr, 2);       // kgm2 .... rotor moment of inertia
-    Matrix<double, 3, 3> I =
-        diag<double, 3>({Ixx, Iyy, Izz});  // kgm3 .... Inertia matrix
+    double Ip;               // kgm2 .... propeller moment of inertia
+    double Im;               // kgm2 .... rotor moment of inertia
+    Matrix<double, 3, 3> I;  // kgm3 .... Inertia matrix
 
     // model constants
-    double k1               = Kv * (Vmax - Vmin) / 60;
-    double k2               = 1 / tau_m;
-    Matrix<double, 3, 3> k3 = diag<double, 3>(
-        {2 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Ixx,
-         2 * ct *rho *nh *pow(Dp, 4) * Nm *L / sqrt(2) / Iyy,
-         2 * cp *rho *nh *pow(Dp, 5) * Nm / (2 * M_PI * Izz)});
-    Matrix<double, 3, 3> k4 =
-        diag<double, 3>({0, 0, 2 * M_PI *Nm *(Im + Ip) / Izz});
+    double k1;
+    double k2;
+    Matrix<double, 3, 3> k3;
+    Matrix<double, 3, 3> k4;
 
     // Matrix Gamma_n
-    Matrix<double, 3, 3> gamma_n = k3 - k2 * k4;
+    Matrix<double, 3, 3> gamma_n;
 
     // Matrix Gamma_u
-    Matrix<double, 3, 3> gamma_u = diag<double, 3>({0, 0, k4[3][3] * k2 *k1});
+    Matrix<double, 3, 3> gamma_u;
 };

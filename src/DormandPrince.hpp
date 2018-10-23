@@ -1,7 +1,10 @@
 #include <cmath>    // pow
 #include <cstddef>  // size_t
+#include <limits>   // epsilon
 #include <utility>  // pair
 #include <vector>   // vector
+
+#include <iostream>  // TODO
 
 #pragma once
 
@@ -52,11 +55,9 @@ constexpr double b7p = 1.0 / 40.0;
 
 }  // namespace DormandPrinceConstants
 
-double norm(double x) {
-    return fabs(x);
-}
+double norm(double x) { return fabs(x); }
 
-template <class T, class F>
+template <class F, class T>
 std::pair<std::vector<double>, std::vector<T>>
 dormandPrince(F f,             // function f(double t, T x)
               double t_start,  // initial value for independent variable
@@ -100,7 +101,14 @@ dormandPrince(F f,             // function f(double t, T x)
 
         // adaptive step size, but conservative
         if (s < 1.0 || s >= 2)
-           h_new = s * h;
+            h_new = s * h;
+
+        double h_min = 1e-6; // TODO TODO
+
+        if (h_new < h_min) {
+            h_new = h_min;
+            t_new += h_min;
+        }
 
         if (error < epsilon) {
             t_new += h;
@@ -120,5 +128,5 @@ dormandPrince(F f,             // function f(double t, T x)
         t = t_new;
         x = x_new;
     }
-    return {};  // error
+    return {t_v, x_v};  // TODO
 }

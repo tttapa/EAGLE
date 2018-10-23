@@ -42,7 +42,7 @@ include(GoogleTest)
 enable_testing()
 
 # -Wsuggest-override
-add_definitions("-g -O0 -Wall -Wextra -fdiagnostics-show-option")
+add_definitions("-g -O0 -Wall -Wextra -Wno-missing-braces -fdiagnostics-show-option -fextended-identifiers -finput-charset=UTF-8")
 
 #include Google Test
 include_directories(${CMAKE_BINARY_DIR}/googletest/googletest-src/googletest/include)
@@ -54,6 +54,12 @@ include_directories(${CMAKE_BINARY_DIR}/googletest/googletest-src/googlemock/inc
 include_directories("../src")
 file(GLOB_RECURSE SOURCES "../src/*.cpp")
 add_library(source STATIC ${SOURCES})
+
+# Main source files
+include_directories("../main")
+file(GLOB_RECURSE MAIN "../main/*.cpp")
+add_executable(main ${MAIN})
+target_link_libraries(main source)
 
 # Test executable compilation and linking
 file(GLOB_RECURSE TESTS "../test/*.cpp")

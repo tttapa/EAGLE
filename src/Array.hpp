@@ -22,5 +22,31 @@ struct Array {
         return true;
     }
 
+    Array<T, N> operator*(double rhs) const {
+        Array<T, N> result = *this;
+        result *= rhs;
+        return result;
+    }
+
+    Array<T, N> &operator*=(double rhs) {
+        for (auto &el : *this)
+            el *= rhs;
+        return *this;
+    }
+
+    Array<T, N> operator+(const Array<T, N> &rhs) const {
+        Array<T, N> result = *this;
+        result += rhs;
+        return result;
+    }
+
+    Array<T, N> &operator+=(const Array<T, N> &rhs) {
+        for (size_t i = 0; i < N; ++i)
+            (*this)[i] += rhs[i];
+        return *this;
+    }
+
     bool operator!=(const Array<T, N> &rhs) const { return !(*this == rhs); }
+
+    static constexpr size_t length = N;
 };
