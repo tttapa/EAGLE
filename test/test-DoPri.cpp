@@ -7,20 +7,22 @@ TEST(DoPri, euler) {
     auto func = [](double t, double x) {
         return x + 0 * t;
     };  // x'(t) = x(t) → x(t) = e^t
-    double t0      = 0;
-    double t1      = 1;
-    double epsilon = 1e-12;
-    double h_start = 1e-2;
-    double x_start = 1;
-    size_t maxiter = 1e6;
+    SimulationOptions opt = {};
+    opt.t_start           = 0;
+    opt.t_end             = 1;
+    opt.epsilon           = 1e-12;
+    opt.h_start           = 1e-2;
+    opt.h_min             = 1e-6;
+    opt.maxiter           = 1e6;
 
-    auto result =
-        dormandPrince(func, t0, t1, epsilon, h_start, x_start, maxiter);
+    double x_start = 1;
+
+    auto result = dormandPrince(func, x_start, opt);
 
     std::cout.precision(std::numeric_limits<double>::max_digits10);
-    std::cout << "e = " << result.second.back() << std::endl;
+    std::cout << "e = " << result.solution.back() << std::endl;
 
-    ASSERT_LE(fabs((result.second.back() - M_E)), epsilon);
+    ASSERT_LE(fabs((result.solution.back() - M_E)), opt.epsilon);
 }
 
 TEST(DoPri, eulerVector) {
@@ -29,24 +31,27 @@ TEST(DoPri, eulerVector) {
         (void) t;
         return x;
     };  // x'(t) = x(t) → x(t) = e^t
-    double t0      = 0;
-    double t1      = 1;
-    double epsilon = 1e-12;
-    double h_start = 1e-2;
-    Type x_start   = {{
+
+    Type x_start = {{
         {1},
         {1},
         {1},
     }};
-    size_t maxiter = 1e6;
 
-    auto result =
-        dormandPrince(func, t0, t1, epsilon, h_start, x_start, maxiter);
+    SimulationOptions opt = {};
+    opt.t_start           = 0;
+    opt.t_end             = 1;
+    opt.epsilon           = 1e-12;
+    opt.h_start           = 1e-2;
+    opt.h_min             = 1e-6;
+    opt.maxiter           = 1e6;
+
+    auto result = dormandPrince(func, x_start, opt);
 
     std::cout.precision(std::numeric_limits<double>::max_digits10);
-    std::cout << "e = " << result.second.back()[0][0] << std::endl;
+    std::cout << "e = " << result.solution.back()[0][0] << std::endl;
 
-    double error = norm(result.second.back() - M_E * x_start);
+    double error = norm(result.solution.back() - M_E * x_start);
 
-    ASSERT_LE(error, epsilon);
+    ASSERT_LE(error, opt.epsilon);
 }

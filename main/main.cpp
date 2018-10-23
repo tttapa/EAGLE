@@ -44,7 +44,7 @@ struct TestInputFunction : public NonLinearFullModel::InputFunction {
         return {{
             {0},
             {0},
-            {0.5 * (t > 2)},
+            {-0.1 * (t < 2) + 0.2 * (t < 3) - 0.1 * (t < 5)},
         }};
     }
 };
@@ -76,9 +76,24 @@ int main(int argc, char const *argv[]) {
         {0},
         {0.1},
     }};
+
+    SimulationOptions opt = {};
+    opt.t_start           = 0;
+    opt.t_end             = 20;
+    opt.epsilon           = 1e-4;
+    opt.h_start           = 1e-2;
+    opt.h_min             = 1e-6;
+    opt.maxiter           = 1e10;
+
     NonLinearFullModel::SimulationResult result =
-        nonlinfull.simulate(u, 0, 10, 1e-3, 1e-2, x0, 1e4);
+        nonlinfull.simulate(u, x0, opt);
+
+    if (result.resultCode & result.MAXIMUM_ITERATIONS_EXCEEDED)
+        std::cerr << "Error: maximum number of iterations exceeded" << endl;
+    if (result.resultCode & result.MINIMUM_STEP_SIZE_REACHED)
+        std::cerr << "Error: minimum step size reached" << endl;
+
     printCSV(result);
     cout << endl;
-    return 0;
+    return result.resultCode;
 }

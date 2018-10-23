@@ -5,12 +5,6 @@
 #include <Matrix.hpp>
 #include <vector>
 
-template <class V>
-struct SimulationResultX {
-    std::vector<double> time;
-    std::vector<V> solution;
-};
-
 template <class U>
 class InputFunctionU {
   public:
@@ -26,15 +20,10 @@ class Model {
     typedef SimulationResultX<VecX_t> SimulationResult;
 
     virtual VecX_t operator()(const VecX_t &x, const VecU_t &u) = 0;
-    virtual SimulationResult
-    simulate(InputFunction &u,
-             double t_start,  // initial value for independent variable
-             double t_end,    // final value for independent variable
-             double epsilon,  // tolerance
-             double h_start,  // initial step size
-             VecX_t x_start,  // initial state
-             size_t maxiter   // maximum number of iterations
-             ) = 0;
+    virtual SimulationResult simulate(InputFunction &u,  // input to the model
+                                      VecX_t x_start,    // initial state
+                                      SimulationOptions opt  // options
+                                      )                         = 0;
 };
 
 template <class X>
@@ -51,19 +40,12 @@ class ContinuousModel : public Model<T, Nx, Nu> {
     using InputFunction    = typename Model<T, Nx, Nu>::InputFunction;
     using SimulationResult = typename Model<T, Nx, Nu>::SimulationResult;
 
-    SimulationResult
-    simulate(InputFunction &u,
-             double t_start,  // initial value for independent variable
-             double t_end,    // final value for independent variable
-             double epsilon,  // tolerance
-             double h_start,  // initial step size
-             VecX_t x_start,  // initial state
-             size_t maxiter   // maximum number of iterations
-             ) override {
+    SimulationResult simulate(InputFunction &u,      // input to the model
+                              VecX_t x_start,        // initial state
+                              SimulationOptions opt  // options
+                              ) override {
         SimulationFunction f = {*this, u};
-        auto result = dormandPrince(f, t_start, t_end, epsilon, h_start,
-                                    x_start, maxiter);
-        return {result.first, result.second};
+        return dormandPrince(f, x_start, opt);
     }
 
   private:
