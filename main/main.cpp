@@ -1,10 +1,7 @@
-#include "Model.hpp"
+#include "NonLinearFullModel.hpp"
 #include "Params.hpp"
 #include "PrintCSV.hpp"
-#include <Matrix/LeastSquares.hpp>
-#include <ODE/DormandPrince.hpp>
 #include <ODE/ODEEval.hpp>
-#include <Quaternions/Quaternion.hpp>
 #include <iostream>
 
 using namespace std;
@@ -13,37 +10,6 @@ using Matrices::T;
 string outputFile = (string) getenv("HOME") + "/Random/data.csv";
 
 constexpr double Ts = 1.0 / 30;
-
-class NonLinearFullModel : public ContinuousModel<double, 10, 3> {
-  public:
-    using VecOmega_t = ColVector<double, 3>;
-    using VecN_t     = ColVector<double, 3>;
-
-    NonLinearFullModel(const Params &p) : p(p) {}
-
-    VecX_t operator()(const VecX_t &x, const VecU_t &u) override {
-        Quaternion q     = getBlock<0, 4, 0, 1>(x);
-        VecOmega_t omega = getBlock<4, 7, 0, 1>(x);
-        VecN_t n         = getBlock<7, 10, 0, 1>(x);
-
-        Quaternion q_omega               = {};
-        assignBlock<1, 4, 0, 1>(q_omega) = omega;
-
-        Quaternion q_dot = 0.5 * quatmultiply(q, q_omega);
-        VecOmega_t omega_dot =
-            p.gamma_n * n + p.gamma_u * u -
-            solveLeastSquares(p.I, cross(omega, p.I * omega));
-        VecN_t n_dot = p.k2 * (p.k1 * u - n);
-
-        VecX_t x_dot;
-        assignBlock<0, 4, 0, 1>(x_dot)  = q_dot;
-        assignBlock<4, 7, 0, 1>(x_dot)  = omega_dot;
-        assignBlock<7, 10, 0, 1>(x_dot) = n_dot;
-
-        return x_dot;
-    }
-    const Params p;
-};
 
 struct TestInputFunction : public NonLinearFullModel::InputFunction {
     NonLinearFullModel::VecU_t operator()(double t) override {
@@ -91,5 +57,6 @@ int main(int argc, char const *argv[]) {
 
     auto sampled = sampleODEResult(result, opt.t_start, Ts, opt.t_end);
     printCSV(outputFile, opt.t_start, Ts, sampled);
+
     return 0;
 }

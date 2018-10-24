@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "Model.hpp"
+#include <ODE/ODEResult.hpp>
 
 template <class T, size_t N>
 void printCSV(std::ostream &out, const ODEResultX<ColVector<T, N>> &result) {

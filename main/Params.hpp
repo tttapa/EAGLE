@@ -1,3 +1,4 @@
+#include <Matrix/LeastSquares.hpp>
 #include <Matrix/Matrix.hpp>
 #include <cmath>
 
@@ -81,31 +82,11 @@ struct Params {
 
     double nh;  // rps ... hovering n
 
-    Params() { compute(); }
-
-    void compute() {
-        nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
-
-        Ip = mp * pow(Dp, 2) / 12;
-        Im = mr * pow(rr, 2);
-        I  = diag<double, 3>({Ixx, Iyy, Izz});
-
-        k1 = Kv * (Vmax - Vmin) / 60;
-        k2 = 1.0 / tau_m;
-        k3 = diag<double, 3>(
-            {2.0 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Ixx,
-             2.0 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Iyy,
-             2.0 * cp * rho * nh * pow(Dp, 5) * Nm / (2.0 * M_PI * Izz)});
-        k4 = diag<double, 3>({0, 0, 2.0 * M_PI * Nm * (Im + Ip) / Izz});
-
-        gamma_n = k3 - k2 * k4;
-        gamma_u = diag<double, 3>({0, 0, k4[2][2] * k2 * k1});
-    }
-
     // Very rough estimation of moments of inertia
-    double Ip;               // kgm2 .... propeller moment of inertia
-    double Im;               // kgm2 .... rotor moment of inertia
-    Matrix<double, 3, 3> I;  // kgm3 .... Inertia matrix
+    double Ip;                   // kgm2 ..... propeller moment of inertia
+    double Im;                   // kgm2 ..... rotor moment of inertia
+    Matrix<double, 3, 3> I;      // kgm3 ..... Inertia matrix
+    Matrix<double, 3, 3> I_inv;  // 1/kgm3 ... Inverse of inertia matrix
 
     // model constants
     double k1;
@@ -118,4 +99,26 @@ struct Params {
 
     // Matrix Gamma_u
     Matrix<double, 3, 3> gamma_u;
+
+    Params() { compute(); }
+
+    void compute() {
+        nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
+
+        Ip    = mp * pow(Dp, 2) / 12;
+        Im    = mr * pow(rr, 2);
+        I     = diag<double, 3>({Ixx, Iyy, Izz});
+        I_inv = solveLeastSquares(I, eye<double, 3>());
+
+        k1 = Kv * (Vmax - Vmin) / 60;
+        k2 = 1.0 / tau_m;
+        k3 = diag<double, 3>(
+            {2.0 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Ixx,
+             2.0 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Iyy,
+             2.0 * cp * rho * nh * pow(Dp, 5) * Nm / (2.0 * M_PI * Izz)});
+        k4 = diag<double, 3>({0, 0, 2.0 * M_PI * Nm * (Im + Ip) / Izz});
+
+        gamma_n = k3 - k2 * k4;
+        gamma_u = diag<double, 3>({0, 0, k4[2][2] * k2 * k1});
+    }
 };
