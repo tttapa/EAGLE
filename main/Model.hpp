@@ -61,3 +61,28 @@ class ContinuousModel : public Model<T, Nx, Nu> {
         }
     };
 };
+
+template <class T, size_t Nx, size_t Nu, size_t Ny>
+class CTLTISystem : public ContinuousModel<T, Nx, Nu> {
+  public:
+    using VecX_t = typename Model<T, Nx, Nu>::VecX_t;
+    using VecU_t = typename Model<T, Nx, Nu>::VecU_t;
+    using VecY_t = ColVector<T, Ny>;
+
+    CTLTISystem(const Matrix<T, Nx, Nx> &A, const Matrix<T, Nx, Nu> &B,
+                const Matrix<T, Ny, Nx> &C, const Matrix<T, Ny, Nu> &D)
+        : A(A), B(B), C(C), D(D) {}
+
+    VecX_t operator()(const VecX_t &x, const VecU_t &u) override {
+        return A * x + B * u;
+    }
+
+    VecY_t getOutput(const VecX_t &x, const VecU_t &u) const override {
+        return C * x + D * u;
+    }
+
+    const Matrix<T, Nx, Nx> A;
+    const Matrix<T, Nx, Nu> B;
+    const Matrix<T, Ny, Nx> C;
+    const Matrix<T, Ny, Nu> D;
+};
