@@ -7,7 +7,7 @@ TEST(DoPri, euler) {
     auto func = [](double t, double x) {
         return x + 0 * t;
     };  // x'(t) = x(t) → x(t) = e^t
-    SimulationOptions opt = {};
+    AdaptiveODEOptions opt = {};
     opt.t_start           = 0;
     opt.t_end             = 1;
     opt.epsilon           = 1e-12;
@@ -23,6 +23,7 @@ TEST(DoPri, euler) {
     std::cout << "e = " << result.solution.back() << std::endl;
 
     ASSERT_LE(fabs((result.solution.back() - M_E)), opt.epsilon);
+    ASSERT_EQ(result.resultCode, ODEResultCodes::SUCCESS);
 }
 
 TEST(DoPri, eulerVector) {
@@ -38,7 +39,7 @@ TEST(DoPri, eulerVector) {
         {1},
     }};
 
-    SimulationOptions opt = {};
+    AdaptiveODEOptions opt = {};
     opt.t_start           = 0;
     opt.t_end             = 1;
     opt.epsilon           = 1e-12;
@@ -54,4 +55,5 @@ TEST(DoPri, eulerVector) {
     double error = norm(result.solution.back() - M_E * x_start);
 
     ASSERT_LE(error, opt.epsilon);
+    ASSERT_EQ(result.resultCode, ODEResultCodes::SUCCESS);
 }

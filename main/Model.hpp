@@ -3,7 +3,6 @@
 #include "Params.hpp"
 #include <DormandPrince.hpp>
 #include <Matrix.hpp>
-#include <vector>
 
 template <class U>
 class InputFunctionU {
@@ -17,12 +16,12 @@ class Model {
     typedef ColVector<T, Nx> VecX_t;
     typedef ColVector<T, Nu> VecU_t;
     typedef InputFunctionU<VecU_t> InputFunction;
-    typedef SimulationResultX<VecX_t> SimulationResult;
+    typedef ODEResultX<VecX_t> SimulationResult;
 
     virtual VecX_t operator()(const VecX_t &x, const VecU_t &u) = 0;
     virtual SimulationResult simulate(InputFunction &u,  // input to the model
                                       VecX_t x_start,    // initial state
-                                      SimulationOptions opt  // options
+                                      const AdaptiveODEOptions &opt  // options
                                       )                         = 0;
 };
 
@@ -40,9 +39,9 @@ class ContinuousModel : public Model<T, Nx, Nu> {
     using InputFunction    = typename Model<T, Nx, Nu>::InputFunction;
     using SimulationResult = typename Model<T, Nx, Nu>::SimulationResult;
 
-    SimulationResult simulate(InputFunction &u,      // input to the model
-                              VecX_t x_start,        // initial state
-                              SimulationOptions opt  // options
+    SimulationResult simulate(InputFunction &u,  // input to the model
+                              VecX_t x_start,    // initial state
+                              const AdaptiveODEOptions &opt  // options
                               ) override {
         SimulationFunction f = {*this, u};
         return dormandPrince(f, x_start, opt);

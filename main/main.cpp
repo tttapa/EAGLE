@@ -15,6 +15,7 @@ class NonLinearFullModel : public ContinuousModel<double, 10, 3> {
     using VecN_t     = ColVector<double, 3>;
 
     NonLinearFullModel(const Params &p) : p(p) {}
+
     VecX_t operator()(const VecX_t &x, const VecU_t &u) override {
         Quaternion q     = getBlock<0, 4, 0, 1>(x);
         VecOmega_t omega = getBlock<4, 7, 0, 1>(x);
@@ -60,40 +61,39 @@ void printCSV(const NonLinearFullModel::SimulationResult &result) {
 }
 
 int main(int argc, char const *argv[]) {
-    const Params p = {};
-    // cout << "I" << endl << p.I << endl;
-    // cout << "k3" << endl << p.k3 << endl;
-    // cout << "k4" << endl << p.k4 << endl;
-    // cout << "gamma_n" << endl << p.gamma_n << endl;
-    // cout << "gamma_u" << endl << p.gamma_u << endl;
-    // return 0;
+    const Params p                = {};
     NonLinearFullModel nonlinfull = p;
     TestInputFunction u           = {};
     NonLinearFullModel::VecX_t x0 = {{
-        {1},
-        {0},
-        {0},
-        {0},
-        {0.1},
+        {1},    // q0
+        {0},    // q1
+        {0},    // q2
+        {0},    // q3 ____
+        {0.1},  // ωx
+        {0},    // ωy
+        {0},    // ωz ____
+        {0},    // nx
+        {0},    // ny
+        {0},    // nz
     }};
 
-    SimulationOptions opt = {};
-    opt.t_start           = 0;
-    opt.t_end             = 20;
-    opt.epsilon           = 1e-4;
-    opt.h_start           = 1e-2;
-    opt.h_min             = 1e-6;
-    opt.maxiter           = 1e10;
+    AdaptiveODEOptions opt = {};
+    opt.t_start            = 0;
+    opt.t_end              = 10;
+    opt.epsilon            = 1e-4;
+    opt.h_start            = 1e-2;
+    opt.h_min              = 1e-6;
+    opt.maxiter            = 1e10;
 
     NonLinearFullModel::SimulationResult result =
         nonlinfull.simulate(u, x0, opt);
 
-    if (result.resultCode & result.MAXIMUM_ITERATIONS_EXCEEDED)
+    if (result.resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED)
         std::cerr << "Error: maximum number of iterations exceeded" << endl;
-    if (result.resultCode & result.MINIMUM_STEP_SIZE_REACHED)
+    if (result.resultCode & ODEResultCodes::MINIMUM_STEP_SIZE_REACHED)
         std::cerr << "Error: minimum step size reached" << endl;
 
     printCSV(result);
     cout << endl;
-    return result.resultCode;
+    return 0;
 }
