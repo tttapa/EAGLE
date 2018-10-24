@@ -61,3 +61,14 @@ TEST(Quaternion, quat2eul) {
     EulerAngles expected = e;
     ASSERT_TRUE(isAlmostEqual(result, expected, 1e-15));
 }
+
+// -------------------------------------------------------------------------- //
+
+TEST(ReducedQuaternion, convertAndBack) {
+    EulerAngles e       = {0.3, 0.7, 0.9};
+    Quaternion q        = eul2quat(e);
+    ReducedQuaternion r = quat2red(q);
+    Quaternion result   = red2quat(r);
+    Quaternion expected = q;
+    ASSERT_TRUE(isAlmostEqual(result, expected, 1e-15));
+}
