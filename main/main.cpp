@@ -1,12 +1,18 @@
 #include "Model.hpp"
 #include "Params.hpp"
+#include "PrintCSV.hpp"
 #include <Matrix/LeastSquares.hpp>
 #include <ODE/DormandPrince.hpp>
+#include <ODE/ODEEval.hpp>
 #include <Quaternions/Quaternion.hpp>
 #include <iostream>
 
 using namespace std;
 using Matrices::T;
+
+string outputFile = (string) getenv("HOME") + "/Random/data.csv";
+
+constexpr double Ts = 1.0 / 30;
 
 class NonLinearFullModel : public ContinuousModel<double, 10, 3> {
   public:
@@ -36,7 +42,7 @@ class NonLinearFullModel : public ContinuousModel<double, 10, 3> {
 
         return x_dot;
     }
-    Params p;
+    const Params p;
 };
 
 struct TestInputFunction : public NonLinearFullModel::InputFunction {
@@ -49,17 +55,8 @@ struct TestInputFunction : public NonLinearFullModel::InputFunction {
     }
 };
 
-void printCSV(const NonLinearFullModel::SimulationResult &result) {
-    for (size_t i = 0; i < result.time.size(); ++i) {
-        cout << result.time[i] << ',';
-        for (size_t j = 0; j < result.solution[0].length; ++j) {
-            cout << result.solution[i][j][0]
-                 << (j == result.solution[0].length - 1 ? "\r\n" : ",");
-        }
-    }
-}
-
 int main(int argc, char const *argv[]) {
+    (void) argc, (void) argv;
     const Params p                = {};
     NonLinearFullModel nonlinfull = p;
     TestInputFunction u           = {};
@@ -78,8 +75,8 @@ int main(int argc, char const *argv[]) {
 
     AdaptiveODEOptions opt = {};
     opt.t_start            = 0;
-    opt.t_end              = 10;
-    opt.epsilon            = 1e-7;
+    opt.t_end              = 20;
+    opt.epsilon            = 1e-6;
     opt.h_start            = 1e-2;
     opt.h_min              = 1e-6;
     opt.maxiter            = 1e6;
@@ -92,7 +89,7 @@ int main(int argc, char const *argv[]) {
     if (result.resultCode & ODEResultCodes::MINIMUM_STEP_SIZE_REACHED)
         std::cerr << "Error: minimum step size reached" << endl;
 
-    printCSV(result);
-    cout << endl;
+    auto sampled = sampleODEResult(result, opt.t_start, Ts, opt.t_end);
+    printCSV(outputFile, opt.t_start, Ts, sampled);
     return 0;
 }
