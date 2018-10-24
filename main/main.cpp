@@ -1,9 +1,8 @@
 #include "Model.hpp"
 #include "Params.hpp"
-#include <DormandPrince.hpp>
-#include <LeastSquares.hpp>
-#include <Matrix.hpp>
-#include <Quaternion.hpp>
+#include <Matrix/LeastSquares.hpp>
+#include <ODE/DormandPrince.hpp>
+#include <Quaternions/Quaternion.hpp>
 #include <iostream>
 
 using namespace std;
@@ -80,10 +79,10 @@ int main(int argc, char const *argv[]) {
     AdaptiveODEOptions opt = {};
     opt.t_start            = 0;
     opt.t_end              = 10;
-    opt.epsilon            = 1e-4;
+    opt.epsilon            = 1e-7;
     opt.h_start            = 1e-2;
     opt.h_min              = 1e-6;
-    opt.maxiter            = 1e10;
+    opt.maxiter            = 1e6;
 
     NonLinearFullModel::SimulationResult result =
         nonlinfull.simulate(u, x0, opt);

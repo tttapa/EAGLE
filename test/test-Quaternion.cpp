@@ -1,5 +1,5 @@
-#include <AlmostEqual.hpp>
-#include <Quaternion.hpp>
+#include <Util/AlmostEqual.hpp>
+#include <Quaternions/ReducedQuaternion.hpp>
 #include <gtest/gtest.h>
 
 TEST(Quaternion, quatmultiply) {

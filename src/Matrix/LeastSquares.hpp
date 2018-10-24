@@ -13,6 +13,7 @@ Matrix<T, N, P> solveLeastSquares(const Matrix<T, M, N> &a,
     auto &r = qr.R;
     auto qtb = qr.applyTranspose(b);
     Matrix<T, N, P> x = {};
+    // Back substitution
     for (size_t p = 0; p < P; ++p) {
         for (size_t n = N; n-- > 0;) {
             auto sum = qtb[n][p];

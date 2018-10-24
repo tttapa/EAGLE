@@ -1,4 +1,4 @@
-#include "Matrix.hpp"
+#include <Matrix/Matrix.hpp>
 #include <cmath>
 
 #pragma once

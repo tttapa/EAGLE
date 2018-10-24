@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Matrix.hpp"
+#include <Matrix/Matrix.hpp>
 
 using Quaternion = ColVector<double, 4>;
 
@@ -62,21 +62,4 @@ inline EulerAngles quat2eul(const Quaternion &q) {
         atan2(2.0 * (q0 * q3 + q1 * q2), 1.0 - 2.0 * (q2 * q2 + q3 * q3));
 
     return {psi, theta, phi};
-}
-
-using ReducedQuaternion = ColVector<double, 3>;
-
-// Reduced quaternion to full quaternion
-inline Quaternion red2quat(const ReducedQuaternion &r) {
-    return {{
-        {sqrt(1 - r[0][0] * r[0][0] - r[1][0] * r[1][0] - r[2][0] * r[2][0])},
-        {r[0][0]},
-        {r[1][0]},
-        {r[2][0]},
-    }};
-}
-
-// Quaternion to reduced quaternion
-inline ReducedQuaternion quat2red(const Quaternion &q) {
-    return getBlock<1, 4, 0, 1>(q);
 }

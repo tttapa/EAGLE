@@ -1,5 +1,5 @@
-#include <AlmostEqual.hpp>
-#include <LeastSquares.hpp>
+#include <Util/AlmostEqual.hpp>
+#include <Matrix/LeastSquares.hpp>
 #include <gtest/gtest.h>
 
 using Matrices::T;

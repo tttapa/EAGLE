@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Array.hpp>
+#include <Matrix/Array.hpp>
 #include <cmath>  // fabs
 
 inline bool isAlmostEqual(double valuelhs, double valuerhs, double epsilon) {

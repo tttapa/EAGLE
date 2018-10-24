@@ -1,5 +1,5 @@
-#include <DormandPrince.hpp>
-#include <Matrix.hpp>
+#include <Matrix/Matrix.hpp>
+#include <ODE/DormandPrince.hpp>
 #include <gtest/gtest.h>
 #include <limits>
 
@@ -8,12 +8,12 @@ TEST(DoPri, euler) {
         return x + 0 * t;
     };  // x'(t) = x(t) → x(t) = e^t
     AdaptiveODEOptions opt = {};
-    opt.t_start           = 0;
-    opt.t_end             = 1;
-    opt.epsilon           = 1e-12;
-    opt.h_start           = 1e-2;
-    opt.h_min             = 1e-6;
-    opt.maxiter           = 1e6;
+    opt.t_start            = 0;
+    opt.t_end              = 1;
+    opt.epsilon            = 1e-12;
+    opt.h_start            = 1e-2;
+    opt.h_min              = 1e-6;
+    opt.maxiter            = 1e6;
 
     double x_start = 1;
 
@@ -40,12 +40,12 @@ TEST(DoPri, eulerVector) {
     }};
 
     AdaptiveODEOptions opt = {};
-    opt.t_start           = 0;
-    opt.t_end             = 1;
-    opt.epsilon           = 1e-12;
-    opt.h_start           = 1e-2;
-    opt.h_min             = 1e-6;
-    opt.maxiter           = 1e6;
+    opt.t_start            = 0;
+    opt.t_end              = 1;
+    opt.epsilon            = 1e-12;
+    opt.h_start            = 1e-2;
+    opt.h_min              = 1e-6;
+    opt.maxiter            = 1e6;
 
     auto result = dormandPrince(func, x_start, opt);
 

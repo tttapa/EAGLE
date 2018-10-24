@@ -1,4 +1,4 @@
-#include <ArrayHelpers.hpp>
+#include <Matrix/ArrayHelpers.hpp>
 #include <gtest/gtest.h>
 
 TEST(Array, initializeAndRetrieve) {

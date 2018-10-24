@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Params.hpp"
-#include <DormandPrince.hpp>
-#include <Matrix.hpp>
+#include <ODE/DormandPrince.hpp>
 
 template <class U>
 class InputFunctionU {

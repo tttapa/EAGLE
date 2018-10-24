@@ -1,5 +1,5 @@
-#include <AlmostEqual.hpp>
-#include <HouseholderQR.hpp>
+#include <Util/AlmostEqual.hpp>
+#include <Matrix/HouseholderQR.hpp>
 #include <gtest/gtest.h>
 
 using Matrices::T;
