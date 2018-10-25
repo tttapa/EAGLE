@@ -5,8 +5,18 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "Make & Test & Main",
-            "command": "cd build && make -j$(nproc) && make test && ./bin/main",
+            "label": "Make & Test",
+            "command": "cd build && make -j$(nproc) tests && make test",
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Make & Main",
+            "command": "cd build && make -j$(nproc) main && ./bin/main",
             "problemMatcher": "$gcc",
             "group": {
                 "kind": "build",

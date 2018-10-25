@@ -26,7 +26,9 @@ int main(int argc, char const *argv[]) {
 
     AdaptiveODEOptions opt = {};
     opt.t_start            = 0;
-    opt.t_end              = 8;
+    opt.t_end              = 12;
+    opt.epsilon            = 1e-5;
+    opt.maxiter            = 10e7;
 
     ContinuousLQRController::SimulationResult result =
         ctrl.simulate(nonlinfull, ref, x0, opt);
@@ -40,6 +42,10 @@ int main(int argc, char const *argv[]) {
     printCSV(outputFile, opt.t_start, Ts, sampled);
 
     auto t = makeTimeVector(opt.t_start, Ts, opt.t_end);
+
+    cout << t.back() << endl << result.time.back() << endl;
+    cout << boolalpha << (t.back() == result.time.back()) << endl;
+    cout << t.size() << endl << sampled.size() << endl;
 
     vector<EulerAngles> orientation;
     orientation.resize(sampled.size());
@@ -55,6 +61,7 @@ int main(int argc, char const *argv[]) {
     matplotlibcpp::subplot(3, 1, 3);
     plotResults(t, sampled, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of motors");
+    matplotlibcpp::tight_layout();
     matplotlibcpp::show();
 
     return EXIT_SUCCESS;

@@ -26,7 +26,7 @@ struct TestReferenceFunction
     ContinuousLQRController::VecR_t operator()(double t) override {
         // ---------------------------------------------------------------------
         ContinuousLQRController::VecR_t ref = {1};
-        if (t > 1 && t < 2)
+        if (t > 1 && t < 5)
             assignBlock<0, 4, 0, 1>(ref) = q1;
         return ref;
         // ---------------------------------------------------------------------

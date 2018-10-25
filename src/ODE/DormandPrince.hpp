@@ -69,10 +69,12 @@ ODEResultX<T> dormandPrince(F f,        // function f(double t, T x)
             x_v.push_back(x_new);
         }
 
-        if (t_new >= opt.t_end)
+        if (t_new >= opt.t_end) {
             // finished
+            t_v.back() =
+                opt.t_end;  // TODO prevent rounding error on last time point
             return {t_v, x_v, resultCode};
-        else if (t_new + h_new > opt.t_end)
+        } else if (t_new + h_new > opt.t_end)
             // finishes on next iteration, don't jump over t_end
             h_new = opt.t_end - t_new;
 

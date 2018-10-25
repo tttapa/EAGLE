@@ -7,10 +7,8 @@ std::vector<double> makeTimeVector(double t_start, double Ts, double t_end) {
     size_t N = floor((t_end - t_start) / Ts) + 1;
     std::vector<double> timevector;
     timevector.reserve(N);
-    double t = t_start;
     for (size_t i = 0; i < N; ++i) {
-        timevector.push_back(t);
-        t += Ts;
+        timevector.push_back(t_start + Ts * i);
     }
     return timevector;
 }
@@ -47,6 +45,15 @@ void plotResults(const std::vector<double> &t,
             matplotlibcpp::plot(t, plotdata, fmt);
     }
     if (legends.size() > 0)
-        matplotlibcpp::legend();
+        try {
+            matplotlibcpp::legend();
+        } catch (std::runtime_error e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+        }
+    try {
+        matplotlibcpp::title(title);
+    } catch (std::runtime_error e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
     matplotlibcpp::title(title);
 }

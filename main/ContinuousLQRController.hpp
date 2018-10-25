@@ -15,9 +15,8 @@ class ContinuousLQRController : public ContinuousController<10, 3, 7> {
         /* W =  [ A B ]
                 [ C D ] */
         Matrix<nx + ny, nx + nu> W = vcat(hcat(A, B), hcat(C, D));
-        Matrix<nx + ny, ny> OI =
-            vcat(zeros<nx, ny>(), eye<ny>());
-        G = solveLeastSquares(W, OI);
+        Matrix<nx + ny, ny> OI     = vcat(zeros<nx, ny>(), eye<ny>());
+        G                          = solveLeastSquares(W, OI);
     }
 
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {

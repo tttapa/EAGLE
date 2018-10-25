@@ -15,11 +15,11 @@ std::vector<X> sampleODEResult(const ODEResultX<X> &result, double t_start,
     size_t N = floor((t_end - t_start) / Ts) + 1;
     std::vector<X> sampled;
     sampled.reserve(N);
-    double t             = t_start;
     const auto tbegin_it = result.time.begin();
     auto tcurr_it        = tbegin_it;
     const auto tend_it   = result.time.end();
     for (size_t i = 0; i < N; ++i) {
+        double t   = t_start + Ts * i;
         auto t2_it = std::lower_bound(tcurr_it, tend_it, t);  // *t2_it >= t
         if (t2_it == tend_it)
             break;
