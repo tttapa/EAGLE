@@ -26,7 +26,7 @@ int main(int argc, char const *argv[]) {
 
     AdaptiveODEOptions opt = {};
     opt.t_start            = 0;
-    opt.t_end              = 12;
+    opt.t_end              = 22;
     opt.epsilon            = 1e-5;
     opt.maxiter            = 10e7;
 
@@ -43,10 +43,6 @@ int main(int argc, char const *argv[]) {
 
     auto t = makeTimeVector(opt.t_start, Ts, opt.t_end);
 
-    cout << t.back() << endl << result.time.back() << endl;
-    cout << boolalpha << (t.back() == result.time.back()) << endl;
-    cout << t.size() << endl << sampled.size() << endl;
-
     vector<EulerAngles> orientation;
     orientation.resize(sampled.size());
     transform(sampled.begin(), sampled.end(), orientation.begin(),
@@ -55,12 +51,15 @@ int main(int argc, char const *argv[]) {
     matplotlibcpp::subplot(3, 1, 1);
     plotResults(t, orientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Orientation of drone");
+    matplotlibcpp::xlim(opt.t_start, opt.t_end);
     matplotlibcpp::subplot(3, 1, 2);
     plotResults(t, sampled, {4, 7}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of drone");
+    matplotlibcpp::xlim(opt.t_start, opt.t_end);
     matplotlibcpp::subplot(3, 1, 3);
     plotResults(t, sampled, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of motors");
+    matplotlibcpp::xlim(opt.t_start, opt.t_end);
     matplotlibcpp::tight_layout();
     matplotlibcpp::show();
 

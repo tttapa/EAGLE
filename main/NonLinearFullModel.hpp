@@ -19,18 +19,14 @@ class NonLinearFullModel : public ContinuousModel<10, 3> {
         VecOmega_t omega = getBlock<4, 7, 0, 1>(x);
         VecN_t n         = getBlock<7, 10, 0, 1>(x);
 
-        Quaternion q_omega               = {};  // TODO: why not q0 = 1 ?
-        assignBlock<1, 4, 0, 1>(q_omega) = omega;
+        Quaternion q_omega               = vcat(zeros<1, 1>(), omega);
 
         Quaternion q_dot = 0.5 * quatmultiply(q, q_omega);
         VecOmega_t omega_dot =
             p.gamma_n * n + p.gamma_u * u - p.I_inv * cross(omega, p.I * omega);
         VecN_t n_dot = p.k2 * (p.k1 * u - n);
 
-        VecX_t x_dot;
-        assignBlock<0, 4, 0, 1>(x_dot)  = q_dot;
-        assignBlock<4, 7, 0, 1>(x_dot)  = omega_dot;
-        assignBlock<7, 10, 0, 1>(x_dot) = n_dot;
+        VecX_t x_dot = vcat(q_dot, omega_dot, n_dot);
 
         return x_dot;
     }
