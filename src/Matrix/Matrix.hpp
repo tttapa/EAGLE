@@ -32,25 +32,45 @@ struct TransposeStruct {
 
 // Diagonal matrix
 template <class T, size_t N>
-TMatrix<T, N, N> diag(const Array<T, N> &diagElements) {
+TMatrix<T, N, N> Tdiag(const Array<T, N> &diagElements) {
     TMatrix<T, N, N> matrix = {};
     for (size_t i = 0; i < N; ++i)
         matrix[i][i] = diagElements[i];
     return matrix;
 }
 
+template <size_t N>
+Matrix<N, N> diag(const Array<double, N> &diagElements) {
+    return Tdiag<double, N>(diagElements);
+}
+
 // Identity matrix
 template <class T, size_t N>
-TMatrix<T, N, N> eye(T unit = 1) {
+TMatrix<T, N, N> Teye() {
     TMatrix<T, N, N> matrix = {};
     for (size_t i = 0; i < N; ++i)
-        matrix[i][i] = unit;
+        matrix[i][i] = T{1};
+    return matrix;
+}
+
+// Identity matrix
+template <size_t N>
+Matrix<N, N> eye() {
+    Matrix<N, N> matrix = {};
+    for (size_t i = 0; i < N; ++i)
+        matrix[i][i] = 1.0;
     return matrix;
 }
 
 // All zeros
 template <class T, size_t M, size_t N>
-TMatrix<T, M, N> zeros() {
+TMatrix<T, M, N> Tzeros() {
+    return {};
+}
+
+// All zeros
+template <size_t M, size_t N>
+Matrix<M, N> zeros() {
     return {};
 }
 

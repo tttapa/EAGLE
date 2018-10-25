@@ -84,9 +84,19 @@ TEST(Matrix, scalarMultiply) {
     ASSERT_EQ(result2, expected);
 }
 
-TEST(Matrix, diag) {
-    TMatrix<int, 3, 3> result   = diag<int, 3>({11, 22, 33});
+TEST(Matrix, Tdiag) {
+    TMatrix<int, 3, 3> result   = Tdiag<int, 3>({11, 22, 33});
     TMatrix<int, 3, 3> expected = {{
+        {11, 0, 0},
+        {0, 22, 0},
+        {0, 0, 33},
+    }};
+    ASSERT_EQ(result, expected);
+}
+
+TEST(Matrix, diag) {
+    Matrix<3, 3> result   = diag<3>({11, 22, 33});
+    Matrix<3, 3> expected = {{
         {11, 0, 0},
         {0, 22, 0},
         {0, 0, 33},

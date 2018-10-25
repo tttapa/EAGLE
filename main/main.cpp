@@ -57,7 +57,6 @@ int main(int argc, char const *argv[]) {
     constexpr size_t Nu = 3;
     constexpr size_t Ny = 7;
 
-
     /* A =  [  0   0   0   0   0   0   0   0   0   0  ]
             [  0   0   0   0  ┌─────────┐  0   0   0  ]
             [  0   0   0   0  │  0.5 I3 │  0   0   0  ]
@@ -68,12 +67,12 @@ int main(int argc, char const *argv[]) {
             [  0   0   0   0   0   0   0  ┌─────────┐ ]
             [  0   0   0   0   0   0   0  │ -k2 I3  │ ]
             [  0   0   0   0   0   0   0  └─────────┘ ] */
-    Matrix<Nx, Nx> A =
-        vcat(zeros<double, 1, 10>(),
-             hcat(zeros<double, 3, 4>(), 0.5 * eye<double, 3>(),
-                  zeros<double, 3, 3>()),
-             hcat(zeros<double, 3, 7>(), p.gamma_n),
-             hcat(zeros<double, 3, 7>(), -p.k2 * eye<double, 3>()));
+    Matrix<Nx, Nx> A = vcat(                                 //
+        zeros<1, 10>(),                                      //
+        hcat(zeros<3, 4>(), 0.5 * eye<3>(), zeros<3, 3>()),  //
+        hcat(zeros<3, 7>(), p.gamma_n),                      //
+        hcat(zeros<3, 7>(), -p.k2 * eye<3>())                //
+    );
 
     cout << "A = " << A << endl;
 
@@ -87,12 +86,15 @@ int main(int argc, char const *argv[]) {
             [ ┌─────────┐ ]
             [ │ k1k2 I3 │ ]
             [ └─────────┘ ] */
-    Matrix<Nx, Nu> B =
-        vcat(zeros<double, 4, 3>(), p.gamma_u, p.k2 * p.k1 * eye<double, 3>());
+    Matrix<Nx, Nu> B = vcat(    //
+        zeros<4, 3>(),          //
+        p.gamma_u,              //
+        p.k2 * p.k1 * eye<3>()  //
+    );
 
     cout << "B = " << B << endl;
 
-    Matrix<Ny, Nx> C = hcat(eye<double, 7>(), zeros<double, 7, 3>());
+    Matrix<Ny, Nx> C = hcat(eye<7>(), zeros<7, 3>());
 
     cout << "C = " << C << endl;
 

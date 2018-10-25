@@ -107,18 +107,18 @@ struct Params {
 
         Ip    = mp * pow(Dp, 2) / 12;
         Im    = mr * pow(rr, 2);
-        I     = diag<double, 3>({Ixx, Iyy, Izz});
-        I_inv = solveLeastSquares(I, eye<double, 3>());
+        I     = diag<3>({Ixx, Iyy, Izz});
+        I_inv = solveLeastSquares(I, eye<3>());
 
         k1 = Kv * (Vmax - Vmin) / 60;
         k2 = 1.0 / tau_m;
-        k3 = diag<double, 3>(
+        k3 = diag<3>(
             {2.0 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Ixx,
              2.0 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Iyy,
              2.0 * cp * rho * nh * pow(Dp, 5) * Nm / (2.0 * M_PI * Izz)});
-        k4 = diag<double, 3>({0, 0, 2.0 * M_PI * Nm * (Im + Ip) / Izz});
+        k4 = diag<3>({0, 0, 2.0 * M_PI * Nm * (Im + Ip) / Izz});
 
         gamma_n = k3 - k2 * k4;
-        gamma_u = diag<double, 3>({0, 0, k4[2][2] * k2 * k1});
+        gamma_u = diag<3>({0, 0, k4[2][2] * k2 * k1});
     }
 };

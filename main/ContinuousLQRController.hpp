@@ -16,7 +16,7 @@ class ContinuousLQRController : public ContinuousController<10, 3, 7> {
                 [ C D ] */
         Matrix<nx + ny, nx + nu> W = vcat(hcat(A, B), hcat(C, D));
         Matrix<nx + ny, ny> OI =
-            vcat(zeros<double, nx, ny>(), eye<double, ny>());
+            vcat(zeros<nx, ny>(), eye<ny>());
         G = solveLeastSquares(W, OI);
     }
 
