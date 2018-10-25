@@ -205,3 +205,33 @@ getBlock(const Matrix<T, R, C> &matrix) {
             result[r][c] = matrix[r + Rstart][c + Cstart];
     return result;
 }
+
+template <class T, size_t R, size_t C1, size_t C2>
+Matrix<T, R, C1 + C2> hcat(const Matrix<T, R, C1> &l,
+                           const Matrix<T, R, C2> &r) {
+    Matrix<T, R, C1 + C2> result;
+    assignBlock<0, R, 0, C1>(result)       = l;
+    assignBlock<0, R, C1, C1 + C2>(result) = r;
+    return result;
+}
+
+template <class T, size_t R, size_t C, class... Args>
+auto hcat(const Matrix<T, R, C> &l, Args... args)
+    -> decltype(hcat(l, hcat(args...))) {
+    return hcat(l, hcat(args...));
+}
+
+template <class T, size_t R1, size_t R2, size_t C>
+Matrix<T, R1 + R2, C> vcat(const Matrix<T, R1, C> &t,
+                           const Matrix<T, R2, C> &b) {
+    Matrix<T, R1 + R2, C> result;
+    assignBlock<0, R1, 0, C>(result)       = t;
+    assignBlock<R1, R1 + R2, 0, C>(result) = b;
+    return result;
+}
+
+template <class T, size_t R, size_t C, class... Args>
+auto vcat(const Matrix<T, R, C> &t, Args... args)
+    -> decltype(vcat(t, vcat(args...))) {
+    return vcat(t, vcat(args...));
+}

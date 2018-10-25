@@ -181,3 +181,99 @@ TEST(Matrix, getBlock) {
     }};
     ASSERT_EQ(result, expected);
 }
+
+TEST(Matrix, hcat) {
+    Matrix<int, 3, 2> l        = {{
+        {11, 12},
+        {21, 22},
+        {31, 32},
+    }};
+    Matrix<int, 3, 2> r        = {{
+        {13, 14},
+        {23, 24},
+        {33, 34},
+    }};
+    Matrix<int, 3, 4> result   = hcat(l, r);
+    Matrix<int, 3, 4> expected = {{
+        {11, 12, 13, 14},
+        {21, 22, 23, 24},
+        {31, 32, 33, 34},
+    }};
+    ASSERT_EQ(result, expected);
+}
+
+TEST(Matrix, hcat3) {
+    Matrix<int, 2, 2> l        = {{
+        {11, 12},
+        {21, 22},
+    }};
+    Matrix<int, 2, 2> m        = {{
+        {13, 14},
+        {23, 24},
+    }};
+    Matrix<int, 2, 3> r        = {{
+        {15, 16, 17},
+        {25, 26, 27},
+    }};
+    Matrix<int, 2, 7> result   = hcat(l, m, r);
+    Matrix<int, 2, 7> expected = {{
+        {11, 12, 13, 14, 15, 16, 17},
+        {21, 22, 23, 24, 25, 26, 27},
+    }};
+    ASSERT_EQ(result, expected);
+}
+
+TEST(Matrix, vcat3) {
+    Matrix<int, 1, 2> t        = {{
+        {11, 12},
+    }};
+    Matrix<int, 2, 2> m        = {{
+        {21, 22},
+        {31, 32},
+    }};
+    Matrix<int, 3, 2> b        = {{
+        {41, 42},
+        {51, 52},
+        {61, 62},
+    }};
+    Matrix<int, 6, 2> result   = vcat(t, m, b);
+    Matrix<int, 6, 2> expected = {{
+        {11, 12},
+        {21, 22},
+        {31, 32},
+        {41, 42},
+        {51, 52},
+        {61, 62},
+    }};
+    ASSERT_EQ(result, expected);
+}
+
+TEST(Matrix, vcathcat) {
+    Matrix<int, 2, 3> lt       = {{
+        {1, 2, 3},
+        {6, 7, 8},
+    }};
+    Matrix<int, 2, 2> rt       = {{
+        {4, 5},
+        {9, 10},
+    }};
+    Matrix<int, 3, 3> lb       = {{
+        {11, 12, 13},
+        {16, 17, 18},
+        {21, 22, 23},
+    }};
+    Matrix<int, 3, 2> rb       = {{
+        {14, 15},
+        {19, 20},
+        {24, 25},
+    }};
+    Matrix<int, 5, 5> result   = vcat(hcat(lt, rt), hcat(lb, rb));
+    Matrix<int, 5, 5> expected = {{
+        {1, 2, 3, 4, 5},
+        {6, 7, 8, 9, 10},
+        {11, 12, 13, 14, 15},
+        {16, 17, 18, 19, 20},
+        {21, 22, 23, 24, 25},
+    }};
+    ASSERT_EQ(result, expected);
+}
