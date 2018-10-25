@@ -12,8 +12,8 @@ inline X interpolate(double t1, double t2, const X &x1, const X &x2, double t) {
 template <class X>
 std::vector<X> sampleODEResult(const ODEResultX<X> &result, double t_start,
                                double Ts, double t_end) {
-    std::vector<X> sampled;
     size_t N = floor((t_end - t_start) / Ts) + 1;
+    std::vector<X> sampled;
     sampled.reserve(N);
     double t             = t_start;
     const auto tbegin_it = result.time.begin();

@@ -51,6 +51,10 @@ include_directories(${CMAKE_BINARY_DIR}/googletest/googletest-src/googletest/inc
 #include Google Mock
 include_directories(${CMAKE_BINARY_DIR}/googletest/googletest-src/googlemock/include)
 
+# include Matplotlib-cpp & Python 
+find_package(PythonLibs 2.7)
+include_directories($ENV{HOME}/lib/matplotlib-cpp)
+
 # Source files
 include_directories("../src")
 file(GLOB_RECURSE SOURCES "../src/*.cpp")
@@ -60,7 +64,8 @@ add_library(source STATIC ${SOURCES})
 include_directories("../main")
 file(GLOB_RECURSE MAIN "../main/*.cpp")
 add_executable(main ${MAIN})
-target_link_libraries(main source)
+target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
+target_link_libraries(main source ${PYTHON_LIBRARIES})
 
 # Test executable compilation and linking
 file(GLOB_RECURSE TESTS "../test/*.cpp")

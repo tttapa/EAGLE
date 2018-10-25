@@ -1,20 +1,23 @@
 {
-    "configurations": [{
-        "name": "Linux",
-        "defines": [
-            "IDE"
-        ],
-        "compilerPath": "/usr/bin/gcc",
-        "cStandard": "c11",
-        "cppStandard": "c++14",
-        "intelliSenseMode": "gcc-x64",
-        "includePath": [
-            "${default}",
-            "${workspaceFolder}/build/googletest/googletest-src/googlemock/include",
-            "${workspaceFolder}/build/googletest/googletest-src/googletest/include",
-            "${workspaceFolder}/src",
-            "/usr/include"
-        ]
-    }],
+    "configurations": [
+        {
+            "name": "Linux",
+            "defines": [
+                "IDE"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "gcc-x64",
+            "includePath": [
+                "${default}",
+                "${workspaceFolder}/build/googletest/googletest-src/googlemock/include",
+                "${workspaceFolder}/build/googletest/googletest-src/googletest/include",
+                "${workspaceFolder}/src",
+                "${HOME}/lib/matplotlib-cpp",
+                "/usr/include/python3.5m"
+            ]
+        }
+    ],
     "version": 4
 }

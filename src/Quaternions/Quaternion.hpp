@@ -30,12 +30,12 @@ inline Quaternion quatDifference(const Quaternion &p, const Quaternion &q) {
     return quatmultiply(p, quatconjugate(q));
 }
 
-using EulerAngles = Array<double, 3>;
+using EulerAngles = ColVector<3>;
 
 inline Quaternion eul2quat(const EulerAngles &eulerAngles) {
-    double phi   = eulerAngles[2];
-    double theta = eulerAngles[1];
-    double psi   = eulerAngles[0];
+    double phi   = eulerAngles[2][0];
+    double theta = eulerAngles[1][0];
+    double psi   = eulerAngles[0][0];
 
     double a = phi / 2;
     double b = theta / 2;

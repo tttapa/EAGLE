@@ -1,41 +1,32 @@
 #include "Drone.hpp"
 #include "InputSignals.hpp"
+#include "K.hpp"
 #include "PrintCSV.hpp"
 #include <ODE/ODEEval.hpp>
 #include <iostream>
 
-#include <K.hpp>
+#include "Plot.hpp"
 
 using namespace std;
 using Matrices::T;
 
 string outputFile = (string) getenv("HOME") + "/Random/data.csv";
 
-constexpr double f  = 10000;
+constexpr double f  = 60;
 constexpr double Ts = 1.0 / f;
 
 int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
 
-    const Drone d                 = {};
-    NonLinearFullModel nonlinfull = d.p;
-    TestInputFunction u           = {};
+    const Drone drone             = {};
+    NonLinearFullModel nonlinfull = drone.p;
     TestReferenceFunction ref     = {};
-    
-    cout << "K = " << K << endl;
 
-    ContinuousLQRController ctrl = {d.A, d.B, d.C, d.D, K};
+    ContinuousLQRController ctrl = {drone.A, drone.B, drone.C, drone.D, K};
 
     AdaptiveODEOptions opt = {};
     opt.t_start            = 0;
     opt.t_end              = 8;
-    opt.epsilon            = 1e-6;
-    opt.h_start            = 1e-2;
-    opt.h_min              = 1e-6;
-    opt.maxiter            = 1e6;
-
-    // NonLinearFullModel::SimulationResult result =
-    //     nonlinfull.simulate(u, x0, opt);
 
     ContinuousLQRController::SimulationResult result =
         ctrl.simulate(nonlinfull, ref, x0, opt);
@@ -48,5 +39,23 @@ int main(int argc, char const *argv[]) {
     auto sampled = sampleODEResult(result, opt.t_start, Ts, opt.t_end);
     printCSV(outputFile, opt.t_start, Ts, sampled);
 
-    return 0;
+    auto t = makeTimeVector(opt.t_start, Ts, opt.t_end);
+
+    vector<EulerAngles> orientation;
+    orientation.resize(sampled.size());
+    transform(sampled.begin(), sampled.end(), orientation.begin(),
+              NonLinearFullModel::stateToEuler);
+
+    matplotlibcpp::subplot(3, 1, 1);
+    plotResults(t, orientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
+                "Orientation of drone");
+    matplotlibcpp::subplot(3, 1, 2);
+    plotResults(t, sampled, {4, 7}, {"x", "y", "z"}, {"r-", "g-", "b-"},
+                "Angular velocity of drone");
+    matplotlibcpp::subplot(3, 1, 3);
+    plotResults(t, sampled, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
+                "Angular velocity of motors");
+    matplotlibcpp::show();
+
+    return EXIT_SUCCESS;
 }

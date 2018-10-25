@@ -19,7 +19,7 @@ class NonLinearFullModel : public ContinuousModel<10, 3> {
         VecOmega_t omega = getBlock<4, 7, 0, 1>(x);
         VecN_t n         = getBlock<7, 10, 0, 1>(x);
 
-        Quaternion q_omega               = {}; // TODO: why not q0 = 1 ?
+        Quaternion q_omega               = {};  // TODO: why not q0 = 1 ?
         assignBlock<1, 4, 0, 1>(q_omega) = omega;
 
         Quaternion q_dot = 0.5 * quatmultiply(q, q_omega);
@@ -35,4 +35,9 @@ class NonLinearFullModel : public ContinuousModel<10, 3> {
         return x_dot;
     }
     const Params p;
+
+    static EulerAngles stateToEuler(const VecX_t &x) {
+        Quaternion q = getBlock<0, 4, 0, 1>(x);
+        return quat2eul(q);
+    }
 };
