@@ -10,7 +10,7 @@ class Controller {
     typedef ColVector<Nx> VecX_t;  // state vectors
     typedef ColVector<Nu> VecU_t;  // input vectors
     typedef ColVector<Nr> VecR_t;  // reference vectors
-    typedef InputFunctionU<VecR_t> ReferenceFunction;
+    typedef TimeFunctionT<VecR_t> ReferenceFunction;
     typedef ODEResultX<VecX_t> SimulationResult;
 
     virtual VecU_t operator()(const VecX_t &x, const VecR_t &r) = 0;

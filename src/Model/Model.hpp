@@ -2,19 +2,14 @@
 
 #include "Params.hpp"
 #include <ODE/DormandPrince.hpp>
-
-template <class U>
-class InputFunctionU {
-  public:
-    virtual U operator()(double t) = 0;
-};
+#include <Util/TimeFunction.hpp>
 
 template <size_t Nx, size_t Nu>
 class Model {
   public:
     typedef ColVector<Nx> VecX_t;
     typedef ColVector<Nu> VecU_t;
-    typedef InputFunctionU<VecU_t> InputFunction;
+    typedef TimeFunctionT<VecU_t> InputFunction;
     typedef ODEResultX<VecX_t> SimulationResult;
 
     virtual VecX_t operator()(const VecX_t &x, const VecU_t &u) = 0;

@@ -9,6 +9,9 @@ class NonLinearFullModel : public ContinuousModel<10, 3> {
     using VecOmega_t = ColVector<3>;
     using VecN_t     = ColVector<3>;
 
+    constexpr static size_t nx = 10;
+    constexpr static size_t nu = 3;
+
     NonLinearFullModel(const Params &p) : p(p) {}
 
     VecX_t operator()(const VecX_t &x, const VecU_t &u) override {
@@ -16,7 +19,7 @@ class NonLinearFullModel : public ContinuousModel<10, 3> {
         VecOmega_t omega = getBlock<4, 7, 0, 1>(x);
         VecN_t n         = getBlock<7, 10, 0, 1>(x);
 
-        Quaternion q_omega               = {};
+        Quaternion q_omega               = {}; // TODO: why not q0 = 1 ?
         assignBlock<1, 4, 0, 1>(q_omega) = omega;
 
         Quaternion q_dot = 0.5 * quatmultiply(q, q_omega);
