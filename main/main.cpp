@@ -15,6 +15,8 @@ string outputFile = (string) getenv("HOME") + "/Random/data.csv";
 constexpr double f  = 60;
 constexpr double Ts = 1.0 / f;
 
+constexpr bool plotSampled = false;
+
 int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
 
@@ -41,11 +43,13 @@ int main(int argc, char const *argv[]) {
     auto sampled = sampleODEResult(result, opt.t_start, Ts, opt.t_end);
     printCSV(outputFile, opt.t_start, Ts, sampled);
 
-    auto t = makeTimeVector(opt.t_start, Ts, opt.t_end);
+    auto t =
+        plotSampled ? makeTimeVector(opt.t_start, Ts, opt.t_end) : result.time;
+    auto data = plotSampled ? sampled : result.solution;
 
     vector<EulerAngles> orientation;
-    orientation.resize(sampled.size());
-    transform(sampled.begin(), sampled.end(), orientation.begin(),
+    orientation.resize(data.size());
+    transform(data.begin(), data.end(), orientation.begin(),
               NonLinearFullModel::stateToEuler);
 
     matplotlibcpp::subplot(3, 1, 1);
@@ -53,11 +57,11 @@ int main(int argc, char const *argv[]) {
                 "Orientation of drone");
     matplotlibcpp::xlim(opt.t_start, opt.t_end);
     matplotlibcpp::subplot(3, 1, 2);
-    plotResults(t, sampled, {4, 7}, {"x", "y", "z"}, {"r-", "g-", "b-"},
+    plotResults(t, data, {4, 7}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of drone");
     matplotlibcpp::xlim(opt.t_start, opt.t_end);
     matplotlibcpp::subplot(3, 1, 3);
-    plotResults(t, sampled, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
+    plotResults(t, data, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of motors");
     matplotlibcpp::xlim(opt.t_start, opt.t_end);
     matplotlibcpp::tight_layout();
