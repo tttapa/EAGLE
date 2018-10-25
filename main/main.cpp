@@ -1,4 +1,4 @@
-#include "Controller.hpp"
+#include "ContinuousLQRController.hpp"
 #include "NonLinearFullModel.hpp"
 #include "Params.hpp"
 #include "PrintCSV.hpp"
@@ -57,10 +57,17 @@ int main(int argc, char const *argv[]) {
     constexpr size_t Nu = 3;
     constexpr size_t Ny = 7;
 
-    /* Matrix<double, Nx, Nx> A     = {}
-    assignBlock<1, 4, 4, 7>(A)   = 0.5 * eye<double, 3>();
-    assignBlock<4, 7, 7, 10>(A)  = p.gamma_n;
-    assignBlock<7, 10, 7, 10>(A) = -p.k2 * eye<double, 3>(); */
+
+    /* A =  [  0   0   0   0   0   0   0   0   0   0  ]
+            [  0   0   0   0  ┌─────────┐  0   0   0  ]
+            [  0   0   0   0  │  0.5 I3 │  0   0   0  ]
+            [  0   0   0   0  └─────────┘  0   0   0  ]
+            [  0   0   0   0   0   0   0  ┌─────────┐ ]
+            [  0   0   0   0   0   0   0  │   Γ_n   │ ]
+            [  0   0   0   0   0   0   0  └─────────┘ ]
+            [  0   0   0   0   0   0   0  ┌─────────┐ ]
+            [  0   0   0   0   0   0   0  │ -k2 I3  │ ]
+            [  0   0   0   0   0   0   0  └─────────┘ ] */
     Matrix<double, Nx, Nx> A =
         vcat(zeros<double, 1, 10>(),
              hcat(zeros<double, 3, 4>(), 0.5 * eye<double, 3>(),
@@ -70,9 +77,16 @@ int main(int argc, char const *argv[]) {
 
     cout << "A = " << A << endl;
 
-    /* Matrix<double, Nx, Nu> B    = {};
-    assignBlock<4, 7, 0, 3>(B)  = p.gamma_u;
-    assignBlock<7, 10, 0, 3>(B) = p.k2 * p.k1 * eye<double, 3>(); */
+    /* B =  [  0   0   0  ]
+            [  0   0   0  ]
+            [  0   0   0  ]
+            [  0   0   0  ]
+            [ ┌─────────┐ ]
+            [ │   Γ_u   │ ]
+            [ └─────────┘ ]
+            [ ┌─────────┐ ]
+            [ │ k1k2 I3 │ ]
+            [ └─────────┘ ] */
     Matrix<double, Nx, Nu> B =
         vcat(zeros<double, 4, 3>(), p.gamma_u, p.k2 * p.k1 * eye<double, 3>());
 
