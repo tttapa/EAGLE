@@ -10,7 +10,8 @@ using Matrices::T;
 
 string outputFile = (string) getenv("HOME") + "/Random/data.csv";
 
-constexpr double Ts = 1.0 / 60;
+constexpr double f  = 1000;
+constexpr double Ts = 1.0 / f;
 
 struct TestInputFunction : public NonLinearFullModel::InputFunction {
     NonLinearFullModel::VecU_t operator()(double t) override {
@@ -56,10 +57,16 @@ int main(int argc, char const *argv[]) {
     constexpr size_t Nu = 3;
     constexpr size_t Ny = 7;
 
-    Matrix<double, Nx, Nx> A     = {};
+    /* Matrix<double, Nx, Nx> A     = {}
     assignBlock<1, 4, 4, 7>(A)   = 0.5 * eye<double, 3>();
     assignBlock<4, 7, 7, 10>(A)  = p.gamma_n;
-    assignBlock<7, 10, 7, 10>(A) = -p.k2 * eye<double, 3>();
+    assignBlock<7, 10, 7, 10>(A) = -p.k2 * eye<double, 3>(); */
+    Matrix<double, Nx, Nx> A =
+        vcat(zeros<double, 1, 10>(),
+             hcat(zeros<double, 3, 4>(), 0.5 * eye<double, 3>(),
+                  zeros<double, 3, 3>()),
+             hcat(zeros<double, 3, 7>(), p.gamma_n),
+             hcat(zeros<double, 3, 7>(), -p.k2 * eye<double, 3>()));
 
     cout << "A = " << A << endl;
 

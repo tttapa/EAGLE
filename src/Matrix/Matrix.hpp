@@ -39,6 +39,12 @@ Matrix<T, N, N> eye(T unit = 1) {
     return matrix;
 }
 
+// All zeros
+template <class T, size_t M, size_t N>
+Matrix<T, M, N> zeros() {
+    return {};
+}
+
 // Matrix multiplication (naive approach, O(n³))
 template <class T, class U, size_t R, size_t M, size_t C>
 Matrix<T, R, C> operator*(const Matrix<T, R, M> &lhs,

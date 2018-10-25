@@ -68,11 +68,7 @@ class ContinuousLQRController : public ContinuousController<double, 10, 3, 7> {
                             const Matrix<double, 7, 3> &D,
                             const Matrix<double, 3, 10> &K)
         : K(K) {
-        Matrix<double, 10 + 7, 10 + 3> W;
-        assignBlock<0, 10, 0, 10>(W)      = A;
-        assignBlock<0, 10, 10, 13>(W)     = B;
-        assignBlock<10, 17, 0, 10>(W)     = C;
-        assignBlock<10, 17, 10, 13>(W)    = D;
+        Matrix<double, 10 + 7, 10 + 3> W  = vcat(hcat(A, B), hcat(C, D));
         Matrix<double, 10 + 7, 7> OI      = {};
         assignBlock<10, 10 + 7, 0, 7>(OI) = eye<double, 7>();
         G                                 = solveLeastSquares(W, OI);
