@@ -3,6 +3,8 @@
 #include <matplotlibcpp.h>
 #include <vector>
 
+namespace plt = matplotlibcpp;
+
 std::vector<double> makeTimeVector(double t_start, double Ts, double t_end) {
     size_t N = floor((t_end - t_start) / Ts) + 1;
     std::vector<double> timevector;
@@ -36,24 +38,26 @@ void plotResults(const std::vector<double> &t,
                  const std::vector<std::string> &legends = {},
                  const std::vector<std::string> &formats = {},
                  const std::string &title                = "") {
+    assert(idx.start < idx.end);
+    assert(idx.end <= N);
     for (size_t i = 0; i < (idx.end - idx.start); ++i) {
         std::vector<double> plotdata = extractRow(vectors, i + idx.start);
         std::string fmt              = i < formats.size() ? formats[i] : "";
         if (i < legends.size())
-            matplotlibcpp::named_plot(legends[i], t, plotdata, fmt);
+            plt::named_plot(legends[i], t, plotdata, fmt);
         else
-            matplotlibcpp::plot(t, plotdata, fmt);
+            plt::plot(t, plotdata, fmt);
     }
     if (legends.size() > 0)
         try {
-            matplotlibcpp::legend();
+            plt::legend();
         } catch (std::runtime_error e) {
             std::cerr << "Error: " << e.what() << std::endl;
         }
     try {
-        matplotlibcpp::title(title);
+        plt::title(title);
     } catch (std::runtime_error e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
-    matplotlibcpp::title(title);
+    plt::title(title);
 }
