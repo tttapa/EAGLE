@@ -10,7 +10,7 @@ using Matrices::T;
 
 string outputFile = (string) getenv("HOME") + "/Random/data.csv";
 
-constexpr double f  = 1000;
+constexpr double f  = 10000;
 constexpr double Ts = 1.0 / f;
 
 struct TestInputFunction : public NonLinearFullModel::InputFunction {
@@ -70,14 +70,15 @@ int main(int argc, char const *argv[]) {
 
     cout << "A = " << A << endl;
 
-    Matrix<double, Nx, Nu> B    = {};
+    /* Matrix<double, Nx, Nu> B    = {};
     assignBlock<4, 7, 0, 3>(B)  = p.gamma_u;
-    assignBlock<7, 10, 0, 3>(B) = p.k2 * p.k1 * eye<double, 3>();
+    assignBlock<7, 10, 0, 3>(B) = p.k2 * p.k1 * eye<double, 3>(); */
+    Matrix<double, Nx, Nu> B =
+        vcat(zeros<double, 4, 3>(), p.gamma_u, p.k2 * p.k1 * eye<double, 3>());
 
     cout << "B = " << B << endl;
 
-    Matrix<double, Ny, Nx> C   = {};
-    assignBlock<0, 7, 0, 7>(C) = eye<double, 7>();
+    Matrix<double, Ny, Nx> C = hcat(eye<double, 7>(), zeros<double, 7, 3>());
 
     cout << "C = " << C << endl;
 
@@ -86,9 +87,42 @@ int main(int argc, char const *argv[]) {
     cout << "D = " << D << endl;
 
     Matrix<double, Nu, Nx> K = {{
-        {0, -10, 0, 0, -1.075087, 0, 0, -0.034567, 0, 0},
-        {0, 0, -10, 0, 0, -1.077362, 0, 0, -0.033435, 0},
-        {0, 0, 0, -10, 0, 0, -1.029377, 0, 0, 0.007721},
+        {
+            0.000000,
+            -10.000000,
+            0.000000,
+            0.000000,
+            -1.927990,
+            0.000000,
+            0.000000,
+            -0.993059,
+            0.000000,
+            -0.000000,
+        },
+        {
+            0.000000,
+            0.000000,
+            -10.000000,
+            -0.000000,
+            0.000000,
+            -1.982692,
+            -0.000000,
+            0.000000,
+            -0.993012,
+            0.000000,
+        },
+        {
+            0.000000,
+            -0.000000,
+            -0.000000,
+            -10.000000,
+            0.000000,
+            -0.000000,
+            -6.423163,
+            0.000000,
+            -0.000000,
+            -0.584187,
+        },
     }};
 
     cout << "K = " << K << endl;
