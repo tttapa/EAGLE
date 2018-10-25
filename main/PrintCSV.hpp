@@ -4,7 +4,7 @@
 #include <ODE/ODEResult.hpp>
 
 template <class T, size_t N>
-void printCSV(std::ostream &out, const ODEResultX<ColVector<T, N>> &result) {
+void printCSV(std::ostream &out, const ODEResultX<TColVector<T, N>> &result) {
     for (size_t i = 0; i < result.time.size(); ++i) {
         out << result.time[i] << ',';
         for (size_t j = 0; j < N - 1; ++j)
@@ -16,7 +16,7 @@ void printCSV(std::ostream &out, const ODEResultX<ColVector<T, N>> &result) {
 
 template <class T, size_t N>
 void printCSV(std::ostream &out, double t_start, double Ts,
-              const std::vector<ColVector<T, N>> &samples) {
+              const std::vector<TColVector<T, N>> &samples) {
     double t = t_start;
     for (size_t i = 0; i < samples.size(); ++i) {
         out << t << ',';

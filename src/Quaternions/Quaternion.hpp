@@ -2,7 +2,7 @@
 
 #include <Matrix/Matrix.hpp>
 
-using Quaternion = ColVector<double, 4>;
+using Quaternion = ColVector<4>;
 
 inline Quaternion quatmultiply(const Quaternion &q, const Quaternion &r) {
     return {{

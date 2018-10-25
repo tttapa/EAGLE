@@ -6,13 +6,22 @@
 #include <ostream>
 
 template <class T, size_t R, size_t C>
-using Matrix = Array<Array<T, C>, R>;
+using TMatrix = Array<Array<T, C>, R>;
+
+template <size_t R, size_t C>
+using Matrix = TMatrix<double, R, C>;
 
 template <class T, size_t R>
-using ColVector = Matrix<T, R, 1>;
+using TColVector = TMatrix<T, R, 1>;
+
+template <size_t R>
+using ColVector = TColVector<double, R>;
 
 template <class T, size_t C>
-using RowVector = Matrix<T, 1, C>;
+using TRowVector = TMatrix<T, 1, C>;
+
+template <size_t C>
+using RowVector = TRowVector<double, C>;
 
 namespace Matrices {
 
@@ -23,8 +32,8 @@ struct TransposeStruct {
 
 // Diagonal matrix
 template <class T, size_t N>
-Matrix<T, N, N> diag(const Array<T, N> &diagElements) {
-    Matrix<T, N, N> matrix = {};
+TMatrix<T, N, N> diag(const Array<T, N> &diagElements) {
+    TMatrix<T, N, N> matrix = {};
     for (size_t i = 0; i < N; ++i)
         matrix[i][i] = diagElements[i];
     return matrix;
@@ -32,8 +41,8 @@ Matrix<T, N, N> diag(const Array<T, N> &diagElements) {
 
 // Identity matrix
 template <class T, size_t N>
-Matrix<T, N, N> eye(T unit = 1) {
-    Matrix<T, N, N> matrix = {};
+TMatrix<T, N, N> eye(T unit = 1) {
+    TMatrix<T, N, N> matrix = {};
     for (size_t i = 0; i < N; ++i)
         matrix[i][i] = unit;
     return matrix;
@@ -41,15 +50,15 @@ Matrix<T, N, N> eye(T unit = 1) {
 
 // All zeros
 template <class T, size_t M, size_t N>
-Matrix<T, M, N> zeros() {
+TMatrix<T, M, N> zeros() {
     return {};
 }
 
 // Matrix multiplication (naive approach, O(n³))
 template <class T, class U, size_t R, size_t M, size_t C>
-Matrix<T, R, C> operator*(const Matrix<T, R, M> &lhs,
-                          const Matrix<U, M, C> &rhs) {
-    Matrix<T, R, C> result;
+TMatrix<T, R, C> operator*(const TMatrix<T, R, M> &lhs,
+                           const TMatrix<U, M, C> &rhs) {
+    TMatrix<T, R, C> result;
     for (size_t r = 0; r < R; ++r)
         for (size_t c = 0; c < C; ++c) {
             T mac = {};
@@ -62,8 +71,8 @@ Matrix<T, R, C> operator*(const Matrix<T, R, M> &lhs,
 
 // Scalar multiplication
 template <class T, size_t R, size_t C>
-Matrix<T, R, C> operator*(T scalar, const Matrix<T, R, C> &matrix) {
-    Matrix<T, R, C> result;
+TMatrix<T, R, C> operator*(T scalar, const TMatrix<T, R, C> &matrix) {
+    TMatrix<T, R, C> result;
     for (size_t r = 0; r < R; ++r)
         for (size_t c = 0; c < C; ++c)
             result[r][c] = scalar * matrix[r][c];
@@ -71,20 +80,21 @@ Matrix<T, R, C> operator*(T scalar, const Matrix<T, R, C> &matrix) {
 }
 
 template <class T, size_t R, size_t C>
-Matrix<T, R, C> operator*(const Matrix<T, R, C> &matrix, T scalar) {
+TMatrix<T, R, C> operator*(const TMatrix<T, R, C> &matrix, T scalar) {
     return scalar * matrix;
 }
 
 // Matrix addition
 template <class T, class U, size_t R, size_t C>
-Matrix<T, R, C> operator+(const Matrix<T, R, C> &lhs,
-                          const Matrix<U, R, C> &rhs) {
-    Matrix<T, R, C> result = lhs;
+TMatrix<T, R, C> operator+(const TMatrix<T, R, C> &lhs,
+                           const TMatrix<U, R, C> &rhs) {
+    TMatrix<T, R, C> result = lhs;
     return result += rhs;
 }
 
 template <class T, class U, size_t R, size_t C>
-Matrix<T, R, C> &operator+=(Matrix<T, R, C> &lhs, const Matrix<U, R, C> &rhs) {
+TMatrix<T, R, C> &operator+=(TMatrix<T, R, C> &lhs,
+                             const TMatrix<U, R, C> &rhs) {
     for (size_t r = 0; r < R; ++r)
         for (size_t c = 0; c < C; ++c)
             lhs[r][c] += rhs[r][c];
@@ -93,9 +103,9 @@ Matrix<T, R, C> &operator+=(Matrix<T, R, C> &lhs, const Matrix<U, R, C> &rhs) {
 
 // Matrix subtraction
 template <class T, class U, size_t R, size_t C>
-Matrix<T, R, C> operator-(const Matrix<T, R, C> &lhs,
-                          const Matrix<U, R, C> &rhs) {
-    Matrix<T, R, C> result;
+TMatrix<T, R, C> operator-(const TMatrix<T, R, C> &lhs,
+                           const TMatrix<U, R, C> &rhs) {
+    TMatrix<T, R, C> result;
     for (size_t r = 0; r < R; ++r)
         for (size_t c = 0; c < C; ++c)
             result[r][c] = lhs[r][c] - rhs[r][c];
@@ -104,8 +114,8 @@ Matrix<T, R, C> operator-(const Matrix<T, R, C> &lhs,
 
 // Matrix transpose
 template <class T, size_t R, size_t C>
-Matrix<T, C, R> transpose(const Matrix<T, R, C> &matrix) {
-    Matrix<T, C, R> result;
+TMatrix<T, C, R> transpose(const TMatrix<T, R, C> &matrix) {
+    TMatrix<T, C, R> result;
     for (size_t r = 0; r < R; ++r)
         for (size_t c = 0; c < C; ++c)
             result[c][r] = matrix[r][c];
@@ -113,15 +123,15 @@ Matrix<T, C, R> transpose(const Matrix<T, R, C> &matrix) {
 }
 
 template <class U, size_t R, size_t C>
-Matrix<U, C, R> operator^(const Matrix<U, R, C> &matrix,
-                          Matrices::TransposeStruct t) {
+TMatrix<U, C, R> operator^(const TMatrix<U, R, C> &matrix,
+                           Matrices::TransposeStruct t) {
     (void) t;
     return transpose(matrix);
 }
 
 // Norm
 template <class T, size_t R>
-double norm(const RowVector<T, R> &rowvector) {
+double norm(const TRowVector<T, R> &rowvector) {
     double sumsq = 0;
     for (size_t r = 0; r < R; ++r)
         sumsq += rowvector[r][0] * rowvector[r][0];
@@ -129,7 +139,7 @@ double norm(const RowVector<T, R> &rowvector) {
 }
 
 template <class T, size_t C>
-double norm(const ColVector<T, C> &colvector) {
+double norm(const TColVector<T, C> &colvector) {
     double sumsq = 0;
     for (size_t c = 0; c < C; ++c)
         sumsq += colvector[0][c] * colvector[0][c];
@@ -146,7 +156,7 @@ double norm(const Array<T, N> &vector) {
 
 // Printing
 template <class T, size_t R, size_t C>
-std::ostream &operator<<(std::ostream &os, const Matrix<T, R, C> &matrix) {
+std::ostream &operator<<(std::ostream &os, const TMatrix<T, R, C> &matrix) {
     auto colsep = ' ';
     auto rowsep = "\r\n";
     os << '(' << R << " × " << C << ')' << rowsep;
@@ -164,7 +174,7 @@ std::ostream &operator<<(std::ostream &os, const Matrix<T, R, C> &matrix) {
  * @brief   Calculates u × v, where u, v ⊆ ℝ³.
  */
 template <class T>
-ColVector<T, 3> cross(const ColVector<T, 3> &u, const ColVector<T, 3> &v) {
+TColVector<T, 3> cross(const TColVector<T, 3> &u, const TColVector<T, 3> &v) {
     return {{
         {u[1][0] * v[2][0] - u[2][0] * v[1][0]},
         {u[2][0] * v[0][0] - u[0][0] * v[2][0]},
@@ -177,9 +187,9 @@ ColVector<T, 3> cross(const ColVector<T, 3> &u, const ColVector<T, 3> &v) {
 template <class T, size_t R, size_t C, size_t RR_sz, size_t CC_sz,
           size_t RR_offset, size_t CC_offset>
 struct MatrixAssignmentHelper {
-    Matrix<T, R, C> &m;
+    TMatrix<T, R, C> &m;
     MatrixAssignmentHelper<T, R, C, RR_sz, CC_sz, RR_offset, CC_offset> &
-    operator=(const Matrix<T, RR_sz, CC_sz> &rhs) {
+    operator=(const TMatrix<T, RR_sz, CC_sz> &rhs) {
         for (size_t r = 0; r < RR_sz; ++r)
             for (size_t c = 0; c < CC_sz; ++c)
                 m[RR_offset + r][CC_offset + c] = rhs[r][c];
@@ -191,7 +201,7 @@ template <size_t Rstart, size_t Rend, size_t Cstart, size_t Cend, class T,
           size_t R, size_t C>
 inline MatrixAssignmentHelper<T, R, C, Rend - Rstart, Cend - Cstart, Rstart,
                               Cstart>
-assignBlock(Matrix<T, R, C> &matrix) {
+assignBlock(TMatrix<T, R, C> &matrix) {
     static_assert(Rstart < R && Rend <= R, "Error: Row indices out of bounds");
     static_assert(Cstart < C && Cend <= C,
                   "Error: Column indices out of bounds");
@@ -200,12 +210,12 @@ assignBlock(Matrix<T, R, C> &matrix) {
 
 template <size_t Rstart, size_t Rend, size_t Cstart, size_t Cend, class T,
           size_t R, size_t C>
-inline Matrix<T, Rend - Rstart, Cend - Cstart>
-getBlock(const Matrix<T, R, C> &matrix) {
+inline TMatrix<T, Rend - Rstart, Cend - Cstart>
+getBlock(const TMatrix<T, R, C> &matrix) {
     static_assert(Rstart < R && Rend <= R, "Error: Row indices out of bounds");
     static_assert(Cstart < C && Cend <= C,
                   "Error: Column indices out of bounds");
-    Matrix<T, Rend - Rstart, Cend - Cstart> result = {};
+    TMatrix<T, Rend - Rstart, Cend - Cstart> result = {};
     for (size_t r = 0; r < Rend - Rstart; ++r)
         for (size_t c = 0; c < Cend - Cstart; ++c)
             result[r][c] = matrix[r + Rstart][c + Cstart];
@@ -213,31 +223,31 @@ getBlock(const Matrix<T, R, C> &matrix) {
 }
 
 template <class T, size_t R, size_t C1, size_t C2>
-Matrix<T, R, C1 + C2> hcat(const Matrix<T, R, C1> &l,
-                           const Matrix<T, R, C2> &r) {
-    Matrix<T, R, C1 + C2> result;
+TMatrix<T, R, C1 + C2> hcat(const TMatrix<T, R, C1> &l,
+                            const TMatrix<T, R, C2> &r) {
+    TMatrix<T, R, C1 + C2> result;
     assignBlock<0, R, 0, C1>(result)       = l;
     assignBlock<0, R, C1, C1 + C2>(result) = r;
     return result;
 }
 
 template <class T, size_t R, size_t C, class... Args>
-auto hcat(const Matrix<T, R, C> &l, Args... args)
+auto hcat(const TMatrix<T, R, C> &l, Args... args)
     -> decltype(hcat(l, hcat(args...))) {
     return hcat(l, hcat(args...));
 }
 
 template <class T, size_t R1, size_t R2, size_t C>
-Matrix<T, R1 + R2, C> vcat(const Matrix<T, R1, C> &t,
-                           const Matrix<T, R2, C> &b) {
-    Matrix<T, R1 + R2, C> result;
+TMatrix<T, R1 + R2, C> vcat(const TMatrix<T, R1, C> &t,
+                            const TMatrix<T, R2, C> &b) {
+    TMatrix<T, R1 + R2, C> result;
     assignBlock<0, R1, 0, C>(result)       = t;
     assignBlock<R1, R1 + R2, 0, C>(result) = b;
     return result;
 }
 
 template <class T, size_t R, size_t C, class... Args>
-auto vcat(const Matrix<T, R, C> &t, Args... args)
+auto vcat(const TMatrix<T, R, C> &t, Args... args)
     -> decltype(vcat(t, vcat(args...))) {
     return vcat(t, vcat(args...));
 }

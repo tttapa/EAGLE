@@ -9,11 +9,11 @@ class InputFunctionU {
     virtual U operator()(double t) = 0;
 };
 
-template <class T, size_t Nx, size_t Nu>
+template <size_t Nx, size_t Nu>
 class Model {
   public:
-    typedef ColVector<T, Nx> VecX_t;
-    typedef ColVector<T, Nu> VecU_t;
+    typedef ColVector<Nx> VecX_t;
+    typedef ColVector<Nu> VecU_t;
     typedef InputFunctionU<VecU_t> InputFunction;
     typedef ODEResultX<VecX_t> SimulationResult;
 
@@ -30,13 +30,13 @@ class ODEFunction {
     virtual X operator()(double t, const X &x) = 0;
 };
 
-template <class T, size_t Nx, size_t Nu>
-class ContinuousModel : public Model<T, Nx, Nu> {
+template <size_t Nx, size_t Nu>
+class ContinuousModel : public Model<Nx, Nu> {
   public:
-    using VecX_t           = typename Model<T, Nx, Nu>::VecX_t;
-    using VecU_t           = typename Model<T, Nx, Nu>::VecU_t;
-    using InputFunction    = typename Model<T, Nx, Nu>::InputFunction;
-    using SimulationResult = typename Model<T, Nx, Nu>::SimulationResult;
+    using VecX_t           = typename Model<Nx, Nu>::VecX_t;
+    using VecU_t           = typename Model<Nx, Nu>::VecU_t;
+    using InputFunction    = typename Model<Nx, Nu>::InputFunction;
+    using SimulationResult = typename Model<Nx, Nu>::SimulationResult;
 
     SimulationResult simulate(InputFunction &u,  // input to the model
                               VecX_t x_start,    // initial state
@@ -49,11 +49,11 @@ class ContinuousModel : public Model<T, Nx, Nu> {
   private:
     class SimulationFunction : public ODEFunction<VecX_t> {
       private:
-        Model<T, Nx, Nu> &model;
+        Model<Nx, Nu> &model;
         InputFunction &u;
 
       public:
-        SimulationFunction(Model<T, Nx, Nu> &model, InputFunction &u)
+        SimulationFunction(Model<Nx, Nu> &model, InputFunction &u)
             : model(model), u(u) {}
         VecX_t operator()(double t, const VecX_t &x) override {
             return model(x, u(t));
@@ -61,15 +61,15 @@ class ContinuousModel : public Model<T, Nx, Nu> {
     };
 };
 
-template <class T, size_t Nx, size_t Nu, size_t Ny>
-class CTLTISystem : public ContinuousModel<T, Nx, Nu> {
+template <size_t Nx, size_t Nu, size_t Ny>
+class CTLTISystem : public ContinuousModel<Nx, Nu> {
   public:
-    using VecX_t = typename Model<T, Nx, Nu>::VecX_t;
-    using VecU_t = typename Model<T, Nx, Nu>::VecU_t;
-    using VecY_t = ColVector<T, Ny>;
+    using VecX_t = typename Model<Nx, Nu>::VecX_t;
+    using VecU_t = typename Model<Nx, Nu>::VecU_t;
+    using VecY_t = ColVector<Ny>;
 
-    CTLTISystem(const Matrix<T, Nx, Nx> &A, const Matrix<T, Nx, Nu> &B,
-                const Matrix<T, Ny, Nx> &C, const Matrix<T, Ny, Nu> &D)
+    CTLTISystem(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
+                const Matrix<Ny, Nx> &C, const Matrix<Ny, Nu> &D)
         : A(A), B(B), C(C), D(D) {}
 
     VecX_t operator()(const VecX_t &x, const VecU_t &u) override {
@@ -80,8 +80,8 @@ class CTLTISystem : public ContinuousModel<T, Nx, Nu> {
         return C * x + D * u;
     }
 
-    const Matrix<T, Nx, Nx> A;
-    const Matrix<T, Nx, Nu> B;
-    const Matrix<T, Ny, Nx> C;
-    const Matrix<T, Ny, Nu> D;
+    const Matrix<Nx, Nx> A;
+    const Matrix<Nx, Nu> B;
+    const Matrix<Ny, Nx> C;
+    const Matrix<Ny, Nu> D;
 };

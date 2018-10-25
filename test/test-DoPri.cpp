@@ -27,7 +27,7 @@ TEST(DoPri, euler) {
 }
 
 TEST(DoPri, eulerVector) {
-    using Type = ColVector<double, 3>;
+    using Type = ColVector<3>;
     auto func  = [](double t, Type x) {
         (void) t;
         return x;

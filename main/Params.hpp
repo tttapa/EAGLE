@@ -85,20 +85,20 @@ struct Params {
     // Very rough estimation of moments of inertia
     double Ip;                   // kgm2 ..... propeller moment of inertia
     double Im;                   // kgm2 ..... rotor moment of inertia
-    Matrix<double, 3, 3> I;      // kgm3 ..... Inertia matrix
-    Matrix<double, 3, 3> I_inv;  // 1/kgm3 ... Inverse of inertia matrix
+    Matrix<3, 3> I;      // kgm3 ..... Inertia matrix
+    Matrix<3, 3> I_inv;  // 1/kgm3 ... Inverse of inertia matrix
 
     // model constants
     double k1;
     double k2;
-    Matrix<double, 3, 3> k3;
-    Matrix<double, 3, 3> k4;
+    Matrix<3, 3> k3;
+    Matrix<3, 3> k4;
 
     // Matrix Gamma_n
-    Matrix<double, 3, 3> gamma_n;
+    Matrix<3, 3> gamma_n;
 
     // Matrix Gamma_u
-    Matrix<double, 3, 3> gamma_u;
+    Matrix<3, 3> gamma_u;
 
     Params() { compute(); }
 

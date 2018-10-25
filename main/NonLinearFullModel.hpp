@@ -4,10 +4,10 @@
 #include <ODE/DormandPrince.hpp>
 #include <Quaternions/Quaternion.hpp>
 
-class NonLinearFullModel : public ContinuousModel<double, 10, 3> {
+class NonLinearFullModel : public ContinuousModel<10, 3> {
   public:
-    using VecOmega_t = ColVector<double, 3>;
-    using VecN_t     = ColVector<double, 3>;
+    using VecOmega_t = ColVector<3>;
+    using VecN_t     = ColVector<3>;
 
     NonLinearFullModel(const Params &p) : p(p) {}
 

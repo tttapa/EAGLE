@@ -2,7 +2,7 @@
 
 #include "Quaternion.hpp"
 
-using ReducedQuaternion = ColVector<double, 3>;
+using ReducedQuaternion = ColVector<3>;
 
 // Reduced quaternion to full quaternion
 inline Quaternion red2quat(const ReducedQuaternion &r) {

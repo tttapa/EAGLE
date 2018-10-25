@@ -6,12 +6,12 @@
 
 template <class T, size_t Rm, size_t Cn>
 struct QR {
-    Matrix<T, Rm, Cn> U;
-    Matrix<T, Rm, Cn> R;
+    TMatrix<T, Rm, Cn> U;
+    TMatrix<T, Rm, Cn> R;
 
     template <size_t C>
-    Matrix<T, Rm, C> applyTranspose(const Matrix<T, Rm, C> &b) {
-        Matrix<T, Rm, C> result = b;
+    TMatrix<T, Rm, C> applyTranspose(const TMatrix<T, Rm, C> &b) {
+        TMatrix<T, Rm, C> result = b;
         typedef typename std::remove_reference<decltype(result[0])>::type row_t;
         for (size_t c = 0; c < Cn; ++c) {
             row_t uTb = {};
@@ -32,7 +32,7 @@ double sign(T x) {
 }
 
 template <class T, size_t Rm, size_t Cn>
-QR<T, Rm, Cn> householderQR(const Matrix<T, Rm, Cn> &a) {
+QR<T, Rm, Cn> householderQR(const TMatrix<T, Rm, Cn> &a) {
     QR<T, Rm, Cn> qtr = {{}, {a}};
 
     for (size_t c = 0; c < Cn; ++c) {

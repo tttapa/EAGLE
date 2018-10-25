@@ -68,7 +68,7 @@ int main(int argc, char const *argv[]) {
             [  0   0   0   0   0   0   0  ┌─────────┐ ]
             [  0   0   0   0   0   0   0  │ -k2 I3  │ ]
             [  0   0   0   0   0   0   0  └─────────┘ ] */
-    Matrix<double, Nx, Nx> A =
+    Matrix<Nx, Nx> A =
         vcat(zeros<double, 1, 10>(),
              hcat(zeros<double, 3, 4>(), 0.5 * eye<double, 3>(),
                   zeros<double, 3, 3>()),
@@ -87,20 +87,20 @@ int main(int argc, char const *argv[]) {
             [ ┌─────────┐ ]
             [ │ k1k2 I3 │ ]
             [ └─────────┘ ] */
-    Matrix<double, Nx, Nu> B =
+    Matrix<Nx, Nu> B =
         vcat(zeros<double, 4, 3>(), p.gamma_u, p.k2 * p.k1 * eye<double, 3>());
 
     cout << "B = " << B << endl;
 
-    Matrix<double, Ny, Nx> C = hcat(eye<double, 7>(), zeros<double, 7, 3>());
+    Matrix<Ny, Nx> C = hcat(eye<double, 7>(), zeros<double, 7, 3>());
 
     cout << "C = " << C << endl;
 
-    Matrix<double, Ny, Nu> D = {};
+    Matrix<Ny, Nu> D = {};
 
     cout << "D = " << D << endl;
 
-    Matrix<double, Nu, Nx> K = {{
+    Matrix<Nu, Nx> K = {{
         {
             0.000000,
             -10.000000,
