@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Model/Controller.hpp>
+#include <algorithm>
 
 class ContinuousLQRController : public ContinuousController<10, 3, 7> {
   public:
@@ -34,6 +35,19 @@ class ContinuousLQRController : public ContinuousController<10, 3, 7> {
         // controller
         ColVector<nu> uc = K * xdiff;
         auto u           = uc + ueq;
+        return u;
+    }
+
+    std::vector<VecU_t> getControlSignal(const std::vector<double> &time,
+                                         const std::vector<VecX_t> &states,
+                                         ReferenceFunction &ref) {
+        std::vector<ContinuousLQRController::VecU_t> u;
+        u.resize(time.size());
+        auto lambda = [this, &ref](double t, auto x) {
+            return (*this)(x, ref(t));
+        };
+        std::transform(time.begin(), time.end(), states.begin(), u.begin(),
+                       lambda);
         return u;
     }
 

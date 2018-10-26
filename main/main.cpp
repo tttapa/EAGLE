@@ -60,23 +60,30 @@ int main(int argc, char const *argv[]) {
         plotSampled ? makeTimeVector(opt.t_start, Ts, opt.t_end) : result.time;
     auto data = plotSampled ? sampled : result.solution;
 
+    // Calculate controller output
+    auto u = ctrl.getControlSignal(t, data, ref);
+
     // Convert the quaternions of the state to euler angles
     vector<EulerAngles> orientation;
     orientation.resize(data.size());
     transform(data.begin(), data.end(), orientation.begin(),
               NonLinearFullModel::stateToEuler);
 
-    plt::subplot(3, 1, 1);
+    plt::subplot(4, 1, 1);
     plotResults(t, orientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Orientation of drone");
     plt::xlim(opt.t_start, opt.t_end);
-    plt::subplot(3, 1, 2);
+    plt::subplot(4, 1, 2);
     plotResults(t, data, {4, 7}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of drone");
     plt::xlim(opt.t_start, opt.t_end);
-    plt::subplot(3, 1, 3);
+    plt::subplot(4, 1, 3);
     plotResults(t, data, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of motors");
+    plt::xlim(opt.t_start, opt.t_end);
+    plt::subplot(4, 1, 4);
+    plotResults(t, u, {0, 3}, {"x", "y", "z"}, {"r-", "g-", "b-"},
+                "Control signal");
     plt::xlim(opt.t_start, opt.t_end);
 
     plt::tight_layout();
