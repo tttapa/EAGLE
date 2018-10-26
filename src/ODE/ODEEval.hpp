@@ -21,10 +21,10 @@ std::vector<X> sampleODEResult(const ODEResultX<X> &result, double t_start,
     for (size_t i = 0; i < N; ++i) {
         double t   = t_start + Ts * i;
         auto t2_it = std::lower_bound(tcurr_it, tend_it, t);  // *t2_it >= t
+        if (t2_it == tbegin_it)
+            ++t2_it;
         if (t2_it == tend_it)
             break;
-        else if (t2_it == tbegin_it)
-            ++t2_it;
         auto t1_it = t2_it - 1;  // *t1_it < t
         auto idx_1 = t1_it - tbegin_it;
         auto x1    = result.solution[idx_1];
