@@ -20,6 +20,16 @@ class ContinuousLQRController : public ContinuousController<10, 3, 7> {
         G                          = solveLeastSquares(W, OI);
     }
 
+    /**
+     * @brief   Given a state x, and a reference value r, calculate the
+     *          controller output.
+     * 
+     * @param   x 
+     *          The current state of the system.
+     * @param   r 
+     *          The current reference output for the system. 
+     * @return  The controller output.
+     */
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
         // new equilibrium state
         ColVector<nx + nu> eq = G * r;
@@ -38,6 +48,10 @@ class ContinuousLQRController : public ContinuousController<10, 3, 7> {
         return u;
     }
 
+    /**
+     * @brief   Given a time and states vector, and a reference signal,
+     *          calculate the output of the controller.
+     */
     std::vector<VecU_t> getControlSignal(const std::vector<double> &time,
                                          const std::vector<VecX_t> &states,
                                          ReferenceFunction &ref) {

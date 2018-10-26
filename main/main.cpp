@@ -27,11 +27,15 @@ int main(int argc, char const *argv[]) {
     ContinuousLQRController ctrl  = {drone.A, drone.B, drone.C, drone.D, K};
     TestReferenceFunction ref     = {};
 
+    cout << "n_h = " << drone.p.nh << " rps = " << drone.p.nh * 60 << " rpm"
+         << endl;
+    cout << "u_h = " << drone.p.uh << endl;
+
     /* ------ Simulation options (for ODE solver) -------------------------- */
 
     AdaptiveODEOptions opt = {};
     opt.t_start            = 0;
-    opt.t_end              = 22;
+    opt.t_end              = 11;
     opt.epsilon            = 1e-6;
     opt.maxiter            = 1e7;
 

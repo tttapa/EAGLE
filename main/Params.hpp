@@ -81,10 +81,11 @@ struct Params {
     // ---- Computed Quantities ----
 
     double nh;  // rps ... hovering n
+    double uh;  // - ..... hovering PWM
 
     // Very rough estimation of moments of inertia
-    double Ip;                   // kgm2 ..... propeller moment of inertia
-    double Im;                   // kgm2 ..... rotor moment of inertia
+    double Ip;           // kgm2 ..... propeller moment of inertia
+    double Im;           // kgm2 ..... rotor moment of inertia
     Matrix<3, 3> I;      // kgm3 ..... Inertia matrix
     Matrix<3, 3> I_inv;  // 1/kgm3 ... Inverse of inertia matrix
 
@@ -104,6 +105,7 @@ struct Params {
 
     void compute() {
         nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
+        uh = nh / k1;
 
         Ip    = mp * pow(Dp, 2) / 12;
         Im    = mr * pow(rr, 2);

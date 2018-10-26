@@ -9,3 +9,4 @@ build/googletest/CMakeLists.txt
 build/googletest/Makefile
 build/Makefile
 CTestCostData.txt
+doc/html/
