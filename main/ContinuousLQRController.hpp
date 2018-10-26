@@ -5,10 +5,18 @@
 
 class ContinuousLQRController : public ContinuousController<10, 3, 7> {
   public:
+    /** Number of states. */
     static constexpr size_t nx = 10;
+    /** Number of inputs. */
     static constexpr size_t nu = 3;
+    /** Number of outputs. */
     static constexpr size_t ny = 7;
 
+    /** 
+     * @brief   Construct a new instance of ContinuousLQRController with the 
+     *          given system matrices A, B, C, D, and the given proportional 
+     *          controller K.
+     */
     ContinuousLQRController(const Matrix<nx, nx> &A, const Matrix<nx, nu> &B,
                             const Matrix<ny, nx> &C, const Matrix<ny, nu> &D,
                             const Matrix<nu, nx> &K)
