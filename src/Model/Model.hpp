@@ -19,12 +19,6 @@ class Model {
                                       )                         = 0;
 };
 
-template <class X>
-class ODEFunction {
-  public:
-    virtual X operator()(double t, const X &x) = 0;
-};
-
 template <size_t Nx, size_t Nu>
 class ContinuousModel : public Model<Nx, Nu> {
   public:
