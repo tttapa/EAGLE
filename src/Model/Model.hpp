@@ -37,23 +37,12 @@ class ContinuousModel : public Model<Nx, Nu> {
                               VecX_t x_start,    // initial state
                               const AdaptiveODEOptions &opt  // options
                               ) override {
-        SimulationFunction f = {*this, u};
+        auto f = [this, &u](double t, const VecX_t &x) {
+            ContinuousModel &model = *this;
+            return model(x, u(t));
+        };
         return dormandPrince(f, x_start, opt);
     }
-
-  private:
-    class SimulationFunction : public ODEFunction<VecX_t> {
-      private:
-        Model<Nx, Nu> &model;
-        InputFunction &u;
-
-      public:
-        SimulationFunction(Model<Nx, Nu> &model, InputFunction &u)
-            : model(model), u(u) {}
-        VecX_t operator()(double t, const VecX_t &x) override {
-            return model(x, u(t));
-        }
-    };
 };
 
 template <size_t Nx, size_t Nu, size_t Ny>

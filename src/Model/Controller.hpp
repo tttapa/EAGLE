@@ -15,7 +15,7 @@ class Controller {
 
     virtual VecU_t operator()(const VecX_t &x, const VecR_t &r) = 0;
     virtual SimulationResult
-    simulate(Model<Nx, Nu> &model,       // the model to control
+    simulate(Model<Nx, Nu> &model,          // the model to control
              ReferenceFunction &r,          // reference input
              VecX_t x_start,                // initial state
              const AdaptiveODEOptions &opt  // options
@@ -37,23 +37,10 @@ class ContinuousController : public Controller<Nx, Nu, Nr> {
                               VecX_t x_start,        // initial state
                               const AdaptiveODEOptions &opt  // options
                               ) override {
-        SimulationFunction f = {model, *this, r};
+        auto f = [&model, this, &r](double t, const VecX_t &x) {
+            ContinuousController &ctrl = *this;
+            return model(x, ctrl(x, r(t)));
+        };
         return dormandPrince(f, x_start, opt);
     }
-
-  private:
-    class SimulationFunction : public ODEFunction<VecX_t> {
-      private:
-        Model<Nx, Nu> &model;
-        Controller<Nx, Nu, Nr> &ctrl;
-        ReferenceFunction &r;
-
-      public:
-        SimulationFunction(Model<Nx, Nu> &model, Controller<Nx, Nu, Nr> &ctrl,
-                           ReferenceFunction &r)
-            : model(model), ctrl(ctrl), r(r) {}
-        VecX_t operator()(double t, const VecX_t &x) override {
-            return model(x, ctrl(x, r(t)));
-        }
-    };
 };
