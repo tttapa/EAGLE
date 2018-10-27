@@ -10,10 +10,9 @@
 
 using namespace std;
 using namespace Config;
-using Matrices::T;
 
 int main(int argc, char const *argv[]) {
-    (void) argc, (void) argv;
+    (void) argc, (void) argv; 
 
     /* ------ Drone full non-linear model ----------------------------------- */
     NonLinearFullModel nonlinfull = drone.p;  // Using the drone's parameters
