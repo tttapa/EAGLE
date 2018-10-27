@@ -55,6 +55,11 @@ include_directories(${CMAKE_BINARY_DIR}/googletest/googletest-src/googlemock/inc
 find_package(PythonLibs 2.7)
 include_directories($ENV{HOME}/lib/matplotlib-cpp)
 
+# include LAPACK
+find_package(LAPACK REQUIRED)
+set(lapack ${LAPACK_LIBRARIES})
+include_directories($ENV{HOME}/lib/lapack-3.8.0/LAPACKE/include/)
+
 # Source files
 include_directories("../src")
 file(GLOB_RECURSE SOURCES "../src/*.cpp")

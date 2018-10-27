@@ -15,7 +15,8 @@
                 "${workspaceFolder}/build/googletest/googletest-src/googletest/include",
                 "${workspaceFolder}/src",
                 "${HOME}/lib/matplotlib-cpp",
-                "/usr/include/python3.5m"
+                "/usr/include/python3.5m",
+                "${HOME}/lib/lapack-3.8.0/LAPACKE/include/"
             ]
         }
     ],

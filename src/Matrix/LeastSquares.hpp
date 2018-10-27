@@ -24,3 +24,8 @@ TMatrix<T, N, P> solveLeastSquares(const TMatrix<T, M, N> &a,
     }
     return x;
 }
+
+template <size_t N>
+Matrix<N, N> inv(const Matrix<N, N> &matrix) {
+    return solveLeastSquares(matrix, eye<N>());
+}

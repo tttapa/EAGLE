@@ -5,6 +5,8 @@
 #include <ODE/ODEEval.hpp>
 #include <iostream>
 
+#include <Matrix/LQR.hpp>
+
 #include "Plot.hpp"
 
 using namespace std;
@@ -92,6 +94,10 @@ int main(int argc, char const *argv[]) {
 
     plt::tight_layout();
     plt::show();
+
+// -------------------------------------------------------------------------- //
+
+    auto s = schur(drone.A, "A");
 
     return EXIT_SUCCESS;
 }
