@@ -1,6 +1,5 @@
 #include "Drone.hpp"
 #include "InputSignals.hpp"
-#include "K.hpp"
 #include "PrintCSV.hpp"
 #include <ODE/ODEEval.hpp>
 #include <iostream>
@@ -27,8 +26,6 @@ int main(int argc, char const *argv[]) {
     const Drone drone             = {};
     NonLinearFullModel nonlinfull = drone.p;
     const Params &p               = drone.p;
-    ContinuousLQRController ctrl  = {drone.A, drone.B, drone.C, drone.D, K};
-    TestReferenceFunction ref     = {};
 
     cout << "n_h = " << drone.p.nh << " rps = " << drone.p.nh * 60 << " rpm"
          << endl;
@@ -46,13 +43,17 @@ int main(int argc, char const *argv[]) {
     auto Q = diag(hcat(Qq, Qomega, Qn));
     auto R = 1.0 / pow(u_att_max, 2) * eye<3>();  // around 9
 
-    auto AK = getBlock<1, 10, 1, 10>(drone.A);
+    auto AK = getBlock<1, 10, 1, 10>(drone.A);  // reduced system matrices
     auto BK = getBlock<1, 10, 0, 3>(drone.B);
 
     auto lqrres = lqr(AK, BK, Q, R);
-    auto KK = -lqrres.K;
+    auto K_red  = -lqrres.K;
+    auto K      = hcat(zeros<3, 1>(), K_red);
 
-    cout << "KK = " << KK << endl;
+    cout << "K = " << K << endl;
+
+    ContinuousLQRController ctrl = {drone.A, drone.B, drone.C, drone.D, K};
+    TestReferenceFunction ref    = {};
 
     /* ------ Simulation options (for ODE solver) -------------------------- */
 
@@ -116,17 +117,7 @@ int main(int argc, char const *argv[]) {
     plt::tight_layout();
     plt::show();
 
-    // -------------------------------------------------------------------------- //
-
-    Matrix<3, 3> M = {{
-        {1, 2, 3},
-        {4, 5, 6},
-        {7, 8, 9},
-    }};
-    auto s         = schur(M, "A");
-
-    cout << "S = " << s.S << endl;
-    cout << "U = " << s.U << endl;
+    // ---------------------------------------------------------------------- //
 
     return EXIT_SUCCESS;
 }
