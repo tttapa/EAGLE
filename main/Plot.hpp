@@ -51,12 +51,12 @@ void plotResults(const std::vector<double> &t,
     if (legends.size() > 0)
         try {
             plt::legend();
-        } catch (std::runtime_error e) {
+        } catch (std::runtime_error &e) {
             std::cerr << "Error: " << e.what() << std::endl;
         }
     try {
         plt::title(title);
-    } catch (std::runtime_error e) {
+    } catch (std::runtime_error &e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
     plt::title(title);

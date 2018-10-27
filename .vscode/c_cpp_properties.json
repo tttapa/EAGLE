@@ -5,7 +5,7 @@
             "defines": [
                 "IDE"
             ],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "/usr/bin/gcc-8",
             "cStandard": "c11",
             "cppStandard": "c++14",
             "intelliSenseMode": "gcc-x64",
@@ -15,7 +15,7 @@
                 "${workspaceFolder}/build/googletest/googletest-src/googletest/include",
                 "${workspaceFolder}/src",
                 "${HOME}/lib/matplotlib-cpp",
-                "/usr/include/python3.5m"
+                "/usr/include/python2.7"
             ]
         }
     ],
