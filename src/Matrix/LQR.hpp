@@ -2,9 +2,8 @@
 
 #include <Matrix/LeastSquares.hpp>
 #include <Matrix/Matrix.hpp>
-#include <string>
-
 #include <lapacke.h>
+#include <string>
 
 template <size_t N>
 struct Schur_result {

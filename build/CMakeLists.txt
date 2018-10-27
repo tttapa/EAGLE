@@ -72,7 +72,8 @@ file(GLOB_RECURSE TESTS "../test/*.cpp")
 add_executable(tests ${TESTS})
 target_link_libraries(tests
                       gmock
-                      source)
+                      source
+                      lapacke)
 
 # Add tests
 gtest_discover_tests(tests)
