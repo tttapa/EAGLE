@@ -3,6 +3,7 @@
 #include "ODEResult.hpp"
 #include <Matrix/Array.hpp>
 #include <algorithm>
+#include <cmath>  // floor
 
 template <class X>
 inline X interpolate(double t1, double t2, const X &x1, const X &x2, double t) {
