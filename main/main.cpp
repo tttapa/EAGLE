@@ -26,12 +26,33 @@ int main(int argc, char const *argv[]) {
 
     const Drone drone             = {};
     NonLinearFullModel nonlinfull = drone.p;
+    const Params &p               = drone.p;
     ContinuousLQRController ctrl  = {drone.A, drone.B, drone.C, drone.D, K};
     TestReferenceFunction ref     = {};
 
     cout << "n_h = " << drone.p.nh << " rps = " << drone.p.nh * 60 << " rpm"
          << endl;
     cout << "u_h = " << drone.p.uh << endl;
+
+    double u_att_max = 1 - p.nh / p.k1;
+    double n_att_max = p.k1 * u_att_max;
+
+    auto Qn =
+        1.0 / pow(n_att_max, 2) * ones<1, 3>();  // very small, around 7e-4
+    auto Qomega = zeros<1, 3>();
+    auto Qq =
+        3.0 *
+        ones<1, 3>();  // The factor determines how aggressive the controller is
+    auto Q = diag(hcat(Qq, Qomega, Qn));
+    auto R = 1.0 / pow(u_att_max, 2) * eye<3>();  // around 9
+
+    auto AK = getBlock<1, 10, 1, 10>(drone.A);
+    auto BK = getBlock<1, 10, 0, 3>(drone.B);
+
+    auto lqrres = lqr(AK, BK, Q, R);
+    auto KK = lqrres.K;
+
+    cout << "KK = " << KK << endl;
 
     /* ------ Simulation options (for ODE solver) -------------------------- */
 
@@ -95,14 +116,14 @@ int main(int argc, char const *argv[]) {
     plt::tight_layout();
     plt::show();
 
-// -------------------------------------------------------------------------- //
+    // -------------------------------------------------------------------------- //
 
     Matrix<3, 3> M = {{
         {1, 2, 3},
         {4, 5, 6},
         {7, 8, 9},
     }};
-    auto s = schur(M, "A");
+    auto s         = schur(M, "A");
 
     cout << "S = " << s.S << endl;
     cout << "U = " << s.U << endl;

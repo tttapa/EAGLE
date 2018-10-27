@@ -32,15 +32,15 @@ struct TransposeStruct {
 
 // Diagonal matrix
 template <class T, size_t N>
-TMatrix<T, N, N> Tdiag(const Array<T, N> &diagElements) {
+TMatrix<T, N, N> Tdiag(const TRowVector<T, N> &diagElements) {
     TMatrix<T, N, N> matrix = {};
     for (size_t i = 0; i < N; ++i)
-        matrix[i][i] = diagElements[i];
+        matrix[i][i] = diagElements[0][i];
     return matrix;
 }
 
 template <size_t N>
-Matrix<N, N> diag(const Array<double, N> &diagElements) {
+Matrix<N, N> diag(const RowVector<N> &diagElements) {
     return Tdiag<double, N>(diagElements);
 }
 
@@ -72,6 +72,22 @@ TMatrix<T, M, N> Tzeros() {
 template <size_t M, size_t N>
 Matrix<M, N> zeros() {
     return {};
+}
+
+// All ones
+template <class T, size_t M, size_t N>
+TMatrix<T, M, N> Tones() {
+    TMatrix<T, M, N> matrix;
+    for (auto &row : matrix)
+        for (auto &el : row)
+            el = T{1};
+    return matrix;
+}
+
+// All zeros
+template <size_t M, size_t N>
+Matrix<M, N> ones() {
+    return Tones<double, M, N>();
 }
 
 // Matrix multiplication (naive approach, O(n³))
@@ -147,6 +163,15 @@ TMatrix<U, C, R> operator^(const TMatrix<U, R, C> &matrix,
                            Matrices::TransposeStruct t) {
     (void) t;
     return transpose(matrix);
+}
+
+template <class T, size_t R, size_t C>
+TMatrix<T, R, C> operator-(const TMatrix<T, R, C> &matrix) {
+    TMatrix<T, R, C> result;
+    for (size_t r = 0; r < R; ++r)
+        for (size_t c = 0; c < C; ++c)
+            result[r][c] = -matrix[r][c];
+    return result;
 }
 
 // Norm

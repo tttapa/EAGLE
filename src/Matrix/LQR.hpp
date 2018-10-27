@@ -41,9 +41,6 @@ Schur_result<N> schur(const Matrix<N, N> &A, const std::string &ord,
         return {S, U};
     }
 
-    // Workspace requirements may need to be fixed if any of the
-    // following change.
-
     char jobvs;
     char sense = 'N';
     char sort  = 'N';
@@ -104,15 +101,42 @@ Schur_result<N> schur(const Matrix<N, N> &A, const std::string &ord,
         pbwork);
 
     std::cout << info << std::endl;
+    if (info != 0)
+        throw std::runtime_error("info != 0");
     return {S, U};
 }
 
-
-
-template<size_t N> 
+template <size_t N>
 struct Balance_result {
     Matrix<N, N> balanced_mat;
+    Matrix<N, N> balancing_mat;
 };
+
+template <size_t N>
+Balance_result<N> balance(const Matrix<N, N> &A, bool noperm = false,
+                          bool noscal = false) {
+    Balance_result<N> result;
+    double *a = &result.balanced_mat[0][0];
+    char job  = noperm ? (noscal ? 'N' : 'S') : (noscal ? 'P' : 'B');
+    double scale[N];
+    lapack_int ilo, ihi;
+    lapack_int n = N;
+    lapack_int info =
+        LAPACKE_dgebal(LAPACK_ROW_MAJOR, job, n, a, n, &ilo, &ihi, scale);
+    std::cout << info << std::endl;
+    if (info != 0)
+        throw std::runtime_error("info != 0");
+
+    result.balancing_mat = eye<N>();
+    char side            = 'R';
+    double *b            = &result.balancing_mat[0][0];
+    info = LAPACKE_dgebak(LAPACK_ROW_MAJOR, job, side, n, ilo, ihi, scale, n, b,
+                          n);
+    std::cout << info << std::endl;
+    if (info != 0)
+        throw std::runtime_error("info != 0");
+    return result;
+}
 
 template <size_t Nx, size_t Nu>
 Matrix<Nx, Nx> are(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
@@ -120,21 +144,29 @@ Matrix<Nx, Nx> are(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
     using Matrices::T;
     // assert(is_controllable(a,b));  // TODO
     // assert(is_observable(a, c));   // TODO
-    auto temp     = vcat(     //
+    auto temp   = vcat(     //
         hcat(A, -B),      //
         hcat(-C, -A ^ T)  //
     );
-    auto balRes   = balance(temp);
-    auto D        = balRes.D;
-    auto H        = balRes.H;
+    auto balRes = balance(temp);
+    auto D      = balRes.balancing_mat;
+    auto H      = balRes.balanced_mat;
+
+    std::cout << "D = " << D << std::endl;
+    std::cout << "H = " << H << std::endl;
+
     auto schurRes = schur(H, "A");
 
-    auto U  = schurRes.U;
-    auto S  = schurRes.S;
-    U       = D * U;
+    auto U = schurRes.U;
+    // auto S  = schurRes.S;
+    std::cout << "U = " << U << std::endl;
+    U = D * U;
+    std::cout << "D * U = " << U << std::endl;
     auto U1 = getBlock<Nx, 2 * Nx, 0, Nx>(U);
     auto U2 = getBlock<0, Nx, 0, Nx>(U);
-    auto X  = U1 * inv(U2);
+    std::cout << "U1 = " << U1 << std::endl;
+    std::cout << "U2 = " << U2 << std::endl;
+    auto X = U1 * inv(U2);
     return X;
 }
 
@@ -142,10 +174,15 @@ template <size_t Nx, size_t Nu>
 LQR_result<Nx, Nu> lqr(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                        const Matrix<Nx, Nx> &Q, const Matrix<Nu, Nu> &R) {
     using Matrices::T;
+    std::cout << "A = " << A << std::endl;
+    std::cout << "B = " << B << std::endl;
+    std::cout << "Q = " << Q << std::endl;
+    std::cout << "R = " << R << std::endl;
     // assert(issymmetric(Q) && issymmetric(R));      // TODO
     // assert(all(eig(q) >= 0) && all(eig(r) > 0)));  // TODO
     Matrix<Nx, Nu> S = zeros<Nx, Nu>();
     auto P           = are(A, B * inv(R) * (B ^ T), Q);
     auto K           = solveLeastSquares(R, (B ^ T) * P + (S ^ T));
-    return K;
+    std::cout << P << std::endl;
+    return {K};
 }
