@@ -57,7 +57,8 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeindex": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "algorithm": "cpp"
     },
     "files.exclude": {
         "**/.git": true,

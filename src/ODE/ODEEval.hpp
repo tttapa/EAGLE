@@ -32,7 +32,6 @@ std::vector<X> sampleODEResult(const ODEResultX<X> &result, double t_start,
         sampled.push_back(interpolate(*t1_it, *t2_it, x1, x2, t));
         tcurr_it = t1_it;  // it doesn't make sense to start searching
         ;                  // from the start each time
-        t += Ts;
     }
     return sampled;
 }
