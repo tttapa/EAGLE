@@ -3,13 +3,13 @@
 #include "Params.hpp"
 
 struct Drone {
-    Drone() { compute(); }
+    constexpr Drone() { compute(); }
 
     constexpr static size_t Nx = 10;
     constexpr static size_t Nu = 3;
     constexpr static size_t Ny = 7;
 
-    void compute() {
+    constexpr void compute() {
         p.compute();
         A = vcat(                                                //
             zeros<1, 10>(),                                      //
@@ -26,7 +26,7 @@ struct Drone {
         D = zeros<Ny, Nu>();
     }
 
-    Params p;
+    Params p = {};
 
     /** ```
      *  A =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]
@@ -40,7 +40,7 @@ struct Drone {
      *       [  ·   ·   ·   ·   ·   ·   ·  │ -k2 I3  │ ]
      *       [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ] 
      * ``` */
-    Matrix<Nx, Nx> A;
+    Matrix<Nx, Nx> A = {};
 
     /** ```
      *  B =  [  ·   ·   ·  ]
@@ -54,7 +54,7 @@ struct Drone {
      *       [ │ k1k2 I3 │ ]
      *       [ └─────────┘ ] 
      * ``` */
-    Matrix<Nx, Nu> B;
+    Matrix<Nx, Nu> B = {};
 
     /** ```
      *  C =  [ 1  ·  ·  ·  ·  ·  ·  ·  ·  · ]
@@ -65,7 +65,7 @@ struct Drone {
      *       [ ·  ·  ·  ·  ·  1  ·  ·  ·  · ]
      *       [ ·  ·  ·  ·  ·  ·  1  ·  ·  · ] 
      * ``` */
-    Matrix<Ny, Nx> C;
+    Matrix<Ny, Nx> C = {};
 
     /** ```
      *  D =  [ ·  ·  · ]
@@ -76,5 +76,5 @@ struct Drone {
      *       [ ·  ·  · ]
      *       [ ·  ·  · ] 
      * ``` */
-    Matrix<Ny, Nu> D;
+    Matrix<Ny, Nu> D = {};
 };

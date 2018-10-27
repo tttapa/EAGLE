@@ -35,6 +35,8 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest/googletest-src
 
 # SET (CMAKE_C_COMPILER "clang")
 # SET (CMAKE_CXX_COMPILER "clang++")
+SET (CMAKE_C_COMPILER "gcc-6")
+SET (CMAKE_CXX_COMPILER "g++-6")
 
 # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
 

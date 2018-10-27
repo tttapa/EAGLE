@@ -20,7 +20,7 @@ constexpr double Ts = 1.0 / fs;  // Sample time step
 constexpr bool plotSampled = false;
 
 /* ------ Define drone parameters ------------------------------------------- */
-const Drone drone = {};
+constexpr Drone drone = {};
 
 /* ------ LQR weighting matrices Q and R ------------------------------------ */
 
@@ -44,7 +44,7 @@ const AdaptiveODEOptions odeopt = {
     .epsilon = 1e-6,
     .h_start = 1e-2,
     .h_min   = 1e-6,
-    .maxiter = 10000000,
+    .maxiter = (unsigned long) 1e7,
 };
 
 }  // namespace Config

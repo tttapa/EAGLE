@@ -80,33 +80,30 @@ struct Params {
 
     // ---- Computed Quantities ----
 
-    double nh;  // rps ... hovering n
-    double uh;  // - ..... hovering PWM
+    double nh = 0;  // rps ... hovering n
+    double uh = 0;  // - ..... hovering PWM
 
     // Very rough estimation of moments of inertia
-    double Ip;           // kgm2 ..... propeller moment of inertia
-    double Im;           // kgm2 ..... rotor moment of inertia
-    Matrix<3, 3> I;      // kgm3 ..... Inertia matrix
-    Matrix<3, 3> I_inv;  // 1/kgm3 ... Inverse of inertia matrix
+    double Ip          = 0;   // kgm2 ..... propeller moment of inertia
+    double Im          = 0;   // kgm2 ..... rotor moment of inertia
+    Matrix<3, 3> I     = {};  // kgm3 ..... Inertia matrix
+    Matrix<3, 3> I_inv = {};  // 1/kgm3 ... Inverse of inertia matrix
 
     // model constants
-    double k1;
-    double k2;
-    Matrix<3, 3> k3;
-    Matrix<3, 3> k4;
+    double k1       = 0;
+    double k2       = 0;
+    Matrix<3, 3> k3 = {};
+    Matrix<3, 3> k4 = {};
 
     // Matrix Gamma_n
-    Matrix<3, 3> gamma_n;
+    Matrix<3, 3> gamma_n = {};
 
     // Matrix Gamma_u
-    Matrix<3, 3> gamma_u;
+    Matrix<3, 3> gamma_u = {};
 
-    Params() { compute(); }
+    constexpr Params() { compute(); }
 
-    void compute() {
-        nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
-        uh = nh / k1;
-
+    constexpr void compute() {
         Ip    = mp * pow(Dp, 2) / 12;
         Im    = mr * pow(rr, 2);
         I     = diag<3>({Ixx, Iyy, Izz});
@@ -119,6 +116,9 @@ struct Params {
              2.0 * ct * rho * nh * pow(Dp, 4) * Nm * L / sqrt(2) / Iyy,
              2.0 * cp * rho * nh * pow(Dp, 5) * Nm / (2.0 * M_PI * Izz)});
         k4 = diag<3>({0, 0, 2.0 * M_PI * Nm * (Im + Ip) / Izz});
+
+        nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
+        uh = nh / k1;
 
         gamma_n = k3 - k2 * k4;
         gamma_u = diag<3>({0, 0, k4[2][2] * k2 * k1});

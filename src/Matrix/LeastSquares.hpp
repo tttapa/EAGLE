@@ -4,14 +4,14 @@
 
 template <class T, size_t M, size_t N, size_t P>
 
-TMatrix<T, N, P> solveLeastSquares(const TMatrix<T, M, N> &a,
-                                  const TMatrix<T, M, P> &b) {
+constexpr TMatrix<T, N, P> solveLeastSquares(const TMatrix<T, M, N> &a,
+                                             const TMatrix<T, M, P> &b) {
     static_assert(M >= N, "Error: A matrix should be a square or rectangular "
                           "matrix with more rows than columns");
 
-    QR<T, M, N> qr = householderQR(a);
-    auto &r = qr.R;
-    auto qtb = qr.applyTranspose(b);
+    QR<T, M, N> qr     = householderQR(a);
+    auto &r            = qr.R;
+    auto qtb           = qr.applyTranspose(b);
     TMatrix<T, N, P> x = {};
     // Back substitution
     for (size_t p = 0; p < P; ++p) {
