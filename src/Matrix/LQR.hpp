@@ -6,13 +6,6 @@
 
 #include <lapacke.h>
 
-// http://lasp.colorado.edu/cism/CISM_DX/code/CISM_DX-0.50/required_packages/octave/share/octave/2.1.50/m/control/base/lqr.m
-template <size_t Nx, size_t Nu>
-struct LQR_result {
-    Matrix<Nu, Nx> K;
-    // TODO
-};
-
 template <size_t N>
 struct Schur_result {
     Matrix<N, N> S;
@@ -100,7 +93,6 @@ Schur_result<N> schur(const Matrix<N, N> &A, const std::string &ord,
         piwork, liwork,                     //
         pbwork);
 
-    std::cout << info << std::endl;
     if (info != 0)
         throw std::runtime_error("info != 0");
     return {S, U};
@@ -112,18 +104,22 @@ struct Balance_result {
     Matrix<N, N> balancing_mat;
 };
 
+// /home/pieter/Downloads/octave-4.4.1/liboctave/numeric/aepbalance.cc
+// /home/pieter/Downloads/octave-4.4.1/liboctave/numeric/aepbalance.h
+// /home/pieter/Downloads/octave-4.4.1/liboctave/numeric/schur.cc
+// /home/pieter/Downloads/octave-4.4.1/liboctave/numeric/schur.h
 template <size_t N>
 Balance_result<N> balance(const Matrix<N, N> &A, bool noperm = false,
                           bool noscal = false) {
     Balance_result<N> result;
-    double *a = &result.balanced_mat[0][0];
-    char job  = noperm ? (noscal ? 'N' : 'S') : (noscal ? 'P' : 'B');
+    result.balanced_mat = A;
+    double *a           = &result.balanced_mat[0][0];
+    char job            = noperm ? (noscal ? 'N' : 'S') : (noscal ? 'P' : 'B');
     double scale[N];
     lapack_int ilo, ihi;
     lapack_int n = N;
     lapack_int info =
         LAPACKE_dgebal(LAPACK_ROW_MAJOR, job, n, a, n, &ilo, &ihi, scale);
-    std::cout << info << std::endl;
     if (info != 0)
         throw std::runtime_error("info != 0");
 
@@ -132,12 +128,12 @@ Balance_result<N> balance(const Matrix<N, N> &A, bool noperm = false,
     double *b            = &result.balancing_mat[0][0];
     info = LAPACKE_dgebak(LAPACK_ROW_MAJOR, job, side, n, ilo, ihi, scale, n, b,
                           n);
-    std::cout << info << std::endl;
     if (info != 0)
         throw std::runtime_error("info != 0");
     return result;
 }
 
+// http://lasp.colorado.edu/cism/CISM_DX/code/CISM_DX-0.50/required_packages/octave/share/octave/2.1.50/m/control/base/are.m
 template <size_t Nx, size_t Nu>
 Matrix<Nx, Nx> are(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                    const Matrix<Nx, Nx> &C) {
@@ -152,37 +148,34 @@ Matrix<Nx, Nx> are(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
     auto D      = balRes.balancing_mat;
     auto H      = balRes.balanced_mat;
 
-    std::cout << "D = " << D << std::endl;
-    std::cout << "H = " << H << std::endl;
-
     auto schurRes = schur(H, "A");
 
     auto U = schurRes.U;
     // auto S  = schurRes.S;
-    std::cout << "U = " << U << std::endl;
-    U = D * U;
-    std::cout << "D * U = " << U << std::endl;
+
+    U       = D * U;
     auto U1 = getBlock<Nx, 2 * Nx, 0, Nx>(U);
     auto U2 = getBlock<0, Nx, 0, Nx>(U);
-    std::cout << "U1 = " << U1 << std::endl;
-    std::cout << "U2 = " << U2 << std::endl;
-    auto X = U1 * inv(U2);
+    auto X  = U1 * inv(U2);
     return X;
 }
+
+// http://lasp.colorado.edu/cism/CISM_DX/code/CISM_DX-0.50/required_packages/octave/share/octave/2.1.50/m/control/base/lqr.m
+template <size_t Nx, size_t Nu>
+struct LQR_result {
+    Matrix<Nx, Nx> P;
+    Matrix<Nu, Nx> K;
+};
 
 template <size_t Nx, size_t Nu>
 LQR_result<Nx, Nu> lqr(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                        const Matrix<Nx, Nx> &Q, const Matrix<Nu, Nu> &R) {
     using Matrices::T;
-    std::cout << "A = " << A << std::endl;
-    std::cout << "B = " << B << std::endl;
-    std::cout << "Q = " << Q << std::endl;
-    std::cout << "R = " << R << std::endl;
+
     // assert(issymmetric(Q) && issymmetric(R));      // TODO
     // assert(all(eig(q) >= 0) && all(eig(r) > 0)));  // TODO
     Matrix<Nx, Nu> S = zeros<Nx, Nu>();
     auto P           = are(A, B * inv(R) * (B ^ T), Q);
     auto K           = solveLeastSquares(R, (B ^ T) * P + (S ^ T));
-    std::cout << P << std::endl;
-    return {K};
+    return {P, K};
 }

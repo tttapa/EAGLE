@@ -50,7 +50,7 @@ int main(int argc, char const *argv[]) {
     auto BK = getBlock<1, 10, 0, 3>(drone.B);
 
     auto lqrres = lqr(AK, BK, Q, R);
-    auto KK = lqrres.K;
+    auto KK = -lqrres.K;
 
     cout << "KK = " << KK << endl;
 
