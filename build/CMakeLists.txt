@@ -36,7 +36,7 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest/googletest-src
 # SET (CMAKE_C_COMPILER "clang")
 # SET (CMAKE_CXX_COMPILER "clang++")
 
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
+# set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
 
 include(GoogleTest)
 enable_testing()
@@ -52,13 +52,8 @@ include_directories(${CMAKE_BINARY_DIR}/googletest/googletest-src/googletest/inc
 include_directories(${CMAKE_BINARY_DIR}/googletest/googletest-src/googlemock/include)
 
 # include Matplotlib-cpp & Python 
-find_package(PythonLibs 2.7)
+find_package(PythonLibs 2.7 REQUIRED)
 include_directories($ENV{HOME}/lib/matplotlib-cpp)
-
-# include LAPACK
-find_package(LAPACK REQUIRED)
-set(lapack ${LAPACK_LIBRARIES})
-include_directories($ENV{HOME}/lib/lapack-3.8.0/LAPACKE/include/)
 
 # Source files
 include_directories("../src")
@@ -70,7 +65,7 @@ include_directories("../main")
 file(GLOB_RECURSE MAIN "../main/*.cpp")
 add_executable(main ${MAIN})
 target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
-target_link_libraries(main source ${PYTHON_LIBRARIES})
+target_link_libraries(main source ${PYTHON_LIBRARIES} lapacke)
 
 # Test executable compilation and linking
 file(GLOB_RECURSE TESTS "../test/*.cpp")

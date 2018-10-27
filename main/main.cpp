@@ -97,7 +97,15 @@ int main(int argc, char const *argv[]) {
 
 // -------------------------------------------------------------------------- //
 
-    auto s = schur(drone.A, "A");
+    Matrix<3, 3> M = {{
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9},
+    }};
+    auto s = schur(M, "A");
+
+    cout << "S = " << s.S << endl;
+    cout << "U = " << s.U << endl;
 
     return EXIT_SUCCESS;
 }

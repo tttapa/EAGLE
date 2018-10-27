@@ -4,9 +4,7 @@
 #include <Matrix/Matrix.hpp>
 #include <string>
 
-extern "C" {
 #include <lapacke.h>
-};
 
 // http://lasp.colorado.edu/cism/CISM_DX/code/CISM_DX-0.50/required_packages/octave/share/octave/2.1.50/m/control/base/lqr.m
 template <size_t Nx, size_t Nu>
@@ -108,6 +106,13 @@ Schur_result<N> schur(const Matrix<N, N> &A, const std::string &ord,
     std::cout << info << std::endl;
     return {S, U};
 }
+
+
+
+template<size_t N> 
+struct Balance_result {
+    Matrix<N, N> balanced_mat;
+};
 
 template <size_t Nx, size_t Nu>
 Matrix<Nx, Nx> are(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
