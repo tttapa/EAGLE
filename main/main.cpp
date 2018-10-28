@@ -43,11 +43,12 @@ int main(int argc, char const *argv[]) {
     TestReferenceFunction ref = {};
 
     /* ------ Simulate the drone with the controller ----------------------- */
-    // LQRController::SimulationResult result =
-    //     ctrl.simulate(nonlinfull, ref, x0, odeopt);
+    LQRController &simulationController = simulateContinuousController
+                                              ? (LQRController &) ctrl
+                                              : (LQRController &) dctrl;
 
     LQRController::SimulationResult result =
-        dctrl.simulate(nonlinfull, ref, x0, odeopt);
+        simulationController.simulate(nonlinfull, ref, x0, odeopt);
 
     double t_end = odeopt.t_end;
     if (result.resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED) {
@@ -72,7 +73,7 @@ int main(int argc, char const *argv[]) {
     auto data = plotSampled ? sampled : result.solution;
 
     // Calculate controller output
-    auto u = ctrl.getControlSignal(t, data, ref);
+    auto u = simulationController.getControlSignal(t, data, ref);
 
     // Convert the quaternions of the state to euler angles
     vector<EulerAngles> orientation;

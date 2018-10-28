@@ -18,6 +18,8 @@ extern const double Ts;  // Sample time step
 
 // Plot the samled version instead of "continuous"
 extern const bool plotSampled;
+// Plot the result of the continuous controller instead of the discrete one.
+extern const bool simulateContinuousController;
 
 /* ------ Define drone parameters ------------------------------------------- */
 constexpr Drone drone = {};
