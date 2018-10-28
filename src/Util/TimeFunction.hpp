@@ -22,3 +22,10 @@ struct FunctionPointerTimeFunctionT : public TimeFunctionT<T> {
     FunctionPtr_t f;
     T operator()(double t) override { return f(t); }
 };
+
+template <class T>
+struct ConstantTimeFunctionT : public TimeFunctionT<T> {
+    ConstantTimeFunctionT(const T &f) : f(f) {}
+    const T f;
+    T operator()(double /* t */) override { return f; }
+};

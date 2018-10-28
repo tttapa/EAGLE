@@ -23,7 +23,7 @@ class Controller {
 };
 
 template <size_t Nx, size_t Nu, size_t Nr>
-class ContinuousController : public Controller<Nx, Nu, Nr> {
+class ContinuousController : public virtual Controller<Nx, Nu, Nr> {
   public:
     using VecX_t = typename Controller<Nx, Nu, Nr>::VecX_t;
     using VecU_t = typename Controller<Nx, Nu, Nr>::VecU_t;
@@ -43,4 +43,48 @@ class ContinuousController : public Controller<Nx, Nu, Nr> {
         };
         return dormandPrince(f, x_start, opt);
     }
+};
+
+template <size_t Nx, size_t Nu, size_t Nr>
+class DiscreteController : public virtual Controller<Nx, Nu, Nr> {
+  public:
+    using VecX_t = typename Controller<Nx, Nu, Nr>::VecX_t;
+    using VecU_t = typename Controller<Nx, Nu, Nr>::VecU_t;
+    using VecR_t = typename Controller<Nx, Nu, Nr>::VecR_t;
+    using ReferenceFunction =
+        typename Controller<Nx, Nu, Nr>::ReferenceFunction;
+    using SimulationResult = typename Controller<Nx, Nu, Nr>::SimulationResult;
+
+    DiscreteController(double Ts) : Ts(Ts) {}
+
+    SimulationResult simulate(Model<Nx, Nu> &model,  // the model to control
+                              ReferenceFunction &r,  // reference input
+                              VecX_t x_start,        // initial state
+                              const AdaptiveODEOptions &opt  // options
+                              ) override {
+        SimulationResult result     = {};
+        size_t N                    = floor((opt.t_end - opt.t_start) / Ts) + 1;
+        VecX_t curr_x               = x_start;
+        AdaptiveODEOptions curr_opt = opt;
+        for (size_t i = 0; i < N; ++i) {
+            double t         = opt.t_start + Ts * i;
+            curr_opt.t_start = t;
+            curr_opt.t_end   = t + Ts;
+            VecR_t curr_ref  = r(t);
+            VecU_t curr_u    = (*this)(curr_x, curr_ref);
+            auto curr_result = model.simulate(curr_u, curr_x, curr_opt);
+
+            result.time.resize(curr_result.time.size() - 1);
+            std::copy(curr_result.time.begin(), curr_result.time.end() - 1,
+                      result.time.end());
+            result.solution.resize(curr_result.solution.size() - 1);
+            std::copy(curr_result.solution.begin(),
+                      curr_result.solution.end() - 1, result.solution.end());
+            result.resultCode |= curr_result.resultCode;
+            curr_x = curr_result.solution.back();
+        }
+        return result;
+    }
+
+    const double Ts;
 };

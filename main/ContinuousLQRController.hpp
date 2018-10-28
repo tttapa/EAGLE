@@ -1,9 +1,10 @@
 #pragma once
 
 #include <Model/Controller.hpp>
+#include <Model/System.hpp>
 #include <algorithm>
 
-class ContinuousLQRController : public ContinuousController<10, 3, 7> {
+class LQRController : public virtual Controller<10, 3, 7> {
   public:
     /** Number of states. */
     static constexpr size_t nx = 10;
@@ -17,17 +18,12 @@ class ContinuousLQRController : public ContinuousController<10, 3, 7> {
      *          given system matrices A, B, C, D, and the given proportional 
      *          controller K.
      */
-    ContinuousLQRController(const Matrix<nx, nx> &A, const Matrix<nx, nu> &B,
-                            const Matrix<ny, nx> &C, const Matrix<ny, nu> &D,
-                            const Matrix<nu, nx> &K)
-        : K(K) {
-        /* W =  [ A B ]
-                [ C D ] */
-        Matrix<nx + ny, nx + nu> W = vcat(hcat(A, B), hcat(C, D));
-        Matrix<nx + ny, ny> OI     = vcat(zeros<nx, ny>(), eye<ny>());
-        G                          = solveLeastSquares(W, OI);
-    }
+    LQRController(const Matrix<nx, nx> &A, const Matrix<nx, nu> &B,
+                  const Matrix<ny, nx> &C, const Matrix<ny, nu> &D,
+                  const Matrix<nu, nx> &K, bool continuous)
+        : K(K), G(calculateG(A, B, C, D, continuous)) {}
 
+  public:
     /**
      * @brief   Given a state x, and a reference value r, calculate the
      *          controller output.
@@ -41,8 +37,8 @@ class ContinuousLQRController : public ContinuousController<10, 3, 7> {
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
         // new equilibrium state
         ColVector<nx + nu> eq = G * r;
-        ColVector<nx> xeq     = getBlock<0, 10, 0, 1>(eq);
-        ColVector<nu> ueq     = getBlock<10, 13, 0, 1>(eq);
+        ColVector<nx> xeq     = getBlock<0, nx, 0, 1>(eq);
+        ColVector<nu> ueq     = getBlock<nx, nx + nu, 0, 1>(eq);
 
         // error
         ColVector<nx> xdiff            = x - xeq;
@@ -63,7 +59,7 @@ class ContinuousLQRController : public ContinuousController<10, 3, 7> {
     std::vector<VecU_t> getControlSignal(const std::vector<double> &time,
                                          const std::vector<VecX_t> &states,
                                          ReferenceFunction &ref) {
-        std::vector<ContinuousLQRController::VecU_t> u;
+        std::vector<LQRController::VecU_t> u;
         u.resize(time.size());
         auto lambda = [this, &ref](double t, auto x) {
             return (*this)(x, ref(t));
@@ -74,6 +70,49 @@ class ContinuousLQRController : public ContinuousController<10, 3, 7> {
     }
 
   private:
-    Matrix<nx + nu, ny> G;
-    Matrix<nu, nx> K;
+    static Matrix<nx + nu, ny> calculateG(const Matrix<nx, nx> &A,
+                                          const Matrix<nx, nu> &B,
+                                          const Matrix<ny, nx> &C,
+                                          const Matrix<ny, nu> &D,
+                                          bool continuous) {
+        Matrix<nx, nx> Aa = continuous ? A : A - eye<nx>();
+        /* W =  [ Aa B ]
+                [ C  D ] */
+        Matrix<nx + ny, nx + nu> W = vcat(  //
+            hcat(Aa, B),                    //
+            hcat(C, D)                      //
+        );
+        Matrix<nx + ny, ny> OI     = vcat(zeros<nx, ny>(), eye<ny>());
+        auto G                     = solveLeastSquares(W, OI);
+        return G;
+    }
+
+  public:
+    const Matrix<nu, nx> K;
+    const Matrix<nx + nu, ny> G;
+};
+
+class ContinuousLQRController : public LQRController,
+                                public ContinuousController<10, 3, 7> {
+  public:
+    ContinuousLQRController(const Matrix<nx, nx> &A, const Matrix<nx, nu> &B,
+                            const Matrix<ny, nx> &C, const Matrix<ny, nu> &D,
+                            const Matrix<nu, nx> &K)
+        : LQRController(A, B, C, D, K, true) {}
+};
+
+class DiscreteLQRController : public LQRController,
+                              public DiscreteController<10, 3, 7> {
+  public:
+    DiscreteLQRController(const Matrix<nx, nx> &A, const Matrix<nx, nu> &B,
+                          const Matrix<ny, nx> &C, const Matrix<ny, nu> &D,
+                          const Matrix<nu, nx> &K, double Ts)
+        : LQRController(A, B, C, D, K, false), DiscreteController<10, 3, 7>(
+                                                   Ts) {}
+
+    DiscreteLQRController(const DTLTISystem<10, 3, 7> &discreteSystem,
+                          const Matrix<nu, nx> &K)
+        : LQRController(discreteSystem.A, discreteSystem.B, discreteSystem.C,
+                        discreteSystem.D, K, false),
+          DiscreteController<10, 3, 7>(discreteSystem.Ts) {}
 };

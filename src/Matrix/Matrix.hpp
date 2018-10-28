@@ -208,7 +208,7 @@ constexpr double norm(const Array<T, N> &vector) {
 template <class T, size_t R, size_t C>
 std::ostream &operator<<(std::ostream &os, const TMatrix<T, R, C> &matrix) {
     auto colsep = ' ';
-    auto rowsep = "\r\n";
+    auto rowsep = ";\r\n";
     os << '(' << R << " × " << C << ')' << rowsep;
     for (const auto &row : matrix) {
         for (const auto &el : row)

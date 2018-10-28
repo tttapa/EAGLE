@@ -17,6 +17,13 @@ class Model {
                                       VecX_t x_start,    // initial state
                                       const AdaptiveODEOptions &opt  // options
                                       )                         = 0;
+    virtual SimulationResult simulate(VecU_t u,        // input to the model
+                                      VecX_t x_start,  // initial state
+                                      const AdaptiveODEOptions &opt  // options
+    ) {
+        ConstantTimeFunctionT<VecU_t> fu = u;
+        return simulate(fu, x_start, opt);
+    }
 };
 
 template <size_t Nx, size_t Nu>
@@ -40,14 +47,14 @@ class ContinuousModel : public Model<Nx, Nu> {
 };
 
 template <size_t Nx, size_t Nu, size_t Ny>
-class CTLTISystem : public ContinuousModel<Nx, Nu> {
+class CTLTIModel : public ContinuousModel<Nx, Nu> {
   public:
     using VecX_t = typename Model<Nx, Nu>::VecX_t;
     using VecU_t = typename Model<Nx, Nu>::VecU_t;
     using VecY_t = ColVector<Ny>;
 
-    CTLTISystem(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
-                const Matrix<Ny, Nx> &C, const Matrix<Ny, Nu> &D)
+    CTLTIModel(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
+               const Matrix<Ny, Nx> &C, const Matrix<Ny, Nu> &D)
         : A(A), B(B), C(C), D(D) {}
 
     VecX_t operator()(const VecX_t &x, const VecU_t &u) override {

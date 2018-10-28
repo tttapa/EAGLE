@@ -1,6 +1,8 @@
 #include "InputSignals.hpp"
 #include "PrintCSV.hpp"
+#include <Matrix/DLQR.hpp>
 #include <Matrix/LQR.hpp>
+#include <Model/System.hpp>
 #include <ODE/ODEEval.hpp>
 #include <iostream>
 
@@ -12,26 +14,40 @@ using namespace std;
 using namespace Config;
 
 int main(int argc, char const *argv[]) {
-    (void) argc, (void) argv; 
+    (void) argc, (void) argv;
 
     /* ------ Drone full non-linear model ----------------------------------- */
     NonLinearFullModel nonlinfull = drone.p;  // Using the drone's parameters
 
+    // TODO: use zero-order hold?
+    CTLTISystem<10, 3, 7> linfull = {drone.A, drone.B, drone.C, drone.D};
+    auto discretized = linfull.discretize(Ts, DiscretizationMethod::Bilinear);
+
     /* ------ Reduced system matrices --------------------------------------- */
     auto A_red = getBlock<1, 10, 1, 10>(drone.A);
     auto B_red = getBlock<1, 10, 0, 3>(drone.B);
+
+    auto Ad_red = getBlock<1, 10, 1, 10>(discretized.A);
+    auto Bd_red = getBlock<1, 10, 0, 3>(discretized.B);
 
     /* ------ Design controller --------------------------------------------- */
     auto K_red = -lqr(A_red, B_red, Q, R).K;
     auto K = hcat(zeros<3, 1>(), K_red);  // add column of zeros for full model
     ContinuousLQRController ctrl = {drone.A, drone.B, drone.C, drone.D, K};
 
+    auto Kd_red                 = -dlqr(Ad_red, Bd_red, Q, R).K;
+    auto Kd                     = hcat(zeros<3, 1>(), Kd_red);
+    DiscreteLQRController dctrl = {discretized, Kd};
+
     /* ------ Reference function -------------------------------------------- */
     TestReferenceFunction ref = {};
 
     /* ------ Simulate the drone with the controller ----------------------- */
-    ContinuousLQRController::SimulationResult result =
+    LQRController::SimulationResult result =
         ctrl.simulate(nonlinfull, ref, x0, odeopt);
+
+    // LQRController::SimulationResult result =
+    //     dctrl.simulate(nonlinfull, ref, x0, odeopt);
 
     double t_end = odeopt.t_end;
     if (result.resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED) {
