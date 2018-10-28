@@ -24,9 +24,15 @@ TEST(QR, QR) {
         {0, 0.627661764705549},
         {0, 0},
     }};
+    Matrix<3, 3> Q_expected   = {{
+        {-0.281866026673626, 0.868265441176001, 0.408248290463862},
+        {-0.538107869104196, 0.209220588235181, -0.816496580927726},
+        {-0.794349711534765, -0.449824264705639, 0.408248290463863},
+    }};
     Matrix<3, 2> QTA_expected = qtr.R;
 
     ASSERT_TRUE(isAlmostEqual(qtr.R, R_expected, 1e-12));
     ASSERT_TRUE(isAlmostEqual(qtr.U, U_expected, 1e-12));
+    ASSERT_TRUE(isAlmostEqual(qtr.Q(), Q_expected, 1e-12));
     ASSERT_TRUE(isAlmostEqual(QTA, QTA_expected, 1e-12));
 }

@@ -103,10 +103,10 @@ struct Balance_result {
     Matrix<N, N> balancing_mat;
 };
 
-// /home/pieter/Downloads/octave-4.4.1/liboctave/numeric/aepbalance.cc
-// /home/pieter/Downloads/octave-4.4.1/liboctave/numeric/aepbalance.h
-// /home/pieter/Downloads/octave-4.4.1/liboctave/numeric/schur.cc
-// /home/pieter/Downloads/octave-4.4.1/liboctave/numeric/schur.h
+// octave-4.4.1/liboctave/numeric/aepbalance.cc
+// octave-4.4.1/liboctave/numeric/aepbalance.h
+// octave-4.4.1/liboctave/numeric/schur.cc
+// octave-4.4.1/liboctave/numeric/schur.h
 template <size_t N>
 Balance_result<N> balance(const Matrix<N, N> &A, bool noperm = false,
                           bool noscal = false) {
@@ -139,10 +139,11 @@ Matrix<Nx, Nx> are(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
     using Matrices::T;
     // assert(is_controllable(a,b));  // TODO
     // assert(is_observable(a, c));   // TODO
-    auto temp   = vcat(     //
+    auto temp = vcat(     //
         hcat(A, -B),      //
         hcat(-C, -A ^ T)  //
     );
+
     auto balRes = balance(temp);
     auto D      = balRes.balancing_mat;
     auto H      = balRes.balanced_mat;

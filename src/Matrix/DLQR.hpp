@@ -1,0 +1,171 @@
+#pragma once
+
+#include <Matrix/HouseholderQR.hpp>
+#include <Matrix/LeastSquares.hpp>
+#include <Matrix/Matrix.hpp>
+#include <lapacke.h>
+#include <limits>
+
+template <size_t N>
+struct Balance_result_GEP {
+    Matrix<N, N> balancing_matrix;
+    Matrix<N, N> balancing_matrix2;
+    Matrix<N, N> balanced_matrix;
+    Matrix<N, N> balanced_matrix2;
+};
+
+template <size_t N>
+Balance_result_GEP<N> balance(const Matrix<N, N> &A, const Matrix<N, N> &B) {
+    Balance_result_GEP<N> result = {eye<N>(), eye<N>(), A, B};
+
+    double *p_balanced_mat  = &result.balanced_matrix[0][0];
+    double *p_balanced_mat2 = &result.balanced_matrix2[0][0];
+
+    char job = 'B';  // TODO
+
+    lapack_int n = N;
+    lapack_int info;
+    lapack_int ilo;
+    lapack_int ihi;
+    double plscale[N];
+    double prscale[N];
+    double pwork[N * 6];
+
+    LAPACKE_dggbal_work(LAPACK_ROW_MAJOR, job, n, p_balanced_mat, n,
+                        p_balanced_mat2, n, &ilo, &ihi, plscale, prscale,
+                        pwork);
+
+    double *p_balancing_mat  = &result.balancing_matrix[0][0];
+    double *p_balancing_mat2 = &result.balancing_matrix2[0][0];
+
+    LAPACKE_dggbak(LAPACK_ROW_MAJOR, job, 'L', n, ilo, ihi, plscale, prscale, n,
+                   p_balancing_mat, n);
+
+    LAPACKE_dggbak(LAPACK_ROW_MAJOR, job, 'R', n, ilo, ihi, plscale, prscale, n,
+                   p_balancing_mat2, n);
+
+    if (info != 0)
+        throw std::runtime_error("info != 0");
+    return result;
+}
+
+template <size_t Nx>
+Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B, char j) {
+    char ord_job = 'S';
+    double sfmin = (1.0 + 2 * std::numeric_limits<double>::epsilon()) /
+                   std::numeric_limits<double>::max();
+    lapack_int nn = Nx;
+
+    Matrix<Nx, Nx> aa = A;
+    double *paa       = &aa[0][0];
+
+    Matrix<Nx, Nx> bb = B;
+    double *pbb       = &bb[0][0];
+
+    Matrix<Nx, Nx> QQ = eye<Nx>();  // TODO
+    double *pqq       = &QQ[0][0];
+    Matrix<Nx, Nx> ZZ = eye<Nx>();
+    double *pzz       = &ZZ[0][0];
+    double alphar[Nx], alphai[Nx], betar[Nx];
+    lapack_int ilo, ihi, info;
+    char comp_q = 'V';
+    char comp_z = 'V';
+
+    // Always perform permutation balancing.
+    const char bal_job = 'P';
+    double lscale[Nx], rscale[Nx], work[6 * Nx], rwork[Nx];
+
+    info = LAPACKE_dggbal_work(LAPACK_ROW_MAJOR, bal_job, nn, paa, nn, pbb, nn,
+                               &ilo, &ihi, lscale, rscale, work);
+
+    char qz_job = 'S';
+
+    // Compute the QR factorization of bb.
+    QR<double, Nx, Nx> qrRes = householderQR(B);
+    bb                       = qrRes.R;
+
+    aa = qrRes.applyTranspose(aa);
+
+    QQ = QQ * qrRes.Q();  // TODO
+
+    info = LAPACKE_dgghrd(LAPACK_ROW_MAJOR, comp_q, comp_z, nn, ilo, ihi, paa,
+                          nn, pbb, nn, pqq, nn, pzz, nn);
+
+    // Hessenberg
+    info = LAPACKE_dgghrd(LAPACK_ROW_MAJOR, comp_q, comp_z, nn, ilo, ihi, paa,
+                          nn, pbb, nn, pqq, nn, pzz, nn);
+    // Schur
+    info = LAPACKE_dhgeqz_work(LAPACK_ROW_MAJOR, qz_job, comp_q, comp_z, nn,
+                               ilo, ihi, paa, nn, pbb, nn, alphar, alphai,
+                               betar, pqq, nn, pzz, nn, work, nn);
+
+    info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, bal_job, 'L', nn, ilo, ihi, lscale,
+                          rscale, nn, pqq, nn);
+
+    info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, bal_job, 'R', nn, ilo, ihi, lscale,
+                          rscale, nn, pzz, nn);
+
+    lapack_logical select[Nx];
+
+    for (size_t j = 0; j < nn; ++j)
+        select[j] =
+            alphar[j] * alphar[j] + alphai[j] * alphai[j] < betar[j] * betar[j];
+
+    lapack_logical wantq = 0, wantz = 1;
+    lapack_int ijob = 0, mm, lrwork3 = 4 * nn + 16, liwork = nn;
+    double pl, pr;
+    double rwork3[lrwork3];
+    lapack_int iwork[liwork];
+
+    LAPACKE_dtgsen_work(LAPACK_ROW_MAJOR, ijob, wantq, wantz, select, nn, paa,
+                        nn, pbb, nn, alphar, alphai, betar, nullptr, nn, pzz,
+                        nn, &mm, &pl, &pr, nullptr, rwork3, lrwork3, iwork,
+                        liwork);
+
+    return ZZ;
+}
+
+template <size_t Nx, size_t Nu>
+Matrix<Nx, Nx> dare(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
+                    const Matrix<Nx, Nx> &C, const Matrix<Nu, Nu> &R) {
+    using Matrices::T;
+
+    auto S1 = vcat(                //
+        hcat(A, zeros<Nx, Nx>()),  //
+        hcat(-C, eye<Nx>())        //
+    );
+
+    auto S2 = vcat(                             //
+        hcat(eye<Nx>(), B * inv(R) * (B ^ T)),  //
+        hcat(zeros<Nx, Nx>(), A ^ T)            //
+    );
+
+    Balance_result_GEP<2 *Nx> balRes = balance(S1, S2);
+    auto U  = qz_Z(balRes.balanced_matrix, balRes.balanced_matrix2, 'S');
+    auto D  = balRes.balancing_matrix2;
+    U       = D * U;
+    auto U1 = getBlock<Nx, 2 * Nx, 0, Nx>(U);
+    auto U2 = getBlock<0, Nx, 0, Nx>(U);
+    auto X  = U1 * inv(U2);
+    return X;
+}
+
+template <size_t Nx, size_t Nu>
+struct DLQR_result {
+    Matrix<Nx, Nx> P;
+    Matrix<Nu, Nx> K;
+};
+
+template <size_t Nx, size_t Nu>
+DLQR_result<Nx, Nu> dlqr(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
+                         const Matrix<Nx, Nx> &Q, const Matrix<Nu, Nu> &R) {
+    using Matrices::T;
+
+    Matrix<Nx, Nu> S = zeros<Nx, Nu>();
+    auto P           = dare(A, B, Q, R);
+    auto K           = solveLeastSquares(    //
+        R + (B ^ T) * P * B,       //
+        (B ^ T) * P * A + (S ^ T)  //
+    );
+    return {P, K};
+}

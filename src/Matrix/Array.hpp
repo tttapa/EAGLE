@@ -34,6 +34,18 @@ struct Array {
         return *this;
     }
 
+    constexpr Array<T, N> operator/(double rhs) const {
+        Array<T, N> result = *this;
+        result /= rhs;
+        return result;
+    }
+
+    constexpr Array<T, N> &operator/=(double rhs) {
+        for (auto &el : *this)
+            el /= rhs;
+        return *this;
+    }
+
     constexpr Array<T, N> operator+(const Array<T, N> &rhs) const {
         Array<T, N> result = *this;
         result += rhs;

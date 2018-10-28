@@ -79,3 +79,7 @@ target_link_libraries(tests
 
 # Add tests
 gtest_discover_tests(tests)
+
+# Add Doxygen target
+add_custom_target(documentation rm -r html && doxygen
+                  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/../doc/")

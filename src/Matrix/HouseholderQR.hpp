@@ -24,6 +24,24 @@ struct QR {
         }
         return result;
     }
+
+    template <size_t C>
+    constexpr TMatrix<T, Rm, C> apply(const TMatrix<T, Rm, C> &b) {
+        TMatrix<T, Rm, C> result = b;
+        typedef typename std::remove_reference<decltype(result[0])>::type row_t;
+        for (size_t c = Cn; c-- > 0;) {
+            row_t uTb = {};
+            for (size_t cc = 0; cc < C; ++cc)
+                for (size_t r = c; r < Rm; ++r)
+                    uTb[cc] += U[r][c] * result[r][cc];
+            for (size_t r = c; r < Rm; ++r)
+                for (size_t cc = 0; cc < C; ++cc)
+                    result[r][cc] += -U[r][c] * uTb[cc];
+        }
+        return result;
+    }
+
+    constexpr TMatrix<T, Rm, Rm> Q() { return apply(Teye<T, Rm>()); }
 };
 
 template <typename T>
