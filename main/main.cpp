@@ -60,13 +60,17 @@ int main(int argc, char const *argv[]) {
 
     /* ------ Export the simulation result as CSV -------------------------- */
 
-    // Sample and/or interpolate the simulation result using a fixed time step
-    auto sampled = sampleODEResult(result, odeopt.t_start, Ts, t_end);
-    // Export to the given output file
-    printCSV(outputFile, odeopt.t_start, Ts, sampled);
+    if (exportCSV) {
+        // Sample/interpolate the simulation result using a fixed time step
+        auto sampled = sampleODEResult(result, odeopt.t_start, CSV_Ts, t_end);
+        // Export to the given output file
+        printCSV(outputFile, odeopt.t_start, CSV_Ts, sampled);
+    }
 
     /* ------ Plot the simulation result ------------------------------------*/
 
+    // Sample/interpolate the simulation result using a fixed time step
+    auto sampled = sampleODEResult(result, odeopt.t_start, Ts, t_end);
     // Decide what data to use: either the sampled version or the raw result
     auto t =
         plotSampled ? makeTimeVector(odeopt.t_start, Ts, t_end) : result.time;

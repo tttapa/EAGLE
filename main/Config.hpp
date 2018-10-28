@@ -10,7 +10,13 @@ namespace Config {
 const std::string home = getenv("HOME");
 
 // Filename for simulation output
-const extern std::string outputFile;
+extern const std::string outputFile;
+// Export the simulation data as CSV.
+extern const bool exportCSV;
+// Sample frequency for CSV output (fps).
+extern const double CSV_fs;
+// Time step for discrete controller.
+extern const double CSV_Ts;
 
 // Sample rate for simulation output
 extern const double fs;  // Sample frequency

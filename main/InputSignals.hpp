@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ContinuousLQRController.hpp"
+#include "LQRController.hpp"
 #include "NonLinearFullModel.hpp"
 
 /** 

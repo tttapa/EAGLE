@@ -4,6 +4,11 @@
 #include <Model/Model.hpp>
 #include <Quaternions/Quaternion.hpp>
 
+/**
+ * @brief   An abstract class for controllers.
+ *          A controller produces a control signal @f$ u @f$ given a state 
+ *          @f$ x @f$ and a reference target @f$ r @f$.
+ */
 template <size_t Nx, size_t Nu, size_t Nr>
 class Controller {
   public:
@@ -13,13 +18,34 @@ class Controller {
     typedef TimeFunctionT<VecR_t> ReferenceFunction;
     typedef ODEResultX<VecX_t> SimulationResult;
 
+    /**
+     * @brief   Given a state x, and a reference value r, calculate the
+     *          controller output. 
+     * 
+     * @param   x 
+     *          The current state of the system.
+     * @param   r 
+     *          The current reference output for the system. 
+     * @return  The controller output.
+     */
     virtual VecU_t operator()(const VecX_t &x, const VecR_t &r) = 0;
-    virtual SimulationResult
-    simulate(Model<Nx, Nu> &model,          // the model to control
-             ReferenceFunction &r,          // reference input
-             VecX_t x_start,                // initial state
-             const AdaptiveODEOptions &opt  // options
-             ) = 0;
+
+    /**
+     * @brief   Simulate the given model with the given reference, initial 
+     *          state, and integration options.
+     * 
+     * @param   model
+     *          The model to control.
+     * @param   r 
+     *          The reference function to steer the model towards.
+     * @param   x_start
+     *          The initial state of the model.
+     * @param   opt 
+     *          Options for the integration.
+     */
+    virtual SimulationResult simulate(ContinuousModel<Nx, Nu> &model,
+                                      ReferenceFunction &r, VecX_t x_start,
+                                      const AdaptiveODEOptions &opt) = 0;
 };
 
 template <size_t Nx, size_t Nu, size_t Nr>
@@ -32,11 +58,12 @@ class ContinuousController : public virtual Controller<Nx, Nu, Nr> {
         typename Controller<Nx, Nu, Nr>::ReferenceFunction;
     using SimulationResult = typename Controller<Nx, Nu, Nr>::SimulationResult;
 
-    SimulationResult simulate(Model<Nx, Nu> &model,  // the model to control
-                              ReferenceFunction &r,  // reference input
-                              VecX_t x_start,        // initial state
-                              const AdaptiveODEOptions &opt  // options
-                              ) override {
+    SimulationResult
+    simulate(ContinuousModel<Nx, Nu> &model,  // the model to control
+             ReferenceFunction &r,            // reference input
+             VecX_t x_start,                  // initial state
+             const AdaptiveODEOptions &opt    // options
+             ) override {
         auto f = [&model, this, &r](double t, const VecX_t &x) {
             ContinuousController &ctrl = *this;
             return model(x, ctrl(x, r(t)));
@@ -57,11 +84,9 @@ class DiscreteController : public virtual Controller<Nx, Nu, Nr> {
 
     DiscreteController(double Ts) : Ts(Ts) {}
 
-    SimulationResult simulate(Model<Nx, Nu> &model,  // the model to control
-                              ReferenceFunction &r,  // reference input
-                              VecX_t x_start,        // initial state
-                              const AdaptiveODEOptions &opt  // options
-                              ) override {
+    SimulationResult simulate(ContinuousModel<Nx, Nu> &model,
+                              ReferenceFunction &r, VecX_t x_start,
+                              const AdaptiveODEOptions &opt) override {
         SimulationResult result     = {};
         size_t N                    = floor((opt.t_end - opt.t_start) / Ts) + 1;
         VecX_t curr_x               = x_start;

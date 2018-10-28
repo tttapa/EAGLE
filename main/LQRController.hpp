@@ -2,9 +2,16 @@
 
 #include <Model/Controller.hpp>
 #include <Model/System.hpp>
-#include <algorithm>
-#include <cassert>
+#include <algorithm>  // transform
+#include <cassert>    // assert
 
+/**
+ * @brief   A class for the LQR attitude controller for the drone.
+ * 
+ * @note    This class is specifically for the attitude controller, as it uses
+ *          Hamiltonian quaternion multiplication for the difference of the
+ *          first four states.
+ */
 class LQRController : public virtual Controller<10, 3, 7> {
   public:
     /** Number of states. */
@@ -18,6 +25,21 @@ class LQRController : public virtual Controller<10, 3, 7> {
      * @brief   Construct a new instance of ContinuousLQRController with the 
      *          given system matrices A, B, C, D, and the given proportional 
      *          controller K.
+     * 
+     * @param   A
+     *          System matrix A.
+     * @param   B
+     *          System matrix B.
+     * @param   C 
+     *          System matrix C.
+     * @param   D 
+     *          System matrix D.
+     * @param   K 
+     *          Proportional controller matrix K.
+     * @param   continuous
+     *          A flag that should be `true` for a continuous controller, and 
+     *          `false` for a discrete controller.  
+     *          This changes the calculation of the new equilibrium point.
      */
     LQRController(const Matrix<nx, nx> &A, const Matrix<nx, nu> &B,
                   const Matrix<ny, nx> &C, const Matrix<ny, nu> &D,
@@ -25,16 +47,6 @@ class LQRController : public virtual Controller<10, 3, 7> {
         : K(K), G(calculateG(A, B, C, D, continuous)) {}
 
   public:
-    /**
-     * @brief   Given a state x, and a reference value r, calculate the
-     *          controller output.
-     * 
-     * @param   x 
-     *          The current state of the system.
-     * @param   r 
-     *          The current reference output for the system. 
-     * @return  The controller output.
-     */
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
         // new equilibrium state
         ColVector<nx + nu> eq = G * r;
@@ -61,17 +73,33 @@ class LQRController : public virtual Controller<10, 3, 7> {
     getControlSignal(const std::vector<double> &time,
                      const std::vector<VecX_t> &states,
                      ReferenceFunction &ref) {
-        std::vector<LQRController::VecU_t> u;
+        std::vector<VecU_t> u;
         u.resize(time.size());
-        auto lambda = [this, &ref](double t, auto x) {
-            return (*this)(x, ref(t));
-        };
-        std::transform(time.begin(), time.end(), states.begin(), u.begin(),
-                       lambda);
+        auto fn = [this, &ref](double t, auto x) { return (*this)(x, ref(t)); };
+        std::transform(time.begin(), time.end(), states.begin(), u.begin(), fn);
         return u;
     }
 
   private:
+    /**
+        Solves the system of equations
+
+        @f$ 
+        \begin{cases}
+            \dot{x} = A x + B u = 0 \\
+            y = C x + D u = r
+        \end{cases} \\
+        \begin{cases}
+            x_{k+1} = A x_k + B u = x_k \\
+            y = C x_k + D u = r
+        \end{cases}
+        @f$  
+        for the continuous and the discrete case respectively, for any given 
+        reference output @f$ r @f$.
+        
+        @return A matrix @f$ G @f$ such that
+                @f$ \begin{pmatrix} x^e \\ u^e \end{pmatrix} = G r @f$.
+    */
     static Matrix<nx + nu, ny> calculateG(const Matrix<nx, nx> &A,
                                           const Matrix<nx, nu> &B,
                                           const Matrix<ny, nx> &C,
@@ -122,7 +150,7 @@ class DiscreteLQRController : public LQRController,
                                          const std::vector<VecX_t> &states,
                                          ReferenceFunction &ref) override {
         assert(time.size() == states.size());
-        std::vector<LQRController::VecU_t> u;
+        std::vector<VecU_t> u;
         u.resize(time.size());
         auto t_it = time.begin();
         auto u_it = u.begin();
