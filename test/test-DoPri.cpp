@@ -24,6 +24,7 @@ TEST(DoPri, euler) {
 
     ASSERT_LE(fabs((result.solution.back() - M_E)), opt.epsilon);
     ASSERT_EQ(result.resultCode, ODEResultCodes::SUCCESS);
+    ASSERT_EQ(result.time.back(), 1.0);
 }
 
 TEST(DoPri, eulerVector) {
@@ -56,4 +57,5 @@ TEST(DoPri, eulerVector) {
 
     ASSERT_LE(error, opt.epsilon);
     ASSERT_EQ(result.resultCode, ODEResultCodes::SUCCESS);
+    ASSERT_EQ(result.time.back(), 1.0);
 }

@@ -17,12 +17,30 @@ class Model {
                                       VecX_t x_start,    // initial state
                                       const AdaptiveODEOptions &opt  // options
                                       )                         = 0;
-    virtual SimulationResult simulate(VecU_t u,        // input to the model
-                                      VecX_t x_start,  // initial state
-                                      const AdaptiveODEOptions &opt  // options
+    virtual ODEResultCode
+    simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
+             typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
+             InputFunction &u,              // input to the model
+             VecX_t x_start,                // initial state
+             const AdaptiveODEOptions &opt  // options
+             ) = 0;
+    SimulationResult simulate(VecU_t u,        // input to the model
+                              VecX_t x_start,  // initial state
+                              const AdaptiveODEOptions &opt  // options
     ) {
         ConstantTimeFunctionT<VecU_t> fu = u;
         return simulate(fu, x_start, opt);
+    }
+
+    ODEResultCode
+    simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
+             typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
+             VecU_t u,                      // input to the model
+             VecX_t x_start,                // initial state
+             const AdaptiveODEOptions &opt  // options
+    ) {
+        ConstantTimeFunctionT<VecU_t> fu = u;
+        return simulate(timeresult, xresult, fu, x_start, opt);
     }
 };
 
@@ -43,6 +61,20 @@ class ContinuousModel : public Model<Nx, Nu> {
             return model(x, u(t));
         };
         return dormandPrince(f, x_start, opt);
+    }
+
+    ODEResultCode
+    simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
+             typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
+             InputFunction &u,              // input to the model
+             VecX_t x_start,                // initial state
+             const AdaptiveODEOptions &opt  // options
+             ) override {
+        auto f = [this, &u](double t, const VecX_t &x) {
+            ContinuousModel &model = *this;
+            return model(x, u(t));
+        };
+        return dormandPrince(timeresult, xresult, f, x_start, opt);
     }
 };
 

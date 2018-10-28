@@ -14,6 +14,7 @@ TEST(QR, QR) {
     }};
     QR<double, 3, 2> qtr      = householderQR(A);
     Matrix<3, 2> QTA          = qtr.applyTranspose(A);
+    Matrix<3, 3> Q            = qtr.Q();
     Matrix<3, 2> U_expected   = {{
         {1.132195224629404, 0},
         {0.475278341931121, -1.074832100035896},
@@ -31,8 +32,9 @@ TEST(QR, QR) {
     }};
     Matrix<3, 2> QTA_expected = qtr.R;
 
-    ASSERT_TRUE(isAlmostEqual(qtr.R, R_expected, 1e-12));
-    ASSERT_TRUE(isAlmostEqual(qtr.U, U_expected, 1e-12));
-    ASSERT_TRUE(isAlmostEqual(qtr.Q(), Q_expected, 1e-12));
-    ASSERT_TRUE(isAlmostEqual(QTA, QTA_expected, 1e-12));
+    ASSERT_TRUE(isAlmostEqual(qtr.R, R_expected, 1e-13));
+    ASSERT_TRUE(isAlmostEqual(qtr.U, U_expected, 1e-13));
+    ASSERT_TRUE(isAlmostEqual(Q, Q_expected, 1e-13));
+    ASSERT_TRUE(isAlmostEqual(QTA, QTA_expected, 1e-13));
+    ASSERT_TRUE(isAlmostEqual(Q * qtr.R, A, 1e-13));
 }

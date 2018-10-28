@@ -43,11 +43,11 @@ int main(int argc, char const *argv[]) {
     TestReferenceFunction ref = {};
 
     /* ------ Simulate the drone with the controller ----------------------- */
-    LQRController::SimulationResult result =
-        ctrl.simulate(nonlinfull, ref, x0, odeopt);
-
     // LQRController::SimulationResult result =
-    //     dctrl.simulate(nonlinfull, ref, x0, odeopt);
+    //     ctrl.simulate(nonlinfull, ref, x0, odeopt);
+
+    LQRController::SimulationResult result =
+        dctrl.simulate(nonlinfull, ref, x0, odeopt);
 
     double t_end = odeopt.t_end;
     if (result.resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED) {

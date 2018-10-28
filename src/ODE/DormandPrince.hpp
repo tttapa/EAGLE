@@ -10,8 +10,10 @@
 
 double norm(double x) { return fabs(x); }
 
-template <class F, class T>
-ODEResultX<T> dormandPrince(F f,        // function f(double t, T x)
+template <class IteratorTimeBegin, class IteratorXBegin, class F, class T>
+ODEResultCode dormandPrince(IteratorTimeBegin timeresult,
+                            IteratorXBegin xresult,
+                            F f,        // function f(double t, T x)
                             T x_start,  // initial value
                             const AdaptiveODEOptions &opt  // options
 ) {
@@ -21,8 +23,8 @@ ODEResultX<T> dormandPrince(F f,        // function f(double t, T x)
     T x      = x_start;
     double h = opt.h_start;
 
-    std::vector<double> t_v = {t};
-    std::vector<T> x_v      = {x};
+    *timeresult++ = {t};
+    *xresult++    = {x};
 
     ODEResultCode resultCode = ODEResultCodes::SUCCESS;
 
@@ -65,15 +67,13 @@ ODEResultX<T> dormandPrince(F f,        // function f(double t, T x)
         if (error < opt.epsilon) {
             t_new += h;
             x_new += h * (b1 * K1 + b3 * K3 + b4 * K4 + b5 * K5 + b6 * K6);
-            t_v.push_back(t_new);
-            x_v.push_back(x_new);
+            *timeresult++ = {fmin(t_new, opt.t_end)};
+            *xresult++    = {x_new};
         }
 
         if (t_new >= opt.t_end) {
             // finished
-            t_v.back() =
-                opt.t_end;  // TODO prevent rounding error on last time point
-            return {t_v, x_v, resultCode};
+            return resultCode;
         } else if (t_new + h_new > opt.t_end)
             // finishes on next iteration, don't jump over t_end
             h_new = opt.t_end - t_new;
@@ -83,5 +83,17 @@ ODEResultX<T> dormandPrince(F f,        // function f(double t, T x)
         x = x_new;
     }
     resultCode |= ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED;
-    return {t_v, x_v, resultCode};  // TODO
+    return resultCode;
+}
+
+template <class F, class T>
+ODEResultX<T> dormandPrince(F f,        // function f(double t, T x)
+                            T x_start,  // initial value
+                            const AdaptiveODEOptions &opt  // options
+) {
+    std::vector<double> t_v;
+    std::vector<T> x_v;
+    ODEResultCode resultCode = dormandPrince(
+        std::back_inserter(t_v), std::back_inserter(x_v), f, x_start, opt);
+    return {t_v, x_v, resultCode};
 }

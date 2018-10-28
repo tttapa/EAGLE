@@ -72,16 +72,12 @@ class DiscreteController : public virtual Controller<Nx, Nu, Nr> {
             curr_opt.t_end   = t + Ts;
             VecR_t curr_ref  = r(t);
             VecU_t curr_u    = (*this)(curr_x, curr_ref);
-            auto curr_result = model.simulate(curr_u, curr_x, curr_opt);
-
-            result.time.resize(curr_result.time.size() - 1);
-            std::copy(curr_result.time.begin(), curr_result.time.end() - 1,
-                      result.time.end());
-            result.solution.resize(curr_result.solution.size() - 1);
-            std::copy(curr_result.solution.begin(),
-                      curr_result.solution.end() - 1, result.solution.end());
-            result.resultCode |= curr_result.resultCode;
-            curr_x = curr_result.solution.back();
+            result.resultCode |= model.simulate(
+                std::back_inserter(result.time),
+                std::back_inserter(result.solution), curr_u, curr_x, curr_opt);
+            curr_x = result.solution.back();
+            result.time.pop_back();
+            result.solution.pop_back();
         }
         return result;
     }
