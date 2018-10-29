@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NonLinearFullDroneModel.hpp"
 #include "Params.hpp"
 
 struct Drone {
@@ -27,6 +28,80 @@ struct Drone {
     }
 
     Params p = {};
+
+    /** 
+     * @brief   Get the true continuous-time, non-linear, full model of the 
+     *          drone.
+     */
+    NonLinearFullDroneModel getNonLinearFullModel() const { return {p}; }
+
+    /** 
+     * @brief   Get a continuous-time system representing the drone,
+     *          linearized around the equilibrium 
+     *          @f$ x = (1, 0, 0, 0, 0, 0, 0, 0, 0, 0), u = (0, 0, 0) @f$.
+     */
+    CTLTISystem<Nx, Nu, Ny> getLinearFullContinuousSystem() const {
+        return {A, B, C, D};
+    }
+
+    /** 
+     * @brief   Get a reduced continuous-time system representing the drone,
+     *          linearized around the equilibrium 
+     *          @f$ x = (0, 0, 0, 0, 0, 0, 0, 0, 0), u = (0, 0, 0) @f$.
+     *          The first state (the real part of the orienation quaternion)
+     *          has been removed from the state-space representation.  
+     *          It can be approximated by @f$ q_0 \approx sqrt{1 - q_1^2 - q_2^2
+     *          - q_3^2} @f$.
+     */
+    CTLTISystem<Nx - 1, Nu, Ny> getLinearReducedContinuousSystem() const {
+        auto A_red = getBlock<1, Nx, 1, Nx>(A);
+        auto B_red = getBlock<1, Nx, 0, Nu>(B);
+        auto C_red = getBlock<0, Ny, 1, Nx>(C);
+        auto D_red = getBlock<0, Ny, 0, Nu>(D);
+        return {A_red, B_red, C_red, D_red};
+    }
+
+    /** 
+     * @brief   Get a continuous-time model of the drone that has been 
+     *          linearized around the equilibrium 
+     *          @f$ x = (1, 0, 0, 0, 0, 0, 0, 0, 0, 0), u = (0, 0, 0) @f$.
+     */
+    CTLTIModel<Nx, Nu, Ny> getLinearFullContinuousModel() const {
+        return {getLinearFullContinuousSystem()};
+    }
+
+    /** 
+     * @brief   Get a discrete-time system representing the drone, a discretized
+     *          version of `getLinearFullContinuousSystem`, using the given 
+     *          sample time and discretization method.
+     */
+    DTLTISystem<Nx, Nu, Ny>
+    getLinearFullDiscreteSystem(double Ts, DiscretizationMethod method) const {
+        auto ctsys = getLinearFullContinuousSystem();
+        return ctsys.discretize(Ts, method);
+    }
+
+    /** 
+     * @brief   Get a reduced discrete-time system representing the drone,
+     *          linearized around the equilibrium 
+     *          @f$ x = (0, 0, 0, 0, 0, 0, 0, 0, 0), u = (0, 0, 0) @f$, and 
+     *          discretized using the given sample time and discretization 
+     *          method.  
+     *          The first state (the real part of the orienation quaternion)
+     *          has been removed from the state-space representation.  
+     *          It can be approximated by @f$ q_0 \approx sqrt{1 - q_1^2 - q_2^2
+     *          - q_3^2} @f$.
+     */
+    DTLTISystem<Nx - 1, Nu, Ny>
+    getLinearReducedDiscreteSystem(double Ts,
+                                   DiscretizationMethod method) const {
+        auto discr  = getLinearFullDiscreteSystem(Ts, method);
+        auto Ad_red = getBlock<1, Nx, 1, Nx>(discr.A);
+        auto Bd_red = getBlock<1, Nx, 0, Nu>(discr.B);
+        auto Cd_red = getBlock<0, Ny, 1, Nx>(discr.C);
+        auto Dd_red = getBlock<0, Ny, 0, Nu>(discr.D);
+        return {Ad_red, Bd_red, Cd_red, Dd_red, Ts};
+    }
 
     /** ```
      *  A =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]

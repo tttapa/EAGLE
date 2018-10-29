@@ -168,6 +168,9 @@ class ContinuousModel : public Model<Nx, Nu> {
 
 #include <Model/System.hpp>
 
+/** 
+ * @brief   Continuous-Time Linear Time-Invariant Model.
+ */
 template <size_t Nx, size_t Nu, size_t Ny>
 class CTLTIModel : public ContinuousModel<Nx, Nu>,
                    public CTLTISystem<Nx, Nu, Ny> {
@@ -184,6 +187,6 @@ class CTLTIModel : public ContinuousModel<Nx, Nu>,
         : CTLTISystem<Nx, Nu, Ny>{sys} {}
 
     VecX_t operator()(const VecX_t &x, const VecU_t &u) override {
-        return getOutput(x, u);
+        return this->getStateChange(x, u);
     }
 };

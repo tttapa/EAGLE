@@ -4,7 +4,7 @@
 #include <ODE/DormandPrince.hpp>
 #include <Quaternions/Quaternion.hpp>
 
-class NonLinearFullModel : public ContinuousModel<10, 3> {
+class NonLinearFullDroneModel : public ContinuousModel<10, 3> {
   public:
     using VecOmega_t = ColVector<3>;
     using VecN_t     = ColVector<3>;
@@ -15,12 +15,12 @@ class NonLinearFullModel : public ContinuousModel<10, 3> {
     constexpr static size_t nu = 3;
 
     /** 
-     * @brief   Construct an instance of NonLinearFullModel with the given
+     * @brief   Construct an instance of NonLinearFullDroneModel with the given
      *          parameters.
      * @param   p 
      *          The parameters of the drone.
      */
-    NonLinearFullModel(const Params &p) : p(p) {}
+    NonLinearFullDroneModel(const Params &p) : p(p) {}
 
     /** 
      * @brief   Calculate the derivative of the state vector, given the current

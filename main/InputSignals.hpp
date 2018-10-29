@@ -1,13 +1,13 @@
 #pragma once
 
 #include "LQRController.hpp"
-#include "NonLinearFullModel.hpp"
+#include "NonLinearFullDroneModel.hpp"
 
 /** 
  * @brief   Input signal for simulations without controllers.
  */
-struct TestInputFunction : public NonLinearFullModel::InputFunction {
-    NonLinearFullModel::VecU_t operator()(double t) override {
+struct TestInputFunction : public NonLinearFullDroneModel::InputFunction {
+    NonLinearFullDroneModel::VecU_t operator()(double t) override {
         // ---------------------------------------------------------------------
         return {{
             {0},
@@ -49,7 +49,7 @@ struct TestReferenceFunction
 /**
  * @brief   Initial state of the drone for simulations
  */
-NonLinearFullModel::VecX_t x0 = {{
+NonLinearFullDroneModel::VecX_t x0 = {{
     {1},    // q0
     {0},    // q1
     {0},    // q2

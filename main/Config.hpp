@@ -26,6 +26,8 @@ extern const double Ts;  // Sample time step
 extern const bool plotSampled;
 // Plot the result of the continuous controller instead of the discrete one.
 extern const bool simulateContinuousController;
+// Plot the linearized model instead of the non-linear real model.
+extern const bool simulateLinearModel;
 
 /* ------ Define drone parameters ------------------------------------------- */
 constexpr Drone drone = {};

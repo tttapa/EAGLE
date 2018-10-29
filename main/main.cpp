@@ -16,39 +16,46 @@ using namespace Config;
 int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
 
-    /* ------ Drone full non-linear model ----------------------------------- */
-    NonLinearFullModel nonlinfull = drone.p;  // Using the drone's parameters
+    /* ------ Drone full non-linear, linear and discrete models ------------- */
+    auto nonLinFullmodel = drone.getNonLinearFullModel();
 
-    // TODO: use zero-order hold?
-    CTLTISystem<10, 3, 7> linfull = {drone.A, drone.B, drone.C, drone.D};
-    auto discretized = linfull.discretize(Ts, DiscretizationMethod::Bilinear);
+    auto linFullContModel  = drone.getLinearFullContinuousModel();
+    auto linFullDiscrModel = drone.getLinearFullDiscreteSystem(
+        Ts, DiscretizationMethod::Bilinear);  // TODO: use zero-order hold?
 
     /* ------ Reduced system matrices --------------------------------------- */
-    auto A_red = getBlock<1, 10, 1, 10>(drone.A);
-    auto B_red = getBlock<1, 10, 0, 3>(drone.B);
-
-    auto Ad_red = getBlock<1, 10, 1, 10>(discretized.A);
-    auto Bd_red = getBlock<1, 10, 0, 3>(discretized.B);
+    auto linReducedContinuousSystem = drone.getLinearReducedContinuousSystem();
+    auto linReducedDiscreteSystem   = drone.getLinearReducedDiscreteSystem(
+        Ts, DiscretizationMethod::Bilinear);  // TODO: use zero-order hold?
 
     /* ------ Design controller --------------------------------------------- */
-    auto K_red = -lqr(A_red, B_red, Q, R).K;
+    auto K_red =
+        -lqr(linReducedContinuousSystem.A, linReducedContinuousSystem.B, Q, R)
+             .K;
     auto K = hcat(zeros<3, 1>(), K_red);  // add column of zeros for full model
-    ContinuousLQRController ctrl = {drone.A, drone.B, drone.C, drone.D, K};
+    ContinuousLQRController fullContinuousLQRController = {linFullContModel, K};
 
-    auto Kd_red                 = -dlqr(Ad_red, Bd_red, Q, R).K;
-    auto Kd                     = hcat(zeros<3, 1>(), Kd_red);
-    DiscreteLQRController dctrl = {discretized, Kd};
+    auto Kd_red =
+        -dlqr(linReducedDiscreteSystem.A, linReducedDiscreteSystem.B, Q, R).K;
+    auto Kd = hcat(zeros<3, 1>(), Kd_red);
+    DiscreteLQRController fullDiscreteLQRController = {linFullDiscrModel, Kd};
 
     /* ------ Reference function -------------------------------------------- */
     TestReferenceFunction ref = {};
 
-    /* ------ Simulate the drone with the controller ----------------------- */
-    LQRController &simulationController = simulateContinuousController
-                                              ? (LQRController &) ctrl
-                                              : (LQRController &) dctrl;
+    /* ------ Simulate the drone with the controller ------------------------ */
+    auto &simulationController =
+        simulateContinuousController
+            ? (LQRController &) fullContinuousLQRController
+            : (LQRController &) fullDiscreteLQRController;
+
+    auto &simulationModel =
+        simulateLinearModel
+            ? (ContinuousModel<drone.Nx, drone.Nu> &) linFullContModel
+            : (ContinuousModel<drone.Nx, drone.Nu> &) nonLinFullmodel;
 
     LQRController::SimulationResult result =
-        simulationController.simulate(nonlinfull, ref, x0, odeopt);
+        simulationController.simulate(simulationModel, ref, x0, odeopt);
 
     double t_end = odeopt.t_end;
     if (result.resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED) {
@@ -58,7 +65,7 @@ int main(int argc, char const *argv[]) {
     if (result.resultCode & ODEResultCodes::MINIMUM_STEP_SIZE_REACHED)
         std::cerr << "Error: minimum step size reached" << endl;
 
-    /* ------ Export the simulation result as CSV -------------------------- */
+    /* ------ Export the simulation result as CSV --------------------------- */
 
     if (exportCSV) {
         // Sample/interpolate the simulation result using a fixed time step
@@ -67,7 +74,7 @@ int main(int argc, char const *argv[]) {
         printCSV(outputFile, odeopt.t_start, CSV_Ts, sampled);
     }
 
-    /* ------ Plot the simulation result ------------------------------------*/
+    /* ------ Plot the simulation result ------------------------------------ */
 
     // Sample/interpolate the simulation result using a fixed time step
     auto sampled = sampleODEResult(result, odeopt.t_start, Ts, t_end);
@@ -83,7 +90,7 @@ int main(int argc, char const *argv[]) {
     vector<EulerAngles> orientation;
     orientation.resize(data.size());
     transform(data.begin(), data.end(), orientation.begin(),
-              NonLinearFullModel::stateToEuler);
+              NonLinearFullDroneModel::stateToEuler);
 
     // Plot all results
     plt::subplot(4, 1, 1);

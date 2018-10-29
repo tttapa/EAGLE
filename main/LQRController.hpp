@@ -129,6 +129,11 @@ class ContinuousLQRController : public LQRController,
                             const Matrix<ny, nx> &C, const Matrix<ny, nu> &D,
                             const Matrix<nu, nx> &K)
         : LQRController(A, B, C, D, K, true) {}
+
+    ContinuousLQRController(const CTLTISystem<nx, nu, ny> &continuousSystem,
+                            const Matrix<nu, nx> &K)
+        : LQRController(continuousSystem.A, continuousSystem.B,
+                        continuousSystem.C, continuousSystem.D, K, true) {}
 };
 
 class DiscreteLQRController : public LQRController,
@@ -140,11 +145,11 @@ class DiscreteLQRController : public LQRController,
         : LQRController(A, B, C, D, K, false), DiscreteController<10, 3, 7>(
                                                    Ts) {}
 
-    DiscreteLQRController(const DTLTISystem<10, 3, 7> &discreteSystem,
+    DiscreteLQRController(const DTLTISystem<nx, nu, ny> &discreteSystem,
                           const Matrix<nu, nx> &K)
         : LQRController(discreteSystem.A, discreteSystem.B, discreteSystem.C,
                         discreteSystem.D, K, false),
-          DiscreteController<10, 3, 7>(discreteSystem.Ts) {}
+          DiscreteController<nx, nu, ny>(discreteSystem.Ts) {}
 
     std::vector<VecU_t> getControlSignal(const std::vector<double> &time,
                                          const std::vector<VecX_t> &states,

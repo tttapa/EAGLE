@@ -24,8 +24,13 @@ const double Ts = 1.0 / fs;
 
 /** Plot the samled version instead of "continuous" result of simulation. */
 const bool plotSampled = false;
+
+/* ------ Simulation settings ----------------------------------------------- */
+
 /** Plot the result of the continuous controller instead of the discrete one. */
 const bool simulateContinuousController = false;
+/** Plot the linearized model instead of the non-linear real model. */
+const bool simulateLinearModel = false;
 
 /* ------ LQR weighting matrices Q and R ------------------------------------ */
 

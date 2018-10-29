@@ -8,7 +8,7 @@
 #include "ODEOptions.hpp"
 #include "ODEResult.hpp"
 
-double norm(double x) { return fabs(x); }
+inline double norm(double x) { return fabs(x); }
 
 template <class IteratorTimeBegin, class IteratorXBegin, class F, class T>
 ODEResultCode dormandPrince(IteratorTimeBegin timeresult,
