@@ -52,42 +52,43 @@ struct Params {
     // ---- Fixed Quantities ----
 
     // general parameters
-    double Vmax = 11.1;        // V ....... maximum voltage
-    double Vmin = 0.1 * Vmax;  // V ....... minimum voltage
-    int Nm      = 4;           // - ....... number of motors
-    double m    = 1.850;       // kg ...... total mass
-    double L    = 0.27;        // m ....... arm length
-    double rho  = 1.225;  // kg/m3 ... air density (nominal, at 15C, sea level)
-    double g    = 9.81;   // m/s2 .... gravitational acceleration
+    double Vmax = 11.1;        ///< V            maximum voltage
+    double Vmin = 0.1 * Vmax;  ///< V            minimum voltage
+    int Nm      = 4;           ///< -            number of motors
+    double m    = 1.850;       ///< kg           total mass
+    double L    = 0.27;        ///< m            arm length
+    double g    = 9.81;        ///< m/s2         gravitational acceleration
+    double rho  = 1.225;       ///< kg/m3        air density (nominal, at 15C,
+                               ///               sea level)
 
     // propellers
-    double ct = 0.1;                // - ....... thrust coefficient
-    double cp = 0.04;               // - ....... power coefficient
-    double mp = 20.0 / 1000;        // kg ...... propeller mass (20g)
-    double Dp = 11.0 * 2.54 / 100;  // m ....... propeller diameter (11")
+    double ct = 0.1;                ///< -       thrust coefficient
+    double cp = 0.04;               ///< -       power coefficient
+    double mp = 20.0 / 1000;        ///< kg      propeller mass (20g)
+    double Dp = 11.0 * 2.54 / 100;  ///< m       propeller diameter (11")
 
     // motors
-    double Kv    = 700.0;         // rpm/V ... motor speed constant
-    double tau_m = 35.0 / 1000;   // s ....... motor's time constant (35ms)
-    double mr    = 42.0 / 1000;   // kg ...... rotor mass (moving parts) (42g)
-    double mm    = 102.0 / 1000;  // kg ...... motor total mass (102g)
-    double rr    = 1.9 / 100;     // m ....... rotor radius (1.9cm)
+    double Kv    = 700.0;         ///< rpm/V     motor speed constant
+    double tau_m = 35.0 / 1000;   ///< s         motor's time constant (35ms)
+    double mr    = 42.0 / 1000;   ///< kg        rotor mass (moving parts) (42g)
+    double mm    = 102.0 / 1000;  ///< kg        motor total mass (102g)
+    double rr    = 1.9 / 100;     ///< m         rotor radius (1.9cm)
 
     // Moments of intertia
-    double Ixx = 0.0321;  // kgm2 .... Ixx moment of inertia
-    double Iyy = 0.0340;  // kgm2 .... Iyy moment of inertia
-    double Izz = 0.0575;  // kgm2 .... Izz moment of inertia
+    double Ixx = 0.0321;  ///< kgm2              Ixx moment of inertia
+    double Iyy = 0.0340;  ///< kgm2              Iyy moment of inertia
+    double Izz = 0.0575;  ///< kgm2              Izz moment of inertia
 
     // ---- Computed Quantities ----
 
-    double nh = 0;  // rps ... hovering n
-    double uh = 0;  // - ..... hovering PWM
+    double nh = 0;  ///< rps                     hovering n
+    double uh = 0;  ///< -                       hovering PWM
 
     // Very rough estimation of moments of inertia
-    double Ip          = 0;   // kgm2 ..... propeller moment of inertia
-    double Im          = 0;   // kgm2 ..... rotor moment of inertia
-    Matrix<3, 3> I     = {};  // kgm3 ..... Inertia matrix
-    Matrix<3, 3> I_inv = {};  // 1/kgm3 ... Inverse of inertia matrix
+    double Ip          = 0;   ///< kgm2          propeller moment of inertia
+    double Im          = 0;   ///< kgm2          rotor moment of inertia
+    Matrix<3, 3> I     = {};  ///< kgm3          Inertia matrix
+    Matrix<3, 3> I_inv = {};  ///< 1/kgm3        Inverse of inertia matrix
 
     // model constants
     double k1       = 0;
