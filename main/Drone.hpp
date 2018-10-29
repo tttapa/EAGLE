@@ -10,6 +10,10 @@ struct Drone {
     constexpr static size_t Nu = 3;
     constexpr static size_t Ny = 7;
 
+    /** 
+     * @brief   Update all computed parameters and system matrices. 
+     *          Should be called each time one of the parameters is changed.
+     */
     constexpr void compute() {
         p.compute();
         A = vcat(                                                //
@@ -27,6 +31,13 @@ struct Drone {
         D = zeros<Ny, Nu>();
     }
 
+    /**
+     * @brief   A struct containing the drone's parameters. 
+     * 
+     * @note    You can edit some of the parameters, however, this invalidates
+     *          some of the other derived/computed parameters, so you have to 
+     *          call `Drone::compute()` afterwards. 
+     */
     Params p = {};
 
     /** 
@@ -50,8 +61,8 @@ struct Drone {
      *          @f$ x = (0, 0, 0, 0, 0, 0, 0, 0, 0), u = (0, 0, 0) @f$.
      *          The first state (the real part of the orienation quaternion)
      *          has been removed from the state-space representation.  
-     *          It can be approximated by @f$ q_0 \approx sqrt{1 - q_1^2 - q_2^2
-     *          - q_3^2} @f$.
+     *          It can be approximated by @f$ q_0 \approx \sqrt{1 - q_1^2 - 
+     *          q_2^2 - q_3^2} @f$.
      */
     CTLTISystem<Nx - 1, Nu, Ny> getLinearReducedContinuousSystem() const {
         auto A_red = getBlock<1, Nx, 1, Nx>(A);
@@ -89,8 +100,8 @@ struct Drone {
      *          method.  
      *          The first state (the real part of the orienation quaternion)
      *          has been removed from the state-space representation.  
-     *          It can be approximated by @f$ q_0 \approx sqrt{1 - q_1^2 - q_2^2
-     *          - q_3^2} @f$.
+     *          It can be approximated by @f$ q_0 \approx \sqrt{1 - q_1^2 -
+     *          q_2^2 - q_3^2} @f$.
      */
     DTLTISystem<Nx - 1, Nu, Ny>
     getLinearReducedDiscreteSystem(double Ts,
@@ -103,7 +114,8 @@ struct Drone {
         return {Ad_red, Bd_red, Cd_red, Dd_red, Ts};
     }
 
-    /** ```
+    /** 
+     * ```
      *  A =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]
      *       [  ·   ·   ·   ·  ┌─────────┐  ·   ·   ·  ]
      *       [  ·   ·   ·   ·  │  0.5 I3 │  ·   ·   ·  ]
@@ -117,7 +129,8 @@ struct Drone {
      * ``` */
     Matrix<Nx, Nx> A = {};
 
-    /** ```
+    /** 
+     * ```
      *  B =  [  ·   ·   ·  ]
      *       [  ·   ·   ·  ]
      *       [  ·   ·   ·  ]
@@ -131,7 +144,8 @@ struct Drone {
      * ``` */
     Matrix<Nx, Nu> B = {};
 
-    /** ```
+    /**
+     * ```
      *  C =  [ 1  ·  ·  ·  ·  ·  ·  ·  ·  · ]
      *       [ ·  1  ·  ·  ·  ·  ·  ·  ·  · ]
      *       [ ·  ·  1  ·  ·  ·  ·  ·  ·  · ]
@@ -142,7 +156,8 @@ struct Drone {
      * ``` */
     Matrix<Ny, Nx> C = {};
 
-    /** ```
+    /** 
+     * ```
      *  D =  [ ·  ·  · ]
      *       [ ·  ·  · ]
      *       [ ·  ·  · ]
