@@ -2,8 +2,6 @@
 
 #include <Model/Controller.hpp>
 #include <Model/System.hpp>
-#include <algorithm>  // transform
-#include <cassert>    // assert
 
 /**
  * @brief   A class for the LQR attitude controller for the drone.
@@ -62,21 +60,6 @@ class LQRController : public virtual Controller<10, 3, 7> {
         // controller
         ColVector<nu> uc = K * xdiff;
         auto u           = uc + ueq;
-        return u;
-    }
-
-    /**
-     * @brief   Given a time and states vector, and a reference signal,
-     *          calculate the output of the controller.
-     */
-    virtual std::vector<VecU_t>
-    getControlSignal(const std::vector<double> &time,
-                     const std::vector<VecX_t> &states,
-                     ReferenceFunction &ref) {
-        std::vector<VecU_t> u;
-        u.resize(time.size());
-        auto fn = [this, &ref](double t, auto x) { return (*this)(x, ref(t)); };
-        std::transform(time.begin(), time.end(), states.begin(), u.begin(), fn);
         return u;
     }
 
@@ -150,26 +133,4 @@ class DiscreteLQRController : public LQRController,
         : LQRController(discreteSystem.A, discreteSystem.B, discreteSystem.C,
                         discreteSystem.D, K, false),
           DiscreteController<nx, nu, ny>(discreteSystem.Ts) {}
-
-    std::vector<VecU_t> getControlSignal(const std::vector<double> &time,
-                                         const std::vector<VecX_t> &states,
-                                         ReferenceFunction &ref) override {
-        assert(time.size() == states.size());
-        std::vector<VecU_t> u;
-        u.resize(time.size());
-        auto t_it = time.begin();
-        auto u_it = u.begin();
-        auto x_it = states.begin();
-        while (t_it != time.end()) {
-            double t_end  = *t_it + Ts;
-            VecU_t curr_u = (*this)(*x_it, ref(*t_it));
-            while (*t_it < t_end && t_it != time.end()) {
-                *u_it = curr_u;
-                ++u_it;
-                ++t_it;
-                ++x_it;
-            }
-        }
-        return u;
-    }
 };
