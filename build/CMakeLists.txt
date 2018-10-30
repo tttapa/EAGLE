@@ -44,7 +44,7 @@ include(GoogleTest)
 enable_testing()
 
 # -Wsuggest-override
-add_definitions("-g -O0 -Wall -Wextra -Wno-missing-braces -fdiagnostics-show-option -fextended-identifiers -finput-charset=UTF-8")
+add_definitions("-g -O0 -Wall -Wextra -Wno-missing-braces -Wno-unknown-pragmas -fdiagnostics-show-option -fextended-identifiers -finput-charset=UTF-8")
 # add_definitions("-O2 -Wall -Wextra -Wno-missing-braces -fdiagnostics-show-option -fextended-identifiers -finput-charset=UTF-8")
 
 #include Google Test

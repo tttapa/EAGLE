@@ -5,7 +5,8 @@ namespace Config {
 /* ------ CSV export settings ----------------------------------------------- */
 
 /** Filename for simulation output. */
-const std::string outputFile = home + "/Random/data.csv";
+const std::string outputFile =
+    home + "/PO-EAGLE/Groups/ANC/Blender/Animation-Data/rotation.csv";
 /** Export the simulation data as CSV. */
 const bool exportCSV = true;
 /** Sample frequency for CSV output (fps). */
@@ -39,8 +40,8 @@ const bool clampController = true;
 static auto invsq = [](double x) { return 1.0 / (x * x); };
 
 const RowVector<3> Qn     = invsq(n_att_max) * ones<1, 3>();
-const RowVector<3> Qomega = 0.05 * ones<1, 3>();  // zeros<1, 3>();
-const RowVector<3> Qq     = 50.0 * ones<1, 3>();
+const RowVector<3> Qomega = 0.04 * ones<1, 3>();
+const RowVector<3> Qq     = 40.0 * ones<1, 3>();
 
 /** Weighting matrix for states in LQR design. */
 const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
@@ -52,7 +53,7 @@ const Matrix<3, 3> R = invsq(u_att_max) * eye<3>();
 /** Options for numerical integration for simulation. */
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
-    .t_end   = 12,
+    .t_end   = 18,
     .epsilon = 1e-6,
     .h_start = 1e-2,
     .h_min   = 1e-6,

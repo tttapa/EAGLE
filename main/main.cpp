@@ -59,8 +59,12 @@ int main(int argc, char const *argv[]) {
     if (exportCSV) {
         // Sample/interpolate the simulation result using a fixed time step
         auto sampled = sampleODEResult(result, odeopt.t_start, CSV_Ts, t_end);
+        vector<EulerAngles> sampledOrientation;
+        sampledOrientation.resize(sampled.size());
+        transform(sampled.begin(), sampled.end(), sampledOrientation.begin(),
+                  NonLinearFullDroneModel::stateToEuler);
         // Export to the given output file
-        printCSV(outputFile, odeopt.t_start, CSV_Ts, sampled);
+        printCSV(outputFile, 0.0, CSV_Ts, sampledOrientation);
     }
 
     /* ------ Plot the simulation result ------------------------------------ */
@@ -81,20 +85,30 @@ int main(int argc, char const *argv[]) {
     transform(data.begin(), data.end(), orientation.begin(),
               NonLinearFullDroneModel::stateToEuler);
 
+    vector<EulerAngles> reference;
+    reference.resize(t.size());
+    transform(t.begin(), t.end(), reference.begin(), [&ref](double t) {
+        return quat2eul(getBlock<0, 4, 0, 1>(ref(t)));
+    });
+
     // Plot all results
-    plt::subplot(4, 1, 1);
+    plt::subplot(5, 1, 1);
+    plotResults(t, reference, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
+                "Reference orientation");
+    plt::xlim(odeopt.t_start, odeopt.t_end);
+    plt::subplot(5, 1, 2);
     plotResults(t, orientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Orientation of drone");
     plt::xlim(odeopt.t_start, odeopt.t_end);
-    plt::subplot(4, 1, 2);
+    plt::subplot(5, 1, 3);
     plotResults(t, data, {4, 7}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of drone");
     plt::xlim(odeopt.t_start, odeopt.t_end);
-    plt::subplot(4, 1, 3);
+    plt::subplot(5, 1, 4);
     plotResults(t, data, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of motors");
     plt::xlim(odeopt.t_start, odeopt.t_end);
-    plt::subplot(4, 1, 4);
+    plt::subplot(5, 1, 5);
     plotResults(t, u, {0, 3}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Control signal");
     plt::xlim(odeopt.t_start, odeopt.t_end);

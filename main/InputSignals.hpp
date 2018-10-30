@@ -34,13 +34,19 @@ struct TestReferenceFunction
             q = quatmultiply(q, qy);
         if (t >= 9 && t < 11)
             q = quatmultiply(q, qx);
+        if (t >= 13 && t < 15)
+            q = quatmultiply(q, qz);
+        if (t >= 14 && t < 16)
+            q = quatmultiply(q, qy);
+        if (t >= 15 && t < 17)
+            q = quatmultiply(q, qx);
         assignBlock<0, 4, 0, 1>(ref) = q;
         return ref;
         // ---------------------------------------------------------------------
     }
-    const Quaternion qz = eul2quat({M_PI / 4, 0, 0});
-    const Quaternion qy = eul2quat({0, M_PI / 4, 0});
-    const Quaternion qx = eul2quat({0, 0, M_PI / 4});
+    const Quaternion qz = eul2quat({M_PI / 8, 0, 0});
+    const Quaternion qy = eul2quat({0, M_PI / 16, 0});
+    const Quaternion qx = eul2quat({0, 0, M_PI / 16});
     const Quaternion qu = eul2quat({0, 0, 0});
 };
 
