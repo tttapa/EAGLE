@@ -17,7 +17,7 @@ class LTISystem {
         return A * x + B * u;
     }
 
-    VecY_t getOutput(const VecX_t &x, const VecU_t &u) const {
+    VecY_t getSystemOutput(const VecX_t &x, const VecU_t &u) const {
         return C * x + D * u;
     }
 
@@ -53,10 +53,10 @@ class CTLTISystem : public LTISystem<Nx, Nu, Ny> {
     DTLTISystem<Nx, Nu, Ny>
     discretize(double Ts,
                DiscretizationMethod method = DiscretizationMethod::Euler) {
-        auto A = this->A;
-        auto B = this->B;
-        auto C = this->C;
-        auto D = this->D;
+        auto A  = this->A;
+        auto B  = this->B;
+        auto C  = this->C;
+        auto D  = this->D;
         auto Ad = A;
         auto Bd = B;
         auto Cd = C;

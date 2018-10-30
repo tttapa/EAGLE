@@ -6,8 +6,8 @@
 #include <ODE/ODEEval.hpp>
 #include <iostream>
 
+#include "ANSIColors.hpp"
 #include "Config.hpp"
-
 #include "Plot.hpp"
 
 using namespace std;
@@ -17,42 +17,33 @@ int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
 
     /* ------ Drone full non-linear and linear models ----------------------- */
-    auto nonLinFullmodel  = drone.getNonLinearFullModel();
-    auto linFullContModel = drone.getLinearFullContinuousModel();
+    auto model = drone.getNonLinearFullModel();
+    // auto model = drone.getLinearFullContinuousModel();
 
     /* ------ Design controller --------------------------------------------- */
-    auto fullContinuousLQRController = drone.getContinuousController(Q, R);
-    auto fullDiscreteLQRController =
-        drone.getDiscreteController(Q, R, Ts, DiscretizationMethod::Bilinear);
-    auto fullClampedDiscreteLQRController = drone.getClampedDiscreteController(
-        Q, R, Ts, DiscretizationMethod::Bilinear);
+    // auto controller = drone.getContinuousController(Q, R);
+    auto controller = clampController
+                          ? drone.getClampedDiscreteController(
+                                Q, R, Ts, DiscretizationMethod::Bilinear)
+                          : drone.getDiscreteController(
+                                Q, R, Ts, DiscretizationMethod::Bilinear);
 
     /* ------ Reference function -------------------------------------------- */
     TestReferenceFunction ref = {};
 
     /* ------ Simulate the drone with the controller ------------------------ */
-    auto &simulationController =
-        simulateContinuousController
-            ? (LQRController &) fullContinuousLQRController
-            : clampController
-                  ? (LQRController &) fullClampedDiscreteLQRController
-                  : (LQRController &) fullDiscreteLQRController;
-
-    auto &simulationModel =
-        simulateLinearModel
-            ? (ContinuousModel<drone.Nx, drone.Nu> &) linFullContModel
-            : (ContinuousModel<drone.Nx, drone.Nu> &) nonLinFullmodel;
-
-    LQRController::SimulationResult result =
-        simulationController.simulate(simulationModel, ref, x0, odeopt);
+    auto result = model.simulate(controller, ref, x0, odeopt);
 
     double t_end = odeopt.t_end;
     if (result.resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED) {
-        std::cerr << "Error: maximum number of iterations exceeded" << endl;
-        t_end = result.time.back();  // TODO
+        std::cerr << ANSIColors::red
+                  << "Error: maximum number of iterations exceeded"
+                  << ANSIColors::reset << endl;
+        t_end = result.time.back();
     }
     if (result.resultCode & ODEResultCodes::MINIMUM_STEP_SIZE_REACHED)
-        std::cerr << "Error: minimum step size reached" << endl;
+        std::cerr << ANSIColors::yellow << "Warning: minimum step size reached"
+                  << ANSIColors::reset << endl;
 
     /* ------ Export the simulation result as CSV --------------------------- */
 
@@ -68,16 +59,12 @@ int main(int argc, char const *argv[]) {
     }
 
     /* ------ Plot the simulation result ------------------------------------ */
-
-    // Sample/interpolate the simulation result using a fixed time step
-    auto sampled = sampleODEResult(result, odeopt.t_start, Ts, t_end);
-    // Decide what data to use: either the sampled version or the raw result
-    auto t =
-        plotSampled ? makeTimeVector(odeopt.t_start, Ts, t_end) : result.time;
-    auto data = plotSampled ? sampled : result.solution;
+    // Time and state solutions
+    auto t    = result.time;
+    auto data = result.solution;
 
     // Calculate controller output
-    auto u = simulationController.getControlSignal(t, data, ref);
+    auto u = controller.getControlSignal(t, data, ref);
 
     // Convert the quaternions of the state to euler angles
     vector<EulerAngles> orientation;
@@ -85,6 +72,7 @@ int main(int argc, char const *argv[]) {
     transform(data.begin(), data.end(), orientation.begin(),
               NonLinearFullDroneModel::stateToEuler);
 
+    // Convert the quaternions of the reference to euler angles
     vector<EulerAngles> reference;
     reference.resize(t.size());
     transform(t.begin(), t.end(), reference.begin(), [&ref](double t) {

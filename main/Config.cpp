@@ -21,17 +21,8 @@ const double fs = 238.0;
 /** Time step for discrete controller. */
 const double Ts = 1.0 / fs;
 
-/* ------ Plot settings ----------------------------------------------------- */
-
-/** Plot the samled version instead of "continuous" result of simulation. */
-const bool plotSampled = false;
-
 /* ------ Simulation settings ----------------------------------------------- */
 
-/** Plot the result of the continuous controller instead of the discrete one. */
-const bool simulateContinuousController = false;
-/** Plot the linearized model instead of the non-linear real model. */
-const bool simulateLinearModel = false;
 /** Clamp the motor control outputs between 0 and 1. */
 const bool clampController = true;
 

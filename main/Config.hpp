@@ -22,12 +22,6 @@ extern const double CSV_Ts;
 extern const double fs;  // Sample frequency
 extern const double Ts;  // Sample time step
 
-// Plot the samled version instead of "continuous"
-extern const bool plotSampled;
-// Plot the result of the continuous controller instead of the discrete one.
-extern const bool simulateContinuousController;
-// Plot the linearized model instead of the non-linear real model.
-extern const bool simulateLinearModel;
 // Clamp the motor control outputs between 0 and 1.
 extern const bool clampController;
 

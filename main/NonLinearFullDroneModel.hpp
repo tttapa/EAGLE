@@ -4,7 +4,7 @@
 #include <ODE/DormandPrince.hpp>
 #include <Quaternions/Quaternion.hpp>
 
-class NonLinearFullDroneModel : public ContinuousModel<10, 3> {
+class NonLinearFullDroneModel : public ContinuousModel<10, 3, 7> {
   public:
     using VecOmega_t = ColVector<3>;
     using VecN_t     = ColVector<3>;
@@ -13,6 +13,8 @@ class NonLinearFullDroneModel : public ContinuousModel<10, 3> {
     constexpr static size_t nx = 10;
     /** Number of inputs */
     constexpr static size_t nu = 3;
+    /** Number of outputs */
+    constexpr static size_t ny = 7;
 
     /** 
      * @brief   Construct an instance of NonLinearFullDroneModel with the given
@@ -46,6 +48,10 @@ class NonLinearFullDroneModel : public ContinuousModel<10, 3> {
         VecX_t x_dot = vcat(q_dot, omega_dot, n_dot);
 
         return x_dot;
+    }
+
+    VecY_t getOutput(const VecX_t &x, const VecU_t & /* u */) override {
+        return getBlock<0, ny, 0, 1>(x);
     }
 
     Params p;
