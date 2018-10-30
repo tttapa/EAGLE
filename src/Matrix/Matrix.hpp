@@ -26,7 +26,7 @@ using RowVector = TRowVector<double, C>;
 namespace Matrices {
 
 struct TransposeStruct {
-} extern T;
+} constexpr T;
 
 }  // namespace Matrices
 

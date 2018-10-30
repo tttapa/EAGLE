@@ -16,29 +16,16 @@ using namespace Config;
 int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
 
-    /* ------ Drone full non-linear, linear and discrete models ------------- */
-    auto nonLinFullmodel = drone.getNonLinearFullModel();
-
-    auto linFullContModel  = drone.getLinearFullContinuousModel();
-    auto linFullDiscrModel = drone.getLinearFullDiscreteSystem(
-        Ts, DiscretizationMethod::Bilinear);  // TODO: use zero-order hold?
-
-    /* ------ Reduced system matrices --------------------------------------- */
-    auto linReducedContinuousSystem = drone.getLinearReducedContinuousSystem();
-    auto linReducedDiscreteSystem   = drone.getLinearReducedDiscreteSystem(
-        Ts, DiscretizationMethod::Bilinear);  // TODO: use zero-order hold?
+    /* ------ Drone full non-linear and linear models ----------------------- */
+    auto nonLinFullmodel  = drone.getNonLinearFullModel();
+    auto linFullContModel = drone.getLinearFullContinuousModel();
 
     /* ------ Design controller --------------------------------------------- */
-    auto K_red =
-        -lqr(linReducedContinuousSystem.A, linReducedContinuousSystem.B, Q, R)
-             .K;
-    auto K = hcat(zeros<3, 1>(), K_red);  // add column of zeros for full model
-    ContinuousLQRController fullContinuousLQRController = {linFullContModel, K};
-
-    auto Kd_red =
-        -dlqr(linReducedDiscreteSystem.A, linReducedDiscreteSystem.B, Q, R).K;
-    auto Kd = hcat(zeros<3, 1>(), Kd_red);
-    DiscreteLQRController fullDiscreteLQRController = {linFullDiscrModel, Kd};
+    auto fullContinuousLQRController = drone.getContinuousController(Q, R);
+    auto fullDiscreteLQRController =
+        drone.getDiscreteController(Q, R, Ts, DiscretizationMethod::Bilinear);
+    auto fullClampedDiscreteLQRController = drone.getClampedDiscreteController(
+        Q, R, Ts, DiscretizationMethod::Bilinear);
 
     /* ------ Reference function -------------------------------------------- */
     TestReferenceFunction ref = {};
@@ -47,7 +34,9 @@ int main(int argc, char const *argv[]) {
     auto &simulationController =
         simulateContinuousController
             ? (LQRController &) fullContinuousLQRController
-            : (LQRController &) fullDiscreteLQRController;
+            : clampController
+                  ? (LQRController &) fullClampedDiscreteLQRController
+                  : (LQRController &) fullDiscreteLQRController;
 
     auto &simulationModel =
         simulateLinearModel

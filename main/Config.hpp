@@ -28,6 +28,8 @@ extern const bool plotSampled;
 extern const bool simulateContinuousController;
 // Plot the linearized model instead of the non-linear real model.
 extern const bool simulateLinearModel;
+// Clamp the motor control outputs between 0 and 1.
+extern const bool clampController;
 
 /* ------ Define drone parameters ------------------------------------------- */
 constexpr Drone drone = {};

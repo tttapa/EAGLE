@@ -1,7 +1,10 @@
 #pragma once
 
+#include "LQRController.hpp"
 #include "NonLinearFullDroneModel.hpp"
 #include "Params.hpp"
+#include <Matrix/DLQR.hpp>
+#include <Matrix/LQR.hpp>
 
 struct Drone {
     constexpr Drone() { compute(); }
@@ -9,6 +12,8 @@ struct Drone {
     constexpr static size_t Nx = 10;
     constexpr static size_t Nu = 3;
     constexpr static size_t Ny = 7;
+
+#pragma region Parameters.......................................................
 
     /** 
      * @brief   Update all computed parameters and system matrices. 
@@ -39,6 +44,45 @@ struct Drone {
      *          call `Drone::compute()` afterwards. 
      */
     Params p = {};
+
+#pragma region Controllers......................................................
+
+    /**
+     * @brief   TODO
+     */
+    ContinuousLQRController
+    getContinuousController(const Matrix<Nx - 1, Nx - 1> &Q,
+                            const Matrix<Nu, Nu> &R) const {
+        auto sys   = getLinearReducedContinuousSystem();
+        auto K_red = -lqr(sys.A, sys.B, Q, R).K;
+        auto K     = hcat(zeros<Nu, 1>(), K_red);
+        return {getLinearFullContinuousModel(), K};
+    }
+
+    /** 
+     * @brief   TODO
+     */
+    DiscreteLQRController
+    getDiscreteController(const Matrix<Nx - 1, Nx - 1> &Q,
+                          const Matrix<Nu, Nu> &R, double Ts,
+                          DiscretizationMethod method) const {
+        auto sys   = getLinearReducedDiscreteSystem(Ts, method);
+        auto K_red = -dlqr(sys.A, sys.B, Q, R).K;
+        auto K     = hcat(zeros<Nu, 1>(), K_red);
+        return {getLinearFullDiscreteSystem(Ts, method), K};
+    }
+
+    /** 
+     * @brief   TODO
+     */
+    ClampedDiscreteLQRController
+    getClampedDiscreteController(const Matrix<Nx - 1, Nx - 1> &Q,
+                                 const Matrix<Nu, Nu> &R, double Ts,
+                                 DiscretizationMethod method) const {
+        return {getDiscreteController(Q, R, Ts, method), p.uh};
+    }
+
+#pragma region Models and Systems...............................................
 
     /** 
      * @brief   Get the true continuous-time, non-linear, full model of the 
@@ -113,6 +157,8 @@ struct Drone {
         auto Dd_red = getBlock<0, Ny, 0, Nu>(discr.D);
         return {Ad_red, Bd_red, Cd_red, Dd_red, Ts};
     }
+
+#pragma region System matrices..................................................
 
     /** 
      * ```

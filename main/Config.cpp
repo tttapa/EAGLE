@@ -31,14 +31,16 @@ const bool plotSampled = false;
 const bool simulateContinuousController = false;
 /** Plot the linearized model instead of the non-linear real model. */
 const bool simulateLinearModel = false;
+/** Clamp the motor control outputs between 0 and 1. */
+const bool clampController = true;
 
 /* ------ LQR weighting matrices Q and R ------------------------------------ */
 
 static auto invsq = [](double x) { return 1.0 / (x * x); };
 
 const RowVector<3> Qn     = invsq(n_att_max) * ones<1, 3>();
-const RowVector<3> Qomega = zeros<1, 3>();
-const RowVector<3> Qq     = 10.0 * ones<1, 3>();
+const RowVector<3> Qomega = 0.05 * ones<1, 3>();  // zeros<1, 3>();
+const RowVector<3> Qq     = 50.0 * ones<1, 3>();
 
 /** Weighting matrix for states in LQR design. */
 const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));

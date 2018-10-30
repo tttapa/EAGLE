@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MotorControl.hpp"
 #include <Model/Controller.hpp>
 #include <Model/System.hpp>
 
@@ -19,6 +20,7 @@ class LQRController : public virtual Controller<10, 3, 7> {
     /** Number of outputs. */
     static constexpr size_t ny = 7;
 
+  protected:
     /** 
      * @brief   Construct a new instance of ContinuousLQRController with the 
      *          given system matrices A, B, C, D, and the given proportional 
@@ -46,6 +48,10 @@ class LQRController : public virtual Controller<10, 3, 7> {
 
   public:
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
+        return getRawControllerOutput(x, r);
+    }
+
+    VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &r) {
         // new equilibrium state
         ColVector<nx + nu> eq = G * r;
         ColVector<nx> xeq     = getBlock<0, nx, 0, 1>(eq);
@@ -58,8 +64,8 @@ class LQRController : public virtual Controller<10, 3, 7> {
         assignBlock<0, 4, 0, 1>(xdiff) = quatDifference(qx, qe);
 
         // controller
-        ColVector<nu> uc = K * xdiff;
-        auto u           = uc + ueq;
+        ColVector<nu> u_ctrl = K * xdiff;
+        auto u               = u_ctrl + ueq;
         return u;
     }
 
@@ -133,4 +139,20 @@ class DiscreteLQRController : public LQRController,
         : LQRController(discreteSystem.A, discreteSystem.B, discreteSystem.C,
                         discreteSystem.D, K, false),
           DiscreteController<nx, nu, ny>(discreteSystem.Ts) {}
+};
+
+class ClampedDiscreteLQRController : public DiscreteLQRController {
+  public:
+    ClampedDiscreteLQRController(
+        const DiscreteLQRController &discreteController, double u_h)
+        : DiscreteLQRController{discreteController}, u_h(u_h) {}
+
+    VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
+        auto u = getRawControllerOutput(x, r);
+        u      = clampMotorControlSignal(u, u_h);
+        return u;
+    }
+
+  private:
+    const double u_h;
 };

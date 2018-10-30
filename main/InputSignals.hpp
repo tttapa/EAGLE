@@ -35,12 +35,12 @@ struct TestReferenceFunction
         if (t >= 9 && t < 11)
             q = quatmultiply(q, qx);
         assignBlock<0, 4, 0, 1>(ref) = q;
-        return ref; 
+        return ref;
         // ---------------------------------------------------------------------
     }
-    const Quaternion qz = eul2quat({M_PI / 8, 0, 0});
-    const Quaternion qy = eul2quat({0, M_PI / 8, 0});
-    const Quaternion qx = eul2quat({0, 0, M_PI / 8});
+    const Quaternion qz = eul2quat({M_PI / 4, 0, 0});
+    const Quaternion qy = eul2quat({0, M_PI / 4, 0});
+    const Quaternion qx = eul2quat({0, 0, M_PI / 4});
     const Quaternion qu = eul2quat({0, 0, 0});
 };
 
@@ -50,14 +50,14 @@ struct TestReferenceFunction
  * @brief   Initial state of the drone for simulations
  */
 NonLinearFullDroneModel::VecX_t x0 = {{
-    {1},    // q0
-    {0},    // q1
-    {0},    // q2
-    {0},    // q3 ____
-    {0.1},  // ωx
-    {0},    // ωy
-    {0},    // ωz ____
-    {0},    // nx
-    {0},    // ny
-    {0},    // nz
+    {1},  // q0
+    {0},  // q1
+    {0},  // q2
+    {0},  // q3 ____
+    {0},  // ωx
+    {0},  // ωy
+    {0},  // ωz ____
+    {0},  // nx
+    {0},  // ny
+    {0},  // nz
 }};
