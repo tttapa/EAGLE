@@ -147,14 +147,14 @@ struct Drone {
      *          It can be approximated by @f$ q_0 \approx \sqrt{1 - q_1^2 -
      *          q_2^2 - q_3^2} @f$.
      */
-    DTLTISystem<Nx - 1, Nu, Ny>
+    DTLTISystem<Nx - 1, Nu, Ny - 1>
     getLinearReducedDiscreteSystem(double Ts,
                                    DiscretizationMethod method) const {
         auto discr  = getLinearFullDiscreteSystem(Ts, method);
         auto Ad_red = getBlock<1, Nx, 1, Nx>(discr.A);
         auto Bd_red = getBlock<1, Nx, 0, Nu>(discr.B);
-        auto Cd_red = getBlock<0, Ny, 1, Nx>(discr.C);
-        auto Dd_red = getBlock<0, Ny, 0, Nu>(discr.D);
+        auto Cd_red = getBlock<1, Ny, 1, Nx>(discr.C);
+        auto Dd_red = getBlock<1, Ny, 0, Nu>(discr.D);
         return {Ad_red, Bd_red, Cd_red, Dd_red, Ts};
     }
 

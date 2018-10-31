@@ -61,7 +61,7 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
     Matrix<Nx, Nx> bb = B;
     double *pbb       = &bb[0][0];
 
-    Matrix<Nx, Nx> QQ = eye<Nx>();  // TODO
+    Matrix<Nx, Nx> QQ = eye<Nx>();
     double *pqq       = &QQ[0][0];
     Matrix<Nx, Nx> ZZ = eye<Nx>();
     double *pzz       = &ZZ[0][0];
@@ -72,7 +72,7 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
     char comp_q = 'V';
     char comp_z = 'V';
 
-    // Always perform permutation balancing.
+    // Permutation balancing
     const char bal_job = 'P';
     double lscale[Nx];
     double rscale[Nx];
@@ -83,7 +83,7 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
     if (info != 0)
         throw std::runtime_error("info != 0");
 
-    // Compute the QR factorization of bb.
+    // QR factorization of bb
     QR<double, Nx, Nx> qrRes = householderQR(B);
     bb                       = qrRes.R;
     aa                       = qrRes.applyTranspose(aa);

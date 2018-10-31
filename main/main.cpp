@@ -1,5 +1,6 @@
 #include "InputSignals.hpp"
 #include "PrintCSV.hpp"
+#include <Matrix/DLQE.hpp>
 #include <Matrix/DLQR.hpp>
 #include <Matrix/LQR.hpp>
 #include <Model/System.hpp>
@@ -105,6 +106,16 @@ int main(int argc, char const *argv[]) {
     plt::show();
 
     /* ---------------------------------------------------------------------- */
+
+    auto discRed = drone.getLinearReducedDiscreteSystem(
+        Ts, DiscretizationMethod::Bilinear);
+
+    Matrix<drone.Nu, drone.Nu> W         = 0.000000001 * eye<drone.Nu>();
+    Matrix<drone.Ny - 1, drone.Ny - 1> V = eye<drone.Ny - 1>();
+    auto dlqeRes = dlqe(discRed.A, discRed.B, discRed.C, W, V);
+    auto L       = dlqeRes.L;
+
+    cout << "L = " << L << endl;
 
     return EXIT_SUCCESS;
 }
