@@ -2,8 +2,8 @@
 
 #include "ODEResult.hpp"
 #include <Matrix/Array.hpp>
+#include <Util/Time.hpp>
 #include <algorithm>
-#include <cmath>  // floor
 
 template <class X>
 inline X interpolate(double t1, double t2, const X &x1, const X &x2, double t) {
@@ -13,7 +13,7 @@ inline X interpolate(double t1, double t2, const X &x1, const X &x2, double t) {
 template <class X>
 std::vector<X> sampleODEResult(const ODEResultX<X> &result, double t_start,
                                double Ts, double t_end) {
-    size_t N = floor((t_end - t_start) / Ts) + 1;
+    size_t N = numberOfSamplesInTimeRange(t_start, Ts, t_end);
     std::vector<X> sampled;
     sampled.reserve(N);
     const auto tbegin_it = result.time.begin();

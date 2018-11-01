@@ -3,6 +3,8 @@
 #include "LQRController.hpp"
 #include "NonLinearFullDroneModel.hpp"
 #include "Params.hpp"
+#include "FullKalman.hpp"
+#include <Matrix/DLQE.hpp>
 #include <Matrix/DLQR.hpp>
 #include <Matrix/LQR.hpp>
 
@@ -80,6 +82,22 @@ struct Drone {
                                  const Matrix<Nu, Nu> &R, double Ts,
                                  DiscretizationMethod method) const {
         return {getDiscreteController(Q, R, Ts, method), p.uh};
+    }
+
+#pragma region Observers........................................................
+
+    /** 
+     * @brief   TODO
+     */
+    FullKalman<Nx, Nu, Ny>
+    getDiscreteObserver(const RowVector<Nu> &covarDynamics,
+                        const RowVector<Ny - 1> &covarSensors, double Ts,
+                        DiscretizationMethod method) {
+        auto sys = getLinearReducedDiscreteSystem(Ts, method);
+        auto L =
+            dlqe(sys.A, sys.B, sys.C, diag(covarDynamics), diag(covarSensors))
+                .L;
+        return {sys.A, sys.B, sys.C, L, Ts};
     }
 
 #pragma region Models and Systems...............................................

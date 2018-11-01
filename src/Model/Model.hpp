@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Controller.hpp"
+#include "Kalman.hpp"
 #include "Params.hpp"
 #include <ODE/DormandPrince.hpp>
+#include <Util/Time.hpp>
 #include <Util/TimeFunction.hpp>
 
 /** 
@@ -18,6 +20,11 @@ class Model {
     typedef TimeFunctionT<VecU_t> InputFunction;
     typedef TimeFunctionT<VecR_t> ReferenceFunction;
     typedef ODEResultX<VecX_t> SimulationResult;
+
+    struct ObserverSimulationResult : public SimulationResult {
+        std::vector<double> sampledTime;
+        std::vector<VecX_t> estimatedSolution;
+    };
 
     /**
      * @brief   Get the state change of the model, given current state
@@ -141,6 +148,16 @@ class Model {
     virtual SimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller, ReferenceFunction &r,
              VecX_t x_start, const AdaptiveODEOptions &opt) = 0;
+
+    /** 
+     * @brief   Simulate the model with the given discrete controller and 
+     *          observer.
+     */
+    virtual ObserverSimulationResult
+    simulate(DiscreteController<Nx, Nu, Ny> &controller,
+             Kalman<Nx, Nu, Ny> &observer, TimeFunctionT<VecU_t> &randFnW,
+             TimeFunctionT<VecY_t> &randFnV, ReferenceFunction &r,
+             VecX_t x_start, const AdaptiveODEOptions &opt) = 0;
 };
 
 /** 
@@ -156,6 +173,8 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
     using InputFunction     = typename Model<Nx, Nu, Ny>::InputFunction;
     using ReferenceFunction = typename Model<Nx, Nu, Ny>::ReferenceFunction;
     using SimulationResult  = typename Model<Nx, Nu, Ny>::SimulationResult;
+    using ObserverSimulationResult =
+        typename Model<Nx, Nu, Ny>::ObserverSimulationResult;
 
     SimulationResult simulate(InputFunction &u, VecX_t x_start,
                               const AdaptiveODEOptions &opt) override {
@@ -220,6 +239,42 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
                                           std::back_inserter(result.solution),
                                           curr_u, curr_x, curr_opt);
             curr_x = result.solution.back();
+            result.time.pop_back();
+            result.solution.pop_back();
+        }
+        return result;
+    }
+
+    ObserverSimulationResult
+    simulate(DiscreteController<Nx, Nu, Ny> &controller,
+             Kalman<Nx, Nu, Ny> &observer, TimeFunctionT<VecU_t> &randFnW,
+             TimeFunctionT<VecY_t> &randFnV, ReferenceFunction &r,
+             VecX_t x_start, const AdaptiveODEOptions &opt) override {
+        ObserverSimulationResult result = {};
+        assert(controller.Ts == observer.Ts);
+        double Ts = controller.Ts;
+        size_t N  = numberOfSamplesInTimeRange(opt.t_start, Ts, opt.t_end);
+        result.sampledTime.reserve(N);
+        result.estimatedSolution.reserve(N);
+        VecX_t curr_x               = x_start;
+        VecX_t curr_x_hat           = x_start;
+        AdaptiveODEOptions curr_opt = opt;
+        for (size_t i = 0; i < N; ++i) {
+            double t         = opt.t_start + Ts * i;
+            curr_opt.t_start = t;
+            curr_opt.t_end   = t + Ts;
+            result.sampledTime.push_back(t);
+            result.estimatedSolution.push_back(curr_x_hat);
+            auto w          = randFnW(t);
+            auto v          = randFnV(t);
+            VecR_t curr_ref = r(t);
+            VecU_t curr_u   = controller(curr_x_hat, curr_ref);
+            result.resultCode |= simulate(std::back_inserter(result.time),
+                                          std::back_inserter(result.solution),
+                                          curr_u + w, curr_x, curr_opt);
+            curr_x     = result.solution.back();
+            VecY_t y   = this->getOutput(curr_x, curr_u) + v;
+            curr_x_hat = observer.getStateChange(curr_x_hat, y, curr_u);
             result.time.pop_back();
             result.solution.pop_back();
         }
