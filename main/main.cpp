@@ -3,6 +3,7 @@
 #include <Matrix/DLQE.hpp>
 #include <Matrix/DLQR.hpp>
 #include <Matrix/LQR.hpp>
+#include <Matrix/Randn.hpp>
 #include <Model/System.hpp>
 #include <ODE/ODEEval.hpp>
 #include <iostream>
@@ -84,38 +85,148 @@ int main(int argc, char const *argv[]) {
     plt::subplot(5, 1, 1);
     plotResults(t, reference, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Reference orientation");
-    plt::xlim(odeopt.t_start, odeopt.t_end);
+    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
     plt::subplot(5, 1, 2);
     plotResults(t, orientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Orientation of drone");
-    plt::xlim(odeopt.t_start, odeopt.t_end);
+    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
     plt::subplot(5, 1, 3);
     plotResults(t, data, {4, 7}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of drone");
-    plt::xlim(odeopt.t_start, odeopt.t_end);
+    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
     plt::subplot(5, 1, 4);
     plotResults(t, data, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of motors");
-    plt::xlim(odeopt.t_start, odeopt.t_end);
+    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
     plt::subplot(5, 1, 5);
     plotResults(t, u, {0, 3}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Control signal");
-    plt::xlim(odeopt.t_start, odeopt.t_end);
+    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
 
     plt::tight_layout();
     plt::show();
 
     /* ---------------------------------------------------------------------- */
 
-    auto discRed = drone.getLinearReducedDiscreteSystem(
-        Ts, DiscretizationMethod::Bilinear);
+    const RowVector<drone.Nu> covarDynamics    = 1e-9 * ones<1, drone.Nu>();
+    const RowVector<drone.Ny - 1> covarSensors = 1e0 * ones<1, drone.Ny - 1>();
 
-    Matrix<drone.Nu, drone.Nu> W         = 0.000000001 * eye<drone.Nu>();
-    Matrix<drone.Ny - 1, drone.Ny - 1> V = eye<drone.Ny - 1>();
-    auto dlqeRes = dlqe(discRed.A, discRed.B, discRed.C, W, V);
-    auto L       = dlqeRes.L;
+    auto kalman = drone.getDiscreteObserver(covarDynamics, covarSensors, Ts,
+                                            DiscretizationMethod::Bilinear);
 
-    cout << "L = " << L << endl;
+    FunctionalTimeFunctionT<ColVector<drone.Nu>> randFnW = {
+        [&covarDynamics](double /* t */) {
+            return randn(covarDynamics[0].data);
+        }  //
+    };
+    FunctionalTimeFunctionT<ColVector<drone.Ny>> randFnV = {
+        [&covarSensors](double /* t */) {
+            return vcat(zeros<1, 1>(), randn(covarSensors[0].data));
+        }  //
+    };
+
+    /** [1 0 0 0 0 0 0] */
+    ConstantTimeFunctionT<ColVector<drone.Ny>> refObs =
+        vcat(ones<1, 1>(), zeros<drone.Ny - 1, 1>());
+
+    auto obsRes = model.simulate(controller, kalman, randFnW, randFnV, refObs,
+                                 x0, odeopt);
+
+    // Convert the quaternions of the reference to euler angles
+    vector<EulerAngles> referenceObs;
+    referenceObs.resize(obsRes.sampledTime.size());
+    transform(obsRes.sampledTime.begin(), obsRes.sampledTime.end(),
+              referenceObs.begin(),
+              [&refObs](double t) {
+                  return quat2eul(getBlock<0, 4, 0, 1>(refObs(t)));
+              }  //
+    );
+
+    // Convert the quaternions of the state to euler angles
+    vector<EulerAngles> sampledOrientation;
+    sampledOrientation.resize(obsRes.estimatedSolution.size());
+    transform(obsRes.estimatedSolution.begin(), obsRes.estimatedSolution.end(),
+              sampledOrientation.begin(),
+              NonLinearFullDroneModel::stateToEuler);
+
+    // Plot all results
+    /* Reference */
+    plt::subplot(5, 2, 1);
+    plotResults(obsRes.sampledTime, referenceObs, {0, 3}, {"z", "y", "x"},
+                {"b-", "g-", "r-"}, "Reference orientation");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    /* Output */
+    plt::subplot(5, 2, 2);
+    plotResults(obsRes.sampledTime, obsRes.output, {0, 7},
+                {"q0", "q1", "q2", "q3", "wx", "wy", "wz"}, {},
+                "Noisy sensor outputs");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    /* Kalman estimation */
+    plt::subplot(5, 2, 3);
+    plotResults(obsRes.sampledTime, sampledOrientation, {0, 3}, {"z", "y", "x"},
+                {"b-", "g-", "r-"}, "Orientation of drone");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    plt::subplot(5, 2, 5);
+    plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {4, 7},
+                {"x", "y", "z"}, {"r-", "g-", "b-"},
+                "Angular velocity of drone");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    plt::subplot(5, 2, 7);
+    plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {7, 10},
+                {"x", "y", "z"}, {"r-", "g-", "b-"},
+                "Angular velocity of motors");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    /* Control signal */
+    plt::subplot(5, 2, 9);
+    plotResults(obsRes.sampledTime, obsRes.control, {0, 3}, {"x", "y", "z"},
+                {"r-", "g-", "b-"}, "Control signal");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    // Convert the quaternions of the state to euler angles
+    vector<EulerAngles> realOrientation;
+    realOrientation.resize(obsRes.solution.size());
+    transform(obsRes.solution.begin(), obsRes.solution.end(),
+              realOrientation.begin(), NonLinearFullDroneModel::stateToEuler);
+
+    /* Real ODE result */
+    plt::subplot(5, 2, 4);
+    plotResults(obsRes.time, realOrientation, {0, 3}, {"z", "y", "x"},
+                {"b-", "g-", "r-"}, "Orientation of drone");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    plt::subplot(5, 2, 6);
+    plotResults(obsRes.time, obsRes.solution, {4, 7}, {"x", "y", "z"},
+                {"r-", "g-", "b-"}, "Angular velocity of drone");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    plt::subplot(5, 2, 8);
+    plotResults(obsRes.time, obsRes.solution, {7, 10}, {"x", "y", "z"},
+                {"r-", "g-", "b-"}, "Angular velocity of motors");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    plt::tight_layout();
+    plt::show();
+
+    // ------------------------------- //
+
+    plt::subplot(2, 1, 1);
+    plotResults(obsRes.time, obsRes.solution, {0, 10},
+                {"q0", "q1", "q2", "q3", "wx", "wy", "wz"}, {}, "Real states");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    plt::subplot(2, 1, 2);
+    plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {0, 10},
+                {"q0", "q1", "q2", "q3", "wx", "wy", "wz"}, {},
+                "Observed states");
+    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+
+    plt::tight_layout();
+    plt::show();
 
     return EXIT_SUCCESS;
 }

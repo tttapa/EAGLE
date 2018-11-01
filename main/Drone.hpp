@@ -1,12 +1,14 @@
 #pragma once
 
+#include "FullKalman.hpp"
 #include "LQRController.hpp"
 #include "NonLinearFullDroneModel.hpp"
 #include "Params.hpp"
-#include "FullKalman.hpp"
 #include <Matrix/DLQE.hpp>
 #include <Matrix/DLQR.hpp>
 #include <Matrix/LQR.hpp>
+
+#include <iostream>
 
 struct Drone {
     constexpr Drone() { compute(); }
@@ -70,7 +72,8 @@ struct Drone {
                           DiscretizationMethod method) const {
         auto sys   = getLinearReducedDiscreteSystem(Ts, method);
         auto K_red = -dlqr(sys.A, sys.B, Q, R).K;
-        auto K     = hcat(zeros<Nu, 1>(), K_red);
+        std::cout << "K = " << K_red << std::endl;
+        auto K = hcat(zeros<Nu, 1>(), K_red);
         return {getLinearFullDiscreteSystem(Ts, method), K};
     }
 
@@ -92,11 +95,12 @@ struct Drone {
     FullKalman<Nx, Nu, Ny>
     getDiscreteObserver(const RowVector<Nu> &covarDynamics,
                         const RowVector<Ny - 1> &covarSensors, double Ts,
-                        DiscretizationMethod method) {
+                        DiscretizationMethod method) const {
         auto sys = getLinearReducedDiscreteSystem(Ts, method);
         auto L =
             dlqe(sys.A, sys.B, sys.C, diag(covarDynamics), diag(covarSensors))
                 .L;
+        std::cout << "L = " << L << std::endl;
         return {sys.A, sys.B, sys.C, L, Ts};
     }
 

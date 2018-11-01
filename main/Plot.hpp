@@ -1,3 +1,4 @@
+#include "ANSIColors.hpp"
 #include <Matrix/Matrix.hpp>
 #include <cmath>  // floor
 #include <matplotlibcpp.h>
@@ -40,24 +41,21 @@ void plotResults(const std::vector<double> &t,
                  const std::string &title                = "") {
     assert(idx.start < idx.end);
     assert(idx.end <= N);
-    for (size_t i = 0; i < (idx.end - idx.start); ++i) {
-        std::vector<double> plotdata = extractRow(vectors, i + idx.start);
-        std::string fmt              = i < formats.size() ? formats[i] : "";
-        if (i < legends.size())
-            plt::named_plot(legends[i], t, plotdata, fmt);
-        else
-            plt::plot(t, plotdata, fmt);
-    }
-    if (legends.size() > 0)
-        try {
-            plt::legend();
-        } catch (std::runtime_error &e) {
-            std::cerr << "Error: " << e.what() << std::endl;
-        }
     try {
+        for (size_t i = 0; i < (idx.end - idx.start); ++i) {
+            std::vector<double> plotdata = extractRow(vectors, i + idx.start);
+            std::string fmt              = i < formats.size() ? formats[i] : "";
+            if (i < legends.size())
+                plt::named_plot(legends[i], t, plotdata, fmt);
+            else
+                plt::plot(t, plotdata, fmt);
+        }
+        if (legends.size() > 0)
+            plt::legend();
+        plt::title(title);
         plt::title(title);
     } catch (std::runtime_error &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << ANSIColors::red << "Error: " << e.what()
+                  << ANSIColors::reset << std::endl;
     }
-    plt::title(title);
 }

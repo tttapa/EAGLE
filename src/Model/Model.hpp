@@ -24,6 +24,8 @@ class Model {
     struct ObserverSimulationResult : public SimulationResult {
         std::vector<double> sampledTime;
         std::vector<VecX_t> estimatedSolution;
+        std::vector<VecU_t> control;
+        std::vector<VecY_t> output;
     };
 
     /**
@@ -155,9 +157,10 @@ class Model {
      */
     virtual ObserverSimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller,
-             Kalman<Nx, Nu, Ny> &observer, TimeFunctionT<VecU_t> &randFnW,
-             TimeFunctionT<VecY_t> &randFnV, ReferenceFunction &r,
-             VecX_t x_start, const AdaptiveODEOptions &opt) = 0;
+             DiscreteObserver<Nx, Nu, Ny> &observer,
+             TimeFunctionT<VecU_t> &randFnW, TimeFunctionT<VecY_t> &randFnV,
+             ReferenceFunction &r, VecX_t x_start,
+             const AdaptiveODEOptions &opt) = 0;
 };
 
 /** 
@@ -247,15 +250,18 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
 
     ObserverSimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller,
-             Kalman<Nx, Nu, Ny> &observer, TimeFunctionT<VecU_t> &randFnW,
-             TimeFunctionT<VecY_t> &randFnV, ReferenceFunction &r,
-             VecX_t x_start, const AdaptiveODEOptions &opt) override {
-        ObserverSimulationResult result = {};
+             DiscreteObserver<Nx, Nu, Ny> &observer,
+             TimeFunctionT<VecU_t> &randFnW, TimeFunctionT<VecY_t> &randFnV,
+             ReferenceFunction &r, VecX_t x_start,
+             const AdaptiveODEOptions &opt) override {
         assert(controller.Ts == observer.Ts);
-        double Ts = controller.Ts;
-        size_t N  = numberOfSamplesInTimeRange(opt.t_start, Ts, opt.t_end);
+        ObserverSimulationResult result = {};
+        double Ts                       = controller.Ts;
+        size_t N = numberOfSamplesInTimeRange(opt.t_start, Ts, opt.t_end);
         result.sampledTime.reserve(N);
         result.estimatedSolution.reserve(N);
+        result.control.reserve(N);
+        result.output.reserve(N);
         VecX_t curr_x               = x_start;
         VecX_t curr_x_hat           = x_start;
         AdaptiveODEOptions curr_opt = opt;
@@ -263,20 +269,22 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             double t         = opt.t_start + Ts * i;
             curr_opt.t_start = t;
             curr_opt.t_end   = t + Ts;
+            auto w           = randFnW(t);
+            auto v           = randFnV(t);
+            VecR_t curr_ref  = r(t);
+            VecU_t curr_u    = controller(curr_x_hat, curr_ref);
             result.sampledTime.push_back(t);
             result.estimatedSolution.push_back(curr_x_hat);
-            auto w          = randFnW(t);
-            auto v          = randFnV(t);
-            VecR_t curr_ref = r(t);
-            VecU_t curr_u   = controller(curr_x_hat, curr_ref);
+            result.control.push_back(curr_u);
             result.resultCode |= simulate(std::back_inserter(result.time),
                                           std::back_inserter(result.solution),
                                           curr_u + w, curr_x, curr_opt);
-            curr_x     = result.solution.back();
-            VecY_t y   = this->getOutput(curr_x, curr_u) + v;
+            curr_x   = result.solution.back();
+            VecY_t y = this->getOutput(curr_x, curr_u) + v;
+            result.output.push_back(y);
             curr_x_hat = observer.getStateChange(curr_x_hat, y, curr_u);
-            result.time.pop_back();
-            result.solution.pop_back();
+            result.time.pop_back();      // start and end point are included
+            result.solution.pop_back();  // by `simulate`, so remove doubles
         }
         return result;
     }
