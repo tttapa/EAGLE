@@ -39,12 +39,19 @@ const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
 /** Weighting matrix for inputs in LQR design. */
 const Matrix<3, 3> R = invsq(u_att_max) * eye<3>();
 
+/* ------ Kalman variance matrices ------------------------------------------ */
+const RowVector<3> varDynamics = 1e-7 * ones<1, 3>();
+const RowVector<6> varSensors  = hcat(  //
+    1e-3 * ones<1, 3>(),                 //
+    1e-4 * ones<1, 3>()                  //
+);
+
 /* ------ Simulation options (for ODE solver) ------------------------------- */
 
 /** Options for numerical integration for simulation. */
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
-    .t_end   = 40,
+    .t_end   = 60,
     .epsilon = 1e-6,
     .h_start = 1e-2,
     .h_min   = 1e-6,

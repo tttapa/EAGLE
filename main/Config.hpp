@@ -39,6 +39,10 @@ extern const RowVector<3> Qq;
 extern const Matrix<9, 9> Q;
 extern const Matrix<3, 3> R;
 
+/* ------ Kalman variance matrices ------------------------------------------ */
+extern const RowVector<3> varDynamics;
+extern const RowVector<6> varSensors;
+
 /* ------ Simulation options (for ODE solver) ------------------------------- */
 extern const AdaptiveODEOptions odeopt;
 

@@ -93,21 +93,29 @@ int main(int argc, char const *argv[]) {
 
     /* ---------------------------------------------------------------------- */
 
-    const RowVector<drone.Nu> covarDynamics    = 1e-9 * ones<1, drone.Nu>();
-    const RowVector<drone.Ny - 1> covarSensors = 1e-2 * ones<1, drone.Ny - 1>();
-
-    auto kalman = drone.getDiscreteObserver(covarDynamics, covarSensors, Ts,
+    auto kalman = drone.getDiscreteObserver(varDynamics, varSensors, Ts,
                                             DiscretizationMethod::Bilinear);
 
     FunctionalTimeFunctionT<ColVector<drone.Nu>> randFnW = {
-        [&covarDynamics](double /* t */) {
-            return randn(covarDynamics[0].data);
-        }  //
+        [](double t) {
+            return randn(varDynamics[0].data);  //
+        }                                       //
     };
     FunctionalTimeFunctionT<ColVector<drone.Ny>> randFnV = {
-        [&covarSensors](double /* t */) {
-            return vcat(zeros<1, 1>(), randn(covarSensors[0].data));
-        }  //
+        [](double t) {
+            // Gaussian noise + drift
+            ColVector<drone.Ny> res     = {};
+            auto varOrientation         = getBlock<0, 1, 0, 3>(varSensors);
+            auto varAngVelocity         = getBlock<0, 1, 3, 6>(varSensors);
+            EulerAngles randOrientation = randn(varOrientation[0].data) +
+                                          2.0 * t * transpose(varOrientation);
+            ColVector<3> randAngVelocity = randn(varAngVelocity[0].data) +
+                                           1.0 * t * transpose(varAngVelocity);
+            return vcat(                    //
+                eul2quat(randOrientation),  //
+                randAngVelocity             //
+            );                              //
+        }                                   //
     };
 
     /** [1 0 0 0 0 0 0] */
@@ -216,8 +224,7 @@ int main(int argc, char const *argv[]) {
 
     if (exportCSV) {
         // Sample/interpolate the simulation result using a fixed time step
-        auto sampled =
-            sampleODEResult(obsRes, odeopt.t_start, CSV_Ts, t_end);
+        auto sampled = sampleODEResult(obsRes, odeopt.t_start, CSV_Ts, t_end);
         vector<EulerAngles> sampledOrientation =
             NonLinearFullDroneModel::statesToEuler(sampled);
         // Export to the given output file
