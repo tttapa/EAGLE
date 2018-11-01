@@ -109,7 +109,7 @@ int main(int argc, char const *argv[]) {
     /* ---------------------------------------------------------------------- */
 
     const RowVector<drone.Nu> covarDynamics    = 1e-9 * ones<1, drone.Nu>();
-    const RowVector<drone.Ny - 1> covarSensors = 1e0 * ones<1, drone.Ny - 1>();
+    const RowVector<drone.Ny - 1> covarSensors = 1e-2 * ones<1, drone.Ny - 1>();
 
     auto kalman = drone.getDiscreteObserver(covarDynamics, covarSensors, Ts,
                                             DiscretizationMethod::Bilinear);
@@ -126,8 +126,11 @@ int main(int argc, char const *argv[]) {
     };
 
     /** [1 0 0 0 0 0 0] */
-    ConstantTimeFunctionT<ColVector<drone.Ny>> refObs =
+    ConstantTimeFunctionT<ColVector<drone.Ny>> ref0 =
         vcat(ones<1, 1>(), zeros<drone.Ny - 1, 1>());
+
+    // auto refObs = ref0;
+    auto refObs = ref;
 
     auto obsRes = model.simulate(controller, kalman, randFnW, randFnV, refObs,
                                  x0, odeopt);
@@ -166,19 +169,19 @@ int main(int argc, char const *argv[]) {
     /* Kalman estimation */
     plt::subplot(5, 2, 3);
     plotResults(obsRes.sampledTime, sampledOrientation, {0, 3}, {"z", "y", "x"},
-                {"b-", "g-", "r-"}, "Orientation of drone");
+                {"b-", "g-", "r-"}, "Estimated orientation of drone");
     plt::xlim(odeopt.t_start, odeopt.t_end + 3);
 
     plt::subplot(5, 2, 5);
     plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {4, 7},
                 {"x", "y", "z"}, {"r-", "g-", "b-"},
-                "Angular velocity of drone");
+                "Estimated angular velocity of drone");
     plt::xlim(odeopt.t_start, odeopt.t_end + 3);
 
     plt::subplot(5, 2, 7);
     plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {7, 10},
                 {"x", "y", "z"}, {"r-", "g-", "b-"},
-                "Angular velocity of motors");
+                "Estimated angular velocity of motors");
     plt::xlim(odeopt.t_start, odeopt.t_end + 3);
 
     /* Control signal */
@@ -196,17 +199,17 @@ int main(int argc, char const *argv[]) {
     /* Real ODE result */
     plt::subplot(5, 2, 4);
     plotResults(obsRes.time, realOrientation, {0, 3}, {"z", "y", "x"},
-                {"b-", "g-", "r-"}, "Orientation of drone");
+                {"b-", "g-", "r-"}, "Actual orientation of drone");
     plt::xlim(odeopt.t_start, odeopt.t_end + 3);
 
     plt::subplot(5, 2, 6);
     plotResults(obsRes.time, obsRes.solution, {4, 7}, {"x", "y", "z"},
-                {"r-", "g-", "b-"}, "Angular velocity of drone");
+                {"r-", "g-", "b-"}, "Actual angular velocity of drone");
     plt::xlim(odeopt.t_start, odeopt.t_end + 3);
 
     plt::subplot(5, 2, 8);
     plotResults(obsRes.time, obsRes.solution, {7, 10}, {"x", "y", "z"},
-                {"r-", "g-", "b-"}, "Angular velocity of motors");
+                {"r-", "g-", "b-"}, "Actual angular velocity of motors");
     plt::xlim(odeopt.t_start, odeopt.t_end + 3);
 
     plt::tight_layout();
@@ -216,17 +219,31 @@ int main(int argc, char const *argv[]) {
 
     plt::subplot(2, 1, 1);
     plotResults(obsRes.time, obsRes.solution, {0, 10},
-                {"q0", "q1", "q2", "q3", "wx", "wy", "wz"}, {}, "Real states");
+                {"q0", "q1", "q2", "q3", "wx", "wy", "wz"}, {},
+                "Actual states");
     plt::xlim(odeopt.t_start, odeopt.t_end + 3);
 
     plt::subplot(2, 1, 2);
     plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {0, 10},
                 {"q0", "q1", "q2", "q3", "wx", "wy", "wz"}, {},
-                "Observed states");
+                "Estimated states");
     plt::xlim(odeopt.t_start, odeopt.t_end + 3);
 
     plt::tight_layout();
     plt::show();
+
+    // ------------------------------- //
+
+    cout << endl;
+    printMATLAB(cout, Q, "Q");
+    printMATLAB(cout, R, "R");
+    cout << endl;
+    printC(cout, Q, "Q");
+    printC(cout, R, "R");
+    cout << endl;
+    printCpp(cout, Q, "Q");
+    printCpp(cout, R, "R");
+    cout << endl;
 
     return EXIT_SUCCESS;
 }

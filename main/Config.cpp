@@ -44,7 +44,7 @@ const Matrix<3, 3> R = invsq(u_att_max) * eye<3>();
 /** Options for numerical integration for simulation. */
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
-    .t_end   = 18,
+    .t_end   = 40,
     .epsilon = 1e-6,
     .h_start = 1e-2,
     .h_min   = 1e-6,

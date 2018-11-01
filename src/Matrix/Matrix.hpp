@@ -204,18 +204,96 @@ constexpr double norm(const Array<T, N> &vector) {
     return sqrt(sumsq);
 }
 
+namespace MatrixPrinting {
+constexpr size_t precision = 6;
+constexpr size_t width     = precision + 5;
+}  // namespace MatrixPrinting
+
 // Printing
 template <class T, size_t R, size_t C>
 std::ostream &operator<<(std::ostream &os, const TMatrix<T, R, C> &matrix) {
     auto colsep = ' ';
-    auto rowsep = ";\r\n";
-    os << '(' << R << " × " << C << ')' << rowsep;
+    auto rowsep = "\r\n";
+    os << '(' << R << " × " << C << ')' << rowsep
+       << std::setprecision(MatrixPrinting::precision);
     for (const auto &row : matrix) {
         for (const auto &el : row)
-            os << std::setw(10) << el << colsep;
+            os << std::setw(MatrixPrinting::width) << el << colsep;
         os << rowsep;
     }
     return os;
+}
+
+template <class T, size_t R, size_t C>
+void printMATLAB(std::ostream &os, const TMatrix<T, R, C> &matrix) {
+    auto colsep = ", ";
+    auto rowsep = ";\r\n";
+    os << "[ " << std::setprecision(MatrixPrinting::precision);
+    for (size_t r = 0; r < R; ++r) {
+        if (r)
+            os << rowsep << "  ";
+        for (size_t c = 0; c < C; ++c) {
+            if (c)
+                os << colsep;
+            os << std::setw(MatrixPrinting::width) << matrix[r][c];
+        }
+    }
+    os << " ];" << std::endl;
+}
+
+template <class T, size_t R, size_t C>
+void printMATLAB(std::ostream &os, const TMatrix<T, R, C> &matrix,
+                 const std::string &name) {
+    os << name << " = ...\r\n";
+    printMATLAB(os, matrix);
+}
+
+template <class T, size_t R, size_t C>
+void printC(std::ostream &os, const TMatrix<T, R, C> &matrix) {
+    auto colsep = ", ";
+    auto rowsep = "},\r\n    {";
+    os << "{\r\n    {" << std::setprecision(MatrixPrinting::precision);
+    for (size_t r = 0; r < R; ++r) {
+        if (r)
+            os << rowsep;
+        for (size_t c = 0; c < C; ++c) {
+            if (c)
+                os << colsep;
+            os << std::setw(MatrixPrinting::width) << matrix[r][c];
+        }
+    }
+    os << "},\r\n};" << std::endl;
+}
+
+template <class T, size_t R, size_t C>
+void printC(std::ostream &os, const TMatrix<T, R, C> &matrix,
+            const std::string &name) {
+    os << "const double[" << R << "][" << C << "] " << name << " = ";
+    printC(os, matrix);
+}
+
+template <class T, size_t R, size_t C>
+void printCpp(std::ostream &os, const TMatrix<T, R, C> &matrix) {
+    auto colsep = ", ";
+    auto rowsep = "},\r\n    {";
+    os << "{{\r\n    {" << std::setprecision(MatrixPrinting::precision);
+    for (size_t r = 0; r < R; ++r) {
+        if (r)
+            os << rowsep;
+        for (size_t c = 0; c < C; ++c) {
+            if (c)
+                os << colsep;
+            os << std::setw(MatrixPrinting::width) << matrix[r][c];
+        }
+    }
+    os << "},\r\n}};" << std::endl;
+}
+
+template <class T, size_t R, size_t C>
+void printCpp(std::ostream &os, const TMatrix<T, R, C> &matrix,
+              const std::string &name) {
+    os << "const Matrix<" << R << ", " << C << "> " << name << " = ";
+    printCpp(os, matrix);
 }
 
 // -----------------------------------------------------------------------------
