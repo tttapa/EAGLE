@@ -47,19 +47,6 @@ int main(int argc, char const *argv[]) {
         std::cerr << ANSIColors::yellow << "Warning: minimum step size reached"
                   << ANSIColors::reset << endl;
 
-    /* ------ Export the simulation result as CSV --------------------------- */
-
-    if (exportCSV) {
-        // Sample/interpolate the simulation result using a fixed time step
-        auto sampled = sampleODEResult(result, odeopt.t_start, CSV_Ts, t_end);
-        vector<EulerAngles> sampledOrientation;
-        sampledOrientation.resize(sampled.size());
-        transform(sampled.begin(), sampled.end(), sampledOrientation.begin(),
-                  NonLinearFullDroneModel::stateToEuler);
-        // Export to the given output file
-        printCSV(outputFile, 0.0, CSV_Ts, sampledOrientation);
-    }
-
     /* ------ Plot the simulation result ------------------------------------ */
     // Time and state solutions
     auto t    = result.time;
@@ -69,21 +56,19 @@ int main(int argc, char const *argv[]) {
     auto u = controller.getControlSignal(t, data, ref);
 
     // Convert the quaternions of the state to euler angles
-    vector<EulerAngles> orientation;
-    orientation.resize(data.size());
-    transform(data.begin(), data.end(), orientation.begin(),
-              NonLinearFullDroneModel::stateToEuler);
+    vector<EulerAngles> orientation =
+        NonLinearFullDroneModel::statesToEuler(data);
 
     // Convert the quaternions of the reference to euler angles
-    vector<EulerAngles> reference;
-    reference.resize(t.size());
-    transform(t.begin(), t.end(), reference.begin(), [&ref](double t) {
+    vector<EulerAngles> refOrientation;
+    refOrientation.resize(t.size());
+    transform(t.begin(), t.end(), refOrientation.begin(), [&ref](double t) {
         return quat2eul(getBlock<0, 4, 0, 1>(ref(t)));
     });
 
     // Plot all results
     plt::subplot(5, 1, 1);
-    plotResults(t, reference, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
+    plotResults(t, refOrientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Reference orientation");
     plt::xlim(odeopt.t_start, odeopt.t_end + 1);
     plt::subplot(5, 1, 2);
@@ -146,11 +131,8 @@ int main(int argc, char const *argv[]) {
     );
 
     // Convert the quaternions of the state to euler angles
-    vector<EulerAngles> sampledOrientation;
-    sampledOrientation.resize(obsRes.estimatedSolution.size());
-    transform(obsRes.estimatedSolution.begin(), obsRes.estimatedSolution.end(),
-              sampledOrientation.begin(),
-              NonLinearFullDroneModel::stateToEuler);
+    vector<EulerAngles> sampledOrientation =
+        NonLinearFullDroneModel::statesToEuler(obsRes.estimatedSolution);
 
     // Plot all results
     /* Reference */
@@ -191,10 +173,8 @@ int main(int argc, char const *argv[]) {
     plt::xlim(odeopt.t_start, odeopt.t_end + 3);
 
     // Convert the quaternions of the state to euler angles
-    vector<EulerAngles> realOrientation;
-    realOrientation.resize(obsRes.solution.size());
-    transform(obsRes.solution.begin(), obsRes.solution.end(),
-              realOrientation.begin(), NonLinearFullDroneModel::stateToEuler);
+    vector<EulerAngles> realOrientation =
+        NonLinearFullDroneModel::statesToEuler(obsRes.solution);
 
     /* Real ODE result */
     plt::subplot(5, 2, 4);
@@ -232,7 +212,19 @@ int main(int argc, char const *argv[]) {
     plt::tight_layout();
     plt::show();
 
-    // ------------------------------- //
+    /* ------ Export the simulation result as CSV --------------------------- */
+
+    if (exportCSV) {
+        // Sample/interpolate the simulation result using a fixed time step
+        auto sampled =
+            sampleODEResult(obsRes, odeopt.t_start, CSV_Ts, t_end);
+        vector<EulerAngles> sampledOrientation =
+            NonLinearFullDroneModel::statesToEuler(sampled);
+        // Export to the given output file
+        printCSV(outputFile, 0.0, CSV_Ts, sampledOrientation);
+    }
+
+    // ---------------------------------------------------------------------- //
 
     cout << endl;
     printMATLAB(cout, Q, "Q");

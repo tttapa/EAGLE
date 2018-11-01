@@ -59,8 +59,22 @@ class NonLinearFullDroneModel : public ContinuousModel<10, 3, 7> {
     /** 
      * @brief   Get the rotation in Euler angles, given a state vector x.
      */
-    static EulerAngles stateToEuler(const VecX_t &x) {
+    template <size_t R>
+    static EulerAngles stateToEuler(const ColVector<R> &x) {
         Quaternion q = getBlock<0, 4, 0, 1>(x);
         return quat2eul(q);
+    }
+
+    /** 
+     * @brief   Convert the vector of states to a vector of Euler angles.
+     */
+    template <size_t R>
+    static std::vector<EulerAngles>
+    statesToEuler(const std::vector<ColVector<R>> &xs) {
+        std::vector<EulerAngles> orientation;
+        orientation.resize(xs.size());
+        transform(xs.begin(), xs.end(), orientation.begin(),
+                  NonLinearFullDroneModel::stateToEuler<R>);
+        return orientation;
     }
 };
