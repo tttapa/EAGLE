@@ -66,14 +66,24 @@ struct Drone {
     /** 
      * @brief   TODO
      */
+    Matrix<Nu, Nx - 1>
+    getReducedDiscreteControllerMatrixK(const Matrix<Nx - 1, Nx - 1> &Q,
+                                        const Matrix<Nu, Nu> &R, double Ts,
+                                        DiscretizationMethod method) const {
+        auto sys   = getLinearReducedDiscreteSystem(Ts, method);
+        auto K_red = -dlqr(sys.A, sys.B, Q, R).K;
+        return K_red;
+    }
+
+    /** 
+     * @brief   TODO
+     */
     DiscreteLQRController
     getDiscreteController(const Matrix<Nx - 1, Nx - 1> &Q,
                           const Matrix<Nu, Nu> &R, double Ts,
                           DiscretizationMethod method) const {
-        auto sys   = getLinearReducedDiscreteSystem(Ts, method);
-        auto K_red = -dlqr(sys.A, sys.B, Q, R).K;
-        std::cout << "K = " << K_red << std::endl;
-        auto K = hcat(zeros<Nu, 1>(), K_red);
+        auto K_red = getReducedDiscreteControllerMatrixK(Q, R, Ts, method);
+        auto K     = hcat(zeros<Nu, 1>(), K_red);
         return {getLinearFullDiscreteSystem(Ts, method), K};
     }
 
@@ -89,19 +99,26 @@ struct Drone {
 
 #pragma region Observers........................................................
 
+    Matrix<Nx - 1, Ny - 1> getReducedDiscreteObserverMatrixL(
+        const RowVector<Nu> &varDynamics, const RowVector<Ny - 1> &varSensors,
+        double Ts, DiscretizationMethod method) const {
+        auto sys = getLinearReducedDiscreteSystem(Ts, method);
+        auto L_red =
+            dlqe(sys.A, sys.B, sys.C, diag(varDynamics), diag(varSensors)).L;
+        return L_red;
+    }
+
     /** 
      * @brief   TODO
      */
     FullKalman<Nx, Nu, Ny>
-    getDiscreteObserver(const RowVector<Nu> &covarDynamics,
-                        const RowVector<Ny - 1> &covarSensors, double Ts,
+    getDiscreteObserver(const RowVector<Nu> &varDynamics,
+                        const RowVector<Ny - 1> &varSensors, double Ts,
                         DiscretizationMethod method) const {
         auto sys = getLinearReducedDiscreteSystem(Ts, method);
-        auto L =
-            dlqe(sys.A, sys.B, sys.C, diag(covarDynamics), diag(covarSensors))
-                .L;
-        std::cout << "L = " << L << std::endl;
-        return {sys.A, sys.B, sys.C, L, Ts};
+        auto L_red =
+            dlqe(sys.A, sys.B, sys.C, diag(varDynamics), diag(varSensors)).L;
+        return {sys.A, sys.B, sys.C, L_red, Ts};
     }
 
 #pragma region Models and Systems...............................................
@@ -130,11 +147,11 @@ struct Drone {
      *          It can be approximated by @f$ q_0 \approx \sqrt{1 - q_1^2 - 
      *          q_2^2 - q_3^2} @f$.
      */
-    CTLTISystem<Nx - 1, Nu, Ny> getLinearReducedContinuousSystem() const {
+    CTLTISystem<Nx - 1, Nu, Ny - 1> getLinearReducedContinuousSystem() const {
         auto A_red = getBlock<1, Nx, 1, Nx>(A);
         auto B_red = getBlock<1, Nx, 0, Nu>(B);
-        auto C_red = getBlock<0, Ny, 1, Nx>(C);
-        auto D_red = getBlock<0, Ny, 0, Nu>(D);
+        auto C_red = getBlock<1, Ny, 1, Nx>(C);
+        auto D_red = getBlock<1, Ny, 0, Nu>(D);
         return {A_red, B_red, C_red, D_red};
     }
 

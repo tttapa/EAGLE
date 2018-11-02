@@ -69,7 +69,6 @@ class LQRController : public virtual Controller<10, 3, 7> {
         return u;
     }
 
-  private:
     /**
         Solves the system of equations
 
@@ -89,24 +88,24 @@ class LQRController : public virtual Controller<10, 3, 7> {
         @return A matrix @f$ G @f$ such that
                 @f$ \begin{pmatrix} x^e \\ u^e \end{pmatrix} = G r @f$.
     */
-    static Matrix<nx + nu, ny> calculateG(const Matrix<nx, nx> &A,
-                                          const Matrix<nx, nu> &B,
-                                          const Matrix<ny, nx> &C,
-                                          const Matrix<ny, nu> &D,
+    template <size_t Nx, size_t Nu, size_t Ny>
+    static Matrix<Nx + Nu, Ny> calculateG(const Matrix<Nx, Nx> &A,
+                                          const Matrix<Nx, Nu> &B,
+                                          const Matrix<Ny, Nx> &C,
+                                          const Matrix<Ny, Nu> &D,
                                           bool continuous) {
-        Matrix<nx, nx> Aa = continuous ? A : A - eye<nx>();
+        Matrix<Nx, Nx> Aa = continuous ? A : A - eye<Nx>();
         /* W =  [ Aa B ]
                 [ C  D ] */
-        Matrix<nx + ny, nx + nu> W = vcat(  //
+        Matrix<Nx + Ny, Nx + Nu> W = vcat(  //
             hcat(Aa, B),                    //
             hcat(C, D)                      //
         );
-        Matrix<nx + ny, ny> OI     = vcat(zeros<nx, ny>(), eye<ny>());
+        Matrix<Nx + Ny, Ny> OI     = vcat(zeros<Nx, Ny>(), eye<Ny>());
         auto G                     = solveLeastSquares(W, OI);
         return G;
     }
 
-  public:
     const Matrix<nu, nx> K;
     const Matrix<nx + nu, ny> G;
 };

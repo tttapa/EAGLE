@@ -7,8 +7,8 @@ template <size_t Nx, size_t Nu, size_t Ny>
 class FullKalman : public DiscreteObserver<Nx, Nu, Ny> {
   public:
     FullKalman(const Matrix<Nx - 1, Nx - 1> &A, const Matrix<Nx - 1, Nu> &B,
-                  const Matrix<Ny - 1, Nx - 1> &C,
-                  const Matrix<Nx - 1, Ny - 1> &L, double Ts)
+               const Matrix<Ny - 1, Nx - 1> &C, const Matrix<Nx - 1, Ny - 1> &L,
+               double Ts)
         : DiscreteObserver<Nx, Nu, Ny>{Ts},  //
           Ak{A - L * C},                     //
           Bk{hcat(L, B)}                     //

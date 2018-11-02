@@ -12,11 +12,15 @@
 #include "Config.hpp"
 #include "Plot.hpp"
 
+#include "CodeGen/CodeGen.hpp"
+
 using namespace std;
 using namespace Config;
 
 int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
+
+#if 0
 
     /* ------ Drone full non-linear and linear models ----------------------- */
     auto model = drone.getNonLinearFullModel();
@@ -104,7 +108,6 @@ int main(int argc, char const *argv[]) {
     FunctionalTimeFunctionT<ColVector<drone.Ny>> randFnV = {
         [](double t) {
             // Gaussian noise + drift
-            ColVector<drone.Ny> res     = {};
             auto varOrientation         = getBlock<0, 1, 0, 3>(varSensors);
             auto varAngVelocity         = getBlock<0, 1, 3, 6>(varSensors);
             EulerAngles randOrientation = randn(varOrientation[0].data) +
@@ -243,6 +246,28 @@ int main(int argc, char const *argv[]) {
     printCpp(cout, Q, "Q");
     printCpp(cout, R, "R");
     cout << endl;
+
+#endif
+    auto method    = DiscretizationMethod::Bilinear;
+    auto redsys    = drone.getLinearReducedDiscreteSystem(Ts, method);
+    auto ATT_A_red = redsys.A;
+    auto ATT_B_red = redsys.B;
+    auto ATT_LQR_red =
+        drone.getReducedDiscreteControllerMatrixK(Q, R, Ts, method);
+    auto ATT_G_red = LQRController::calculateG(redsys.A, redsys.B, redsys.C,
+                                               redsys.D, false);
+    auto ATT_L_red = drone.getReducedDiscreteObserverMatrixL(
+        varDynamics, varSensors, Ts, method);
+
+    std::map<string, DynamicMatrix> matmap = {};
+    matmap.insert(std::make_pair("ATT_A", ATT_A_red));
+    matmap.insert(std::make_pair("ATT_B", ATT_B_red));
+    matmap.insert(std::make_pair("ATT_G", ATT_G_red));
+    matmap.insert(std::make_pair("ATT_L", ATT_L_red));
+    matmap.insert(std::make_pair("ATT_LQR", ATT_LQR_red));
+
+    replaceTagsInFile(home + "/tmp/testTags.txt",
+                      home + "/tmp/testTags.out.txt", matmap);
 
     return EXIT_SUCCESS;
 }
