@@ -23,6 +23,16 @@ using TRowVector = TMatrix<T, 1, C>;
 template <size_t C>
 using RowVector = TRowVector<double, C>;
 
+template <class T, size_t R, size_t C>
+T *toArrayPointer(TMatrix<T, R, C> &matrix) {
+    return &matrix[0][0];
+}
+
+template <class T, size_t R, size_t C>
+const T *toArrayPointer(const TMatrix<T, R, C> &matrix) {
+    return &matrix[0][0];
+}
+
 namespace Matrices {
 
 struct TransposeStruct {

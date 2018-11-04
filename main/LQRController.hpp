@@ -4,10 +4,6 @@
 #include <Model/Controller.hpp>
 #include <Model/System.hpp>
 
-#ifdef USE_GENERATED_CODE
-#include "Generated/attitude.h"
-#endif
-
 /**
  * @brief   A class for the LQR attitude controller for the drone.
  * 
@@ -56,19 +52,6 @@ class LQRController : public virtual Controller<10, 3, 7> {
     }
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &r) {
-#ifdef USE_GENERATED_CODE
-        ColVector<nu> u;
-        double arr_x_red[9];
-        for (size_t i = 0; i < 9; ++i)
-            arr_x_red[i] = x[i+1][0];
-        double arr_ref[4];
-        for (size_t i = 0; i < 4; ++i)
-            arr_ref[i] = r[i][0];
-        double arr_u[3];
-        getControllerOutput(arr_x_red, arr_ref, arr_u);
-        for (size_t i = 0; i < 3; ++i)
-            u[i][0] = arr_u[i];
-#else
         // new equilibrium state
         ColVector<nx + nu> eq = G * r;
         ColVector<nx> xeq     = getBlock<0, nx, 0, 1>(eq);
@@ -83,7 +66,6 @@ class LQRController : public virtual Controller<10, 3, 7> {
         // controller
         ColVector<nu> u_ctrl = K * xdiff;
         ColVector<nu> u      = u_ctrl + ueq;
-#endif
         return u;
     }
 

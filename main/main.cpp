@@ -12,6 +12,8 @@
 #include "Config.hpp"
 #include "Plot.hpp"
 
+#include "Generated/GeneratedController.hpp"
+
 #include "CodeGen/CodeGen.hpp"
 
 using namespace std;
@@ -34,6 +36,8 @@ int main(int argc, char const *argv[]) {
                           : drone.getDiscreteController(
                                 Q, R, Ts, DiscretizationMethod::Bilinear);
 
+    GeneratedLQRController generatedController = {};
+
     /* ------ Reference function -------------------------------------------- */
     TestReferenceFunction ref = {};
 
@@ -51,17 +55,28 @@ int main(int argc, char const *argv[]) {
         std::cerr << ANSIColors::yellow << "Warning: minimum step size reached"
                   << ANSIColors::reset << endl;
 
+    auto generatedResult = model.simulate(generatedController, ref, x0, odeopt);
+
     /* ------ Plot the simulation result ------------------------------------ */
     // Time and state solutions
     auto t    = result.time;
     auto data = result.solution;
 
+    auto generatedTime = generatedResult.time;
+    auto generatedData = generatedResult.solution;
+
     // Calculate controller output
     auto u = controller.getControlSignal(t, data, ref);
+    auto generatedU =
+        generatedController.getControlSignal(generatedTime, generatedData, ref);
 
     // Convert the quaternions of the state to euler angles
     vector<EulerAngles> orientation =
         NonLinearFullDroneModel::statesToEuler(data);
+
+    // Convert the quaternions of the state to euler angles
+    vector<EulerAngles> generatedOrientation =
+        NonLinearFullDroneModel::statesToEuler(generatedData);
 
     // Convert the quaternions of the reference to euler angles
     vector<EulerAngles> refOrientation;
@@ -78,24 +93,34 @@ int main(int argc, char const *argv[]) {
     plt::subplot(5, 1, 2);
     plotResults(t, orientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Orientation of drone");
+    plotResults(generatedTime, generatedOrientation, {0, 3}, {"gz", "gy", "gx"},
+                {"b--", "g--", "r--"});
     plt::xlim(odeopt.t_start, odeopt.t_end + 1);
     plt::subplot(5, 1, 3);
     plotResults(t, data, {4, 7}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of drone");
+    plotResults(generatedTime, generatedData, {4, 7}, {"gx", "gy", "gz"},
+                {"r--", "g--", "b--"});
     plt::xlim(odeopt.t_start, odeopt.t_end + 1);
     plt::subplot(5, 1, 4);
     plotResults(t, data, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of motors");
+    plotResults(generatedTime, generatedData, {7, 10}, {"gx", "gy", "gz"},
+                {"r--", "g--", "b--"});
     plt::xlim(odeopt.t_start, odeopt.t_end + 1);
     plt::subplot(5, 1, 5);
     plotResults(t, u, {0, 3}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Control signal");
+    plotResults(generatedTime, generatedU, {0, 3}, {"gx", "gy", "gz"},
+                {"r--", "g--", "b--"});
     plt::xlim(odeopt.t_start, odeopt.t_end + 1);
 
     plt::tight_layout();
     plt::show();
 
     /* ---------------------------------------------------------------------- */
+
+#ifdef PLOT_OBSERVER
 
     auto kalman = drone.getDiscreteObserver(varDynamics, varSensors, Ts,
                                             DiscretizationMethod::Bilinear);
@@ -206,8 +231,11 @@ int main(int argc, char const *argv[]) {
     plt::tight_layout();
     plt::show();
 
+#endif
+
     // ------------------------------- //
 
+#if PLOT_ACTUAL_VS_ESTIMATED_STATES
     plt::subplot(2, 1, 1);
     plotResults(obsRes.time, obsRes.solution, {0, 10},
                 {"q0", "q1", "q2", "q3", "wx", "wy", "wz"}, {},
@@ -222,12 +250,13 @@ int main(int argc, char const *argv[]) {
 
     plt::tight_layout();
     plt::show();
+#endif
 
     /* ------ Export the simulation result as CSV --------------------------- */
 
     if (exportCSV) {
         // Sample/interpolate the simulation result using a fixed time step
-        auto sampled = sampleODEResult(obsRes, odeopt.t_start, CSV_Ts, t_end);
+        auto sampled = sampleODEResult(result, odeopt.t_start, CSV_Ts, t_end);
         vector<EulerAngles> sampledOrientation =
             NonLinearFullDroneModel::statesToEuler(sampled);
         // Export to the given output file
@@ -263,6 +292,9 @@ int main(int argc, char const *argv[]) {
     cout << "A_red = " << ATT_A_red << endl;
     cout << "B_red = " << ATT_B_red << endl;
     cout << "K_red = " << ATT_LQR_red << endl;
+    cout << "Q = " << Q << endl;
+    cout << "R = " << R << endl;
+    cout << "G = " << controller.G << endl;
 
     std::map<string, DynamicMatrix> matmap = {};
     matmap.insert(std::make_pair("ATT_A", ATT_A_red));
@@ -273,8 +305,6 @@ int main(int argc, char const *argv[]) {
 
     replaceTagsInFile(home + "/tmp/testTags.txt",
                       home + "/tmp/testTags.out.txt", matmap);
-
-    cout << ATT_B_red << endl;
 
     return EXIT_SUCCESS;
 }

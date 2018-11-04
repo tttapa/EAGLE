@@ -46,7 +46,8 @@ enable_testing()
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
--O2 \
+-Og \
+-g \
 -Wall -Wextra \
 -Wsuggest-override \
 -Wno-missing-braces -Wno-unknown-pragmas \
@@ -80,7 +81,8 @@ add_executable(main ${MAIN})
 target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(main source ${PYTHON_LIBRARIES} lapacke)
 
-add_definitions(-DUSE_GENERATED_CODE)
+# add_definitions(-DPLOT_ACTUAL_VS_ESTIMATED_STATES)
+# add_definitions(-DPLOT_OBSERVER)
 
 # Test executable compilation and linking
 file(GLOB_RECURSE TESTS "../test/*.cpp")
