@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_C_STANDARD 90) # ANSI
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -43,9 +44,19 @@ SET (CMAKE_CXX_COMPILER "g++-8")
 include(GoogleTest)
 enable_testing()
 
-# -Wsuggest-override
-# add_definitions("-g -O0 -Wall -Wextra -Wno-missing-braces -Wno-unknown-pragmas -fdiagnostics-show-option -fextended-identifiers -finput-charset=UTF-8")
-add_definitions("-O2 -Wall -Wextra -Wno-missing-braces -Wno-unknown-pragmas -fdiagnostics-show-option -fextended-identifiers -finput-charset=UTF-8")
+# Compiler flags for C++
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
+-O2 \
+-Wall -Wextra \
+-Wsuggest-override \
+-Wno-missing-braces -Wno-unknown-pragmas \
+-fdiagnostics-show-option \
+-fextended-identifiers -finput-charset=UTF-8")
+
+# Compiler flags for C
+SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} \
+-O2 \
+-Wall -Wextra")
 
 #include Google Test
 include_directories(${CMAKE_BINARY_DIR}/googletest/googletest-src/googletest/include)
@@ -64,10 +75,12 @@ add_library(source STATIC ${SOURCES})
 
 # Main source files
 include_directories("../main")
-file(GLOB_RECURSE MAIN "../main/*.cpp")
+file(GLOB_RECURSE MAIN "../main/*.cpp" "../main/*.c")
 add_executable(main ${MAIN})
 target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(main source ${PYTHON_LIBRARIES} lapacke)
+
+add_definitions(-DUSE_GENERATED_CODE)
 
 # Test executable compilation and linking
 file(GLOB_RECURSE TESTS "../test/*.cpp")

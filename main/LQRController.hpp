@@ -4,6 +4,10 @@
 #include <Model/Controller.hpp>
 #include <Model/System.hpp>
 
+#ifdef USE_GENERATED_CODE
+#include "Generated/attitude.h"
+#endif
+
 /**
  * @brief   A class for the LQR attitude controller for the drone.
  * 
@@ -52,6 +56,19 @@ class LQRController : public virtual Controller<10, 3, 7> {
     }
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &r) {
+#ifdef USE_GENERATED_CODE
+        ColVector<nu> u;
+        double arr_x_red[9];
+        for (size_t i = 0; i < 9; ++i)
+            arr_x_red[i] = x[i+1][0];
+        double arr_ref[4];
+        for (size_t i = 0; i < 4; ++i)
+            arr_ref[i] = r[i][0];
+        double arr_u[3];
+        getControllerOutput(arr_x_red, arr_ref, arr_u);
+        for (size_t i = 0; i < 3; ++i)
+            u[i][0] = arr_u[i];
+#else
         // new equilibrium state
         ColVector<nx + nu> eq = G * r;
         ColVector<nx> xeq     = getBlock<0, nx, 0, 1>(eq);
@@ -65,7 +82,8 @@ class LQRController : public virtual Controller<10, 3, 7> {
 
         // controller
         ColVector<nu> u_ctrl = K * xdiff;
-        auto u               = u_ctrl + ueq;
+        ColVector<nu> u      = u_ctrl + ueq;
+#endif
         return u;
     }
 
@@ -89,11 +107,10 @@ class LQRController : public virtual Controller<10, 3, 7> {
                 @f$ \begin{pmatrix} x^e \\ u^e \end{pmatrix} = G r @f$.
     */
     template <size_t Nx, size_t Nu, size_t Ny>
-    static Matrix<Nx + Nu, Ny> calculateG(const Matrix<Nx, Nx> &A,
-                                          const Matrix<Nx, Nu> &B,
-                                          const Matrix<Ny, Nx> &C,
-                                          const Matrix<Ny, Nu> &D,
-                                          bool continuous) {
+    static Matrix<Nx + Nu, Ny>
+    calculateG(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
+               const Matrix<Ny, Nx> &C, const Matrix<Ny, Nu> &D,
+               bool continuous) {
         Matrix<Nx, Nx> Aa = continuous ? A : A - eye<Nx>();
         /* W =  [ Aa B ]
                 [ C  D ] */

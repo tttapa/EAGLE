@@ -20,7 +20,7 @@ using namespace Config;
 int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
 
-#if 0
+#if 1
 
     /* ------ Drone full non-linear and linear models ----------------------- */
     auto model = drone.getNonLinearFullModel();
@@ -248,6 +248,7 @@ int main(int argc, char const *argv[]) {
     cout << endl;
 
 #endif
+
     auto method    = DiscretizationMethod::Bilinear;
     auto redsys    = drone.getLinearReducedDiscreteSystem(Ts, method);
     auto ATT_A_red = redsys.A;
@@ -259,6 +260,10 @@ int main(int argc, char const *argv[]) {
     auto ATT_L_red = drone.getReducedDiscreteObserverMatrixL(
         varDynamics, varSensors, Ts, method);
 
+    cout << "A_red = " << ATT_A_red << endl;
+    cout << "B_red = " << ATT_B_red << endl;
+    cout << "K_red = " << ATT_LQR_red << endl;
+
     std::map<string, DynamicMatrix> matmap = {};
     matmap.insert(std::make_pair("ATT_A", ATT_A_red));
     matmap.insert(std::make_pair("ATT_B", ATT_B_red));
@@ -268,6 +273,8 @@ int main(int argc, char const *argv[]) {
 
     replaceTagsInFile(home + "/tmp/testTags.txt",
                       home + "/tmp/testTags.out.txt", matmap);
+
+    cout << ATT_B_red << endl;
 
     return EXIT_SUCCESS;
 }
