@@ -6,6 +6,7 @@
 #include <Matrix/Randn.hpp>
 #include <Model/System.hpp>
 #include <ODE/ODEEval.hpp>
+#include <Util/AlmostEqual.hpp>
 #include <iostream>
 
 #include "ANSIColors.hpp"
@@ -46,7 +47,7 @@ int main(int argc, char const *argv[]) {
 
     double t_end = odeopt.t_end;
     if (result.resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED) {
-        std::cerr << ANSIColors::red
+        std::cerr << ANSIColors::redb
                   << "Error: maximum number of iterations exceeded"
                   << ANSIColors::reset << endl;
         t_end = result.time.back();
@@ -56,6 +57,16 @@ int main(int argc, char const *argv[]) {
                   << ANSIColors::reset << endl;
 
     auto generatedResult = model.simulate(generatedController, ref, x0, odeopt);
+    if (generatedResult.resultCode &
+        ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED) {
+        std::cerr << ANSIColors::redb
+                  << "Error: maximum number of iterations exceeded"
+                  << ANSIColors::reset << endl;
+        t_end = result.time.back();
+    }
+    if (generatedResult.resultCode & ODEResultCodes::MINIMUM_STEP_SIZE_REACHED)
+        std::cerr << ANSIColors::yellow << "Warning: minimum step size reached"
+                  << ANSIColors::reset << endl;
 
     /* ------ Plot the simulation result ------------------------------------ */
     // Time and state solutions
@@ -263,8 +274,30 @@ int main(int argc, char const *argv[]) {
         printCSV(outputFile, 0.0, CSV_Ts, sampledOrientation);
     }
 
+    /* ------ Test the generated result vs the expected result -------------- */
+
+    const auto sampledExpected =
+        sampleODEResult(result, odeopt.t_start, Ts, t_end);
+    const auto sampledGenerated =
+        sampleODEResult(generatedResult, odeopt.t_start, Ts, t_end);
+
+    assert(sampledExpected.size() == sampledGenerated.size());
+    bool equal = true;
+    for (size_t i = 0; i < sampledExpected.size(); ++i)
+        if (!isAlmostEqual(sampledExpected[i], sampledGenerated[i], 1e-10)) {
+            equal = false;
+            break;
+        }
+    assert(equal);
+    cout << ANSIColors::greenb
+         << "Success: Generated controller matches full controller"
+         << ANSIColors::reset << endl;
+
     // ---------------------------------------------------------------------- //
 
+#endif
+
+#if 0
     cout << endl;
     printMATLAB(cout, Q, "Q");
     printMATLAB(cout, R, "R");
@@ -275,7 +308,6 @@ int main(int argc, char const *argv[]) {
     printCpp(cout, Q, "Q");
     printCpp(cout, R, "R");
     cout << endl;
-
 #endif
 
     auto method    = DiscretizationMethod::Bilinear;
@@ -288,13 +320,14 @@ int main(int argc, char const *argv[]) {
                                                redsys.D, false);
     auto ATT_L_red = drone.getReducedDiscreteObserverMatrixL(
         varDynamics, varSensors, Ts, method);
-
+#if 0
     cout << "A_red = " << ATT_A_red << endl;
     cout << "B_red = " << ATT_B_red << endl;
     cout << "K_red = " << ATT_LQR_red << endl;
     cout << "Q = " << Q << endl;
     cout << "R = " << R << endl;
     cout << "G = " << controller.G << endl;
+#endif
 
     std::map<string, DynamicMatrix> matmap = {};
     matmap.insert(std::make_pair("ATT_A", ATT_A_red));
@@ -306,5 +339,5 @@ int main(int argc, char const *argv[]) {
     replaceTagsInFile(home + "/tmp/testTags.txt",
                       home + "/tmp/testTags.out.txt", matmap);
 
-    return EXIT_SUCCESS;
+    return equal ? EXIT_SUCCESS : 1;
 }

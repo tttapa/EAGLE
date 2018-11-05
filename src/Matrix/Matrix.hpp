@@ -216,7 +216,7 @@ constexpr double norm(const Array<T, N> &vector) {
 
 namespace MatrixPrinting {
 constexpr size_t precision = 6;
-constexpr size_t width     = precision + 5;
+constexpr size_t width     = precision + 6;
 }  // namespace MatrixPrinting
 
 // Printing

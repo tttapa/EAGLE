@@ -10,9 +10,6 @@ typedef double ReducedStateX[9];
  * @brief   Given the current state estimation `x_hat` and the target reference
  *          `ref`, calculate the control signal `u`.
  *
- * @note    This is an automatically generated function. Do not edit it here,
- *          edit it in the template, or in the MATLAB code generator.
- *
  * @param   x_hat
  *          An array of 9 the estimates of the nine (reduced) states.
  * @param   ref
