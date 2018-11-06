@@ -6,6 +6,7 @@
 #include <ODE/DormandPrince.hpp>
 #include <Util/Time.hpp>
 #include <Util/TimeFunction.hpp>
+#include <Quaternions/QuaternionStateAddSub.hpp>
 
 /** 
  * @brief   An abstract class for general models that can be simulated.
@@ -280,7 +281,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
                                           std::back_inserter(result.solution),
                                           curr_u + w, curr_x, curr_opt);
             curr_x   = result.solution.back();
-            VecY_t y = this->getOutput(curr_x, curr_u) + v;
+            VecY_t y = quaternionStatesAdd(this->getOutput(curr_x, curr_u), v);
             result.output.push_back(y);
             curr_x_hat = observer.getStateChange(curr_x_hat, y, curr_u);
             result.time.pop_back();      // start and end point are included

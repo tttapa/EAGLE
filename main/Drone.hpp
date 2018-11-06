@@ -115,9 +115,10 @@ struct Drone {
     getDiscreteObserver(const RowVector<Nu> &varDynamics,
                         const RowVector<Ny - 1> &varSensors, double Ts,
                         DiscretizationMethod method) const {
-        auto sys = getLinearReducedDiscreteSystem(Ts, method);
+        auto sys_red = getLinearReducedDiscreteSystem(Ts, method);
+        auto sys = getLinearFullDiscreteSystem(Ts, method);
         auto L_red =
-            dlqe(sys.A, sys.B, sys.C, diag(varDynamics), diag(varSensors)).L;
+            dlqe(sys_red.A, sys_red.B, sys_red.C, diag(varDynamics), diag(varSensors)).L;
         return {sys.A, sys.B, sys.C, L_red, Ts};
     }
 

@@ -146,10 +146,8 @@ int main(int argc, char const *argv[]) {
             // Gaussian noise + drift
             auto varOrientation         = getBlock<0, 1, 0, 3>(varSensors);
             auto varAngVelocity         = getBlock<0, 1, 3, 6>(varSensors);
-            EulerAngles randOrientation = randn(varOrientation[0].data) +
-                                          2.0 * t * transpose(varOrientation);
-            ColVector<3> randAngVelocity = randn(varAngVelocity[0].data) +
-                                           1.0 * t * transpose(varAngVelocity);
+            EulerAngles randOrientation = randn(varOrientation[0].data); // + 2.0 * t * transpose(varOrientation);
+            ColVector<3> randAngVelocity = randn(varAngVelocity[0].data); // + 1.0 * t * transpose(varAngVelocity);
             return vcat(                    //
                 eul2quat(randOrientation),  //
                 randAngVelocity             //
