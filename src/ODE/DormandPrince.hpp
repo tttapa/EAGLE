@@ -3,6 +3,7 @@
 #include <cmath>    // pow
 #include <cstddef>  // size_t
 #include <limits>   // epsilon
+#include <exception>
 
 #include "DormandPrinceConstants.hpp"
 #include "ODEOptions.hpp"
@@ -29,6 +30,10 @@ ODEResultCode dormandPrince(IteratorTimeBegin timeresult,
     ODEResultCode resultCode = ODEResultCodes::SUCCESS;
 
     for (size_t i = 0; i < opt.maxiter; ++i) {
+        if (!std::all_of(x.begin(), x.end(), [](auto v){return std::isfinite(v[0]);}))
+            throw std::runtime_error{"Error: x is not finite"};
+        if (!std::isfinite(t))
+            throw std::runtime_error{"Error: t is not finite"};
         // Calculate all seven slopes
         T K1 = f(t, x);
         T K2 = f(t + c2 * h, x + h * (a21 * K1));

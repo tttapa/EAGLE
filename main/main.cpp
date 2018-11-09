@@ -17,6 +17,8 @@
 
 #include "CodeGen/CodeGen.hpp"
 
+#include <debug.hpp>
+
 using namespace std;
 using namespace Config;
 
@@ -96,6 +98,8 @@ int main(int argc, char const *argv[]) {
         return quat2eul(getBlock<0, 4, 0, 1>(ref(t)));
     });
 
+#ifdef PLOT_CONTROLLER
+
     // Plot all results
     plt::subplot(5, 1, 1);
     plotResults(t, refOrientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
@@ -129,6 +133,8 @@ int main(int argc, char const *argv[]) {
     plt::tight_layout();
     plt::show();
 
+#endif
+
     /* ---------------------------------------------------------------------- */
 
 #ifdef PLOT_OBSERVER
@@ -137,27 +143,27 @@ int main(int argc, char const *argv[]) {
                                             DiscretizationMethod::Bilinear);
 
     FunctionalTimeFunctionT<ColVector<drone.Nu>> randFnW = {
-        [](double t) {
+        [](double /* t */) {
             return randn(varDynamics[0].data);  //
         }                                       //
     };
     FunctionalTimeFunctionT<ColVector<drone.Ny>> randFnV = {
-        [](double t) {
+        [](double /* t */) {
             // Gaussian noise + drift
-            auto varOrientation         = getBlock<0, 1, 0, 3>(varSensors);
-            auto varAngVelocity         = getBlock<0, 1, 3, 6>(varSensors);
-            EulerAngles randOrientation = randn(varOrientation[0].data); // + 2.0 * t * transpose(varOrientation);
-            ColVector<3> randAngVelocity = randn(varAngVelocity[0].data); // + 1.0 * t * transpose(varAngVelocity);
-            return vcat(                    //
+            auto varOrientation = getBlock<0, 1, 0, 3>(varSensors);
+            auto varAngVelocity = getBlock<0, 1, 3, 6>(varSensors);
+            EulerAngles randOrientation =
+                randn(varOrientation[0]
+                          .data);  // + 2.0 * t * transpose(varOrientation);
+            ColVector<3> randAngVelocity =
+                randn(varAngVelocity[0]
+                          .data);  // + 1.0 * t * transpose(varAngVelocity);
+            return vcat(           //
                 eul2quat(randOrientation),  //
                 randAngVelocity             //
             );                              //
         }                                   //
     };
-
-    /** [1 0 0 0 0 0 0] */
-    ConstantTimeFunctionT<ColVector<drone.Ny>> ref0 =
-        vcat(ones<1, 1>(), zeros<drone.Ny - 1, 1>());
 
     // auto refObs = ref0;
     auto refObs = ref;
@@ -245,20 +251,43 @@ int main(int argc, char const *argv[]) {
     // ------------------------------- //
 
 #if PLOT_ACTUAL_VS_ESTIMATED_STATES
-    plt::subplot(2, 1, 1);
-    plotResults(obsRes.time, obsRes.solution, {0, 10},
-                {"q0", "q1", "q2", "q3", "wx", "wy", "wz"}, {},
-                "Actual states");
-    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+    plt::subplot(3, 1, 1);
+    plotResults(obsRes.time, obsRes.solution, {0, 4},
+                {"Actual q0", "Actual q1", "Actual q2", "Actual q3"},
+                {"b", "g", "r", "y"}, "Orientation Quaternion");
+    plotResults(
+        obsRes.sampledTime, obsRes.estimatedSolution, {0, 4},
+        {"Estimated q0", "Estimated q1", "Estimated q2", "Estimated q3"},
+        {"--b", "--g", "--r", "--y"});
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
 
-    plt::subplot(2, 1, 2);
-    plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {0, 10},
-                {"q0", "q1", "q2", "q3", "wx", "wy", "wz"}, {},
-                "Estimated states");
-    plt::xlim(odeopt.t_start, odeopt.t_end + 3);
+    plt::subplot(3, 1, 2);
+    plotResults(obsRes.time, obsRes.solution, {4, 7},
+                {"Actual wx", "Actual wy", "Actual wz"}, {"b", "g", "r"},
+                "Angular velocity of drone");
+    plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {4, 7},
+                {"Estimated wx", "Estimated wy", "Estimated wz"},
+                {"--b", "--g", "--r"});
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
+
+    plt::subplot(3, 1, 3);
+    plotResults(obsRes.time, obsRes.solution, {7, 10},
+                {"Actual nx", "Actual ny", "Actual nz"}, {"b", "g", "r"},
+                "Angular velocity of motors");
+    plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {7, 10},
+                {"Estimated nx", "Estimated ny", "Estimated nz"},
+                {"--b", "--g", "--r"});
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
 
     plt::tight_layout();
     plt::show();
+
+    plotResults(obsRes.time, obsRes.solution, {0, 1}, {"Actual q0"}, {"b"});
+    plotResults(obsRes.sampledTime, obsRes.estimatedSolution, {0, 1},
+                {"Estimated q0"}, {"r"});
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
+    plt::show();
+
 #endif
 
     /* ------ Export the simulation result as CSV --------------------------- */
@@ -318,6 +347,7 @@ int main(int argc, char const *argv[]) {
                                                redsys.D, false);
     auto ATT_L_red = drone.getReducedDiscreteObserverMatrixL(
         varDynamics, varSensors, Ts, method);
+
 #if 0
     cout << "A_red = " << ATT_A_red << endl;
     cout << "B_red = " << ATT_B_red << endl;
@@ -325,8 +355,10 @@ int main(int argc, char const *argv[]) {
     cout << "Q = " << Q << endl;
     cout << "R = " << R << endl;
     cout << "G = " << controller.G << endl;
+    cout << "L = " << ATT_L_red << endl;
 #endif
 
+#if 0
     std::map<string, DynamicMatrix> matmap = {};
     matmap.insert(std::make_pair("ATT_A", ATT_A_red));
     matmap.insert(std::make_pair("ATT_B", ATT_B_red));
@@ -337,5 +369,9 @@ int main(int argc, char const *argv[]) {
     replaceTagsInFile(home + "/tmp/testTags.txt",
                       home + "/tmp/testTags.out.txt", matmap);
 
+#endif
+
     return equal ? EXIT_SUCCESS : 1;
 }
+
+void mydebug() { std::cerr << "ERROR" << std::endl; }

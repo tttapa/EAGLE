@@ -391,3 +391,12 @@ constexpr auto vcat(const TMatrix<T, R, C> &t, Args... args)
     -> decltype(vcat(t, vcat(args...))) {
     return vcat(t, vcat(args...));
 }
+
+template <size_t R, size_t C>
+Matrix<R, C> round(const Matrix<R, C> &m, size_t digits) {
+    auto result = m;
+    for (auto &row : result)
+        for (auto &el : row) 
+            el = round(el * pow(10, digits)) / pow(10, digits);
+    return result;
+}

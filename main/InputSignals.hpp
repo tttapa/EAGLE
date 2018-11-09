@@ -55,7 +55,7 @@ struct TestReferenceFunction
 /**
  * @brief   Initial state of the drone for simulations
  */
-NonLinearFullDroneModel::VecX_t x0 = {{
+constexpr NonLinearFullDroneModel::VecX_t x0 = {{
     {1},  // q0
     {0},  // q1
     {0},  // q2
@@ -67,3 +67,6 @@ NonLinearFullDroneModel::VecX_t x0 = {{
     {0},  // ny
     {0},  // nz
 }};
+
+/** [1 0 0 0 0 0 0] */
+ConstantTimeFunctionT<ColVector<7>> ref0 = vcat(ones<1, 1>(), zeros<6, 1>());

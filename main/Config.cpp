@@ -40,10 +40,15 @@ const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
 const Matrix<3, 3> R = invsq(u_att_max) * eye<3>();
 
 /* ------ Kalman variance matrices ------------------------------------------ */
-const RowVector<3> varDynamics = 1e-6 * ones<1, 3>();
+/** @todo   Tune */
+const RowVector<3> varDynamics = {{
+    1e-4,
+    1e-4,
+    1e-6,
+}};
 const RowVector<6> varSensors  = hcat(  //
-    1e-1 * ones<1, 3>(),                 //
-    1e-2 * ones<1, 3>()                  //
+    M_PI / 180.0 * ones<1, 3>(),       //
+    0.005 * ones<1, 3>()               //
 );
 
 /* ------ Simulation options (for ODE solver) ------------------------------- */
