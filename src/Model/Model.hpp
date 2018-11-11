@@ -259,11 +259,13 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
         ObserverSimulationResult result = {};
         double Ts                       = controller.Ts;
         size_t N = numberOfSamplesInTimeRange(opt.t_start, Ts, opt.t_end);
+        
+        // pre-allocate memory for result vectors
         result.sampledTime.reserve(N);
         result.estimatedSolution.reserve(N);
         result.control.reserve(N);
         result.output.reserve(N);
-        
+
         // actual state = inital state
         VecX_t curr_x = x_start;
         // estimated state = inital state
