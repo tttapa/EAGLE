@@ -180,51 +180,196 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
     using ObserverSimulationResult =
         typename Model<Nx, Nu, Ny>::ObserverSimulationResult;
 
+    /**
+     * @brief   Simulate the continuous model starting from the given initial 
+     *          state, evaluating the given input function, using the given
+     *          integration options.
+     * 
+     * @param   u
+     *          The input function that can be evaluated at any given time in 
+     *          the integration interval.
+     * @param   x_start
+     *          The inital state, which is the initial condition for the ODE
+     *          solver.
+     * @param   opt
+     *          A struct of options for the ODE solver.
+     * 
+     * @return
+     *          A struct containing a vector of time points, and a vector of
+     *          states that have equal lenghts.  
+     *          A result code is given as well, to indicate whether the 
+     *          integration was successful.
+     */
     SimulationResult simulate(InputFunction &u, VecX_t x_start,
                               const AdaptiveODEOptions &opt) override {
-        auto f = [this, &u](double t, const VecX_t &x) {
-            ContinuousModel &model = *this;
+        // A lambda function that evaluates the input function and the dynamics
+        // of the model
+        ContinuousModel &model = *this;
+        auto f                 = [&model, &u](double t, const VecX_t &x) {
             return model(x, u(t));
         };
+        // Use the ODE solver to simulate the system
         return dormandPrince(f, x_start, opt);
     }
 
+    /**
+     * @brief   Simulate the continuous model starting from the given initial 
+     *          state, evaluating the given input function, using the given
+     *          integration options.  
+     *          This version appends the results to existing time and states
+     *          vectors.
+     * 
+     * @param   timeresult 
+     *          The time vector that the time results will be appended to.
+     * @param   xresult
+     *          The states vector that the state results will be appended to.
+     * @param   u
+     *          The input function that can be evaluated at any given time in 
+     *          the integration interval.
+     * @param   x_start
+     *          The inital state, which is the initial condition for the ODE
+     *          solver.
+     * @param   opt
+     *          A struct of options for the ODE solver.
+     * 
+     * @return
+     *          A result code that indicates whether the integration was
+     *          successful.
+     */
     ODEResultCode
     simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
              typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
              InputFunction &u, VecX_t x_start,
              const AdaptiveODEOptions &opt) override {
-        auto f = [this, &u](double t, const VecX_t &x) {
-            ContinuousModel &model = *this;
+        ContinuousModel &model = *this;
+        auto f                 = [&model, &u](double t, const VecX_t &x) {
             return model(x, u(t));
         };
         return dormandPrince(timeresult, xresult, f, x_start, opt);
     }
 
+    /**
+     * @brief   Simulate the continuous model starting from the given initial 
+     *          state, with a given constant input, using the given
+     *          integration options.  
+     *          This version appends the results to existing time and states
+     *          vectors.
+     * 
+     * @param   u
+     *          The constant input.
+     * @param   x_start
+     *          The inital state, which is the initial condition for the ODE
+     *          solver.
+     * @param   opt
+     *          A struct of options for the ODE solver.
+     * 
+     * @return
+     *          A struct containing a vector of time points, and a vector of
+     *          states that have equal lenghts.  
+     *          A result code is given as well, to indicate whether the 
+     *          integration was successful.
+     */
     SimulationResult simulate(VecU_t u, VecX_t x_start,
                               const AdaptiveODEOptions &opt) override {
-        ConstantTimeFunctionT<VecU_t> fu = {u};
-        return simulate(fu, x_start, opt);
+        ContinuousModel &model = *this;
+        auto f                 = [&model, &u](double /* t */, const VecX_t &x) {
+            return model(x, u);
+        };
+        return dormandPrince(f, x_start, opt);
     }
 
+    /**
+     * @brief   Simulate the continuous model starting from the given initial 
+     *          state, with a given constant input, using the given integration
+     *          options.  
+     *          This version appends the results to existing time and states
+     *          vectors.
+     * 
+     * @param   timeresult 
+     *          The time vector that the time results will be appended to.
+     * @param   xresult
+     *          The states vector that the state results will be appended to.
+     * @param   u
+     *          The constant input.
+     * @param   x_start
+     *          The inital state, which is the initial condition for the ODE
+     *          solver.
+     * @param   opt
+     *          A struct of options for the ODE solver.
+     * 
+     * @return
+     *          A result code that indicates whether the integration was
+     *          successful.
+     */
     ODEResultCode
     simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
              typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
              VecU_t u, VecX_t x_start, const AdaptiveODEOptions &opt) override {
-        ConstantTimeFunctionT<VecU_t> fu = {u};
-        return simulate(timeresult, xresult, fu, x_start, opt);
+        ContinuousModel &model = *this;
+        auto f                 = [&model, &u](double /* t */, const VecX_t &x) {
+            return model(x, u);
+        };
+        return dormandPrince(timeresult, xresult, f, x_start, opt);
     }
 
+    /**
+     * @brief   Simulate the closed-loop continuous model using the given 
+     *          state-less continuous controller, starting from the given
+     *          initial state, evaluating the given input function, 
+     *          using the given integration options.
+     * 
+     * @param   controller
+     *          The state-less continuous controller that produces a control 
+     *          output u, given the system state x and reference state r.
+     * @param   r
+     *          The reference function that can be evaluated at any given time
+     *          in the integration interval.
+     * @param   x_start
+     *          The inital state, which is the initial condition for the ODE
+     *          solver.
+     * @param   opt
+     *          A struct of options for the ODE solver.
+     * 
+     * @return
+     *          A struct containing a vector of time points, and a vector of
+     *          states that have equal lenghts.  
+     *          A result code is given as well, to indicate whether the 
+     *          integration was successful.
+     */
     SimulationResult simulate(ContinuousController<Nx, Nu, Ny> &controller,
                               ReferenceFunction &r, VecX_t x_start,
                               const AdaptiveODEOptions &opt) override {
-        auto f = [this, &controller, &r](double t, const VecX_t &x) {
-            ContinuousModel &model = *this;
+        ContinuousModel &model = *this;
+        auto f = [&model, &controller, &r](double t, const VecX_t &x) {
             return model(x, controller(x, r(t)));
         };
         return dormandPrince(f, x_start, opt);
     }
 
+    /**
+     * @brief   Simulate the closed-loop continuous model using the given 
+     *          state-less discrete controller, starting from the given
+     *          initial state, evaluating the given input function, 
+     *          using the given integration options.
+     * 
+     * @param   controller
+     *          The state-less discrete controller that produces a control 
+     *          output u, given the system state x and reference state r.
+     * @param   r
+     *          The reference function that can be evaluated at any given time
+     *          in the integration interval.
+     * @param   x_start
+     *          The inital state, which is the initial condition for the ODE
+     *          solver.
+     * @param   opt
+     *          A struct of options for the ODE solver.
+     * 
+     * @return
+     *          A struct containing a vector of time points, and a vector of
+     *          states that have equal lenghts.  
+     *          A result code is given as well, to indicate whether the 
+     *          integration was successful.
+     */
     SimulationResult simulate(DiscreteController<Nx, Nu, Ny> &controller,
                               ReferenceFunction &r, VecX_t x_start,
                               const AdaptiveODEOptions &opt) override {
@@ -239,9 +384,9 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             curr_opt.t_end   = t + Ts;
             VecR_t curr_ref  = r(t);
             VecU_t curr_u    = controller(curr_x, curr_ref);
-            result.resultCode |= simulate(std::back_inserter(result.time),
-                                          std::back_inserter(result.solution),
-                                          curr_u, curr_x, curr_opt);
+            result.resultCode |= this->simulate(
+                std::back_inserter(result.time),
+                std::back_inserter(result.solution), curr_u, curr_x, curr_opt);
             curr_x = result.solution.back();
             result.time.pop_back();
             result.solution.pop_back();
@@ -249,6 +394,40 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
         return result;
     }
 
+    /**
+     * @brief   Simulate the closed-loop continuous model using the given 
+     *          state-less discrete controller, starting from the given
+     *          initial state, evaluating the given input function, 
+     *          using the given integration options.
+     * 
+     * @param   controller
+     *          The state-less discrete controller that produces a control 
+     *          output u, given the system state x and reference state r.
+     * @param   observer
+     *          The discrete observer that estimates the system state, given
+     *          the control signal u and a noisy measurement of the system 
+     *          output y.
+     * @param   randFnW
+     *          A function that returns a random vector of system disturbances.
+     * @param   randFnV
+     *          A function that returns a random vector of sensor noise.
+     * @param   r
+     *          The reference function that can be evaluated at any given time
+     *          in the integration interval.
+     * @param   x_start
+     *          The inital state, which is the initial condition for the ODE
+     *          solver.
+     * @param   opt
+     *          A struct of options for the ODE solver.
+     * 
+     * @return
+     *          A struct containing a vector of time points, and a vector of
+     *          states that have equal lenghts.  
+     *          It also contains the time, estimated state, control output, and
+     *          sensor measurement for each time step.
+     *          A result code is given as well, to indicate whether the 
+     *          integration was successful.
+     */
     ObserverSimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller,
              DiscreteObserver<Nx, Nu, Ny> &observer,
@@ -259,7 +438,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
         ObserverSimulationResult result = {};
         double Ts                       = controller.Ts;
         size_t N = numberOfSamplesInTimeRange(opt.t_start, Ts, opt.t_end);
-        
+
         // pre-allocate memory for result vectors
         result.sampledTime.reserve(N);
         result.estimatedSolution.reserve(N);
@@ -303,9 +482,10 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
 
             // simulate the continuous system over this time step [t, t + Ts]
             // and add the time points and states to the result
-            result.resultCode |= simulate(std::back_inserter(result.time),
-                                          std::back_inserter(result.solution),
-                                          curr_u + w, curr_x, curr_opt);
+            result.resultCode |=
+                this->simulate(std::back_inserter(result.time),
+                               std::back_inserter(result.solution), curr_u + w,
+                               curr_x, curr_opt);
             // update the actual state using the result of the continuous
             // simulation at t + Ts
             curr_x = result.solution.back();

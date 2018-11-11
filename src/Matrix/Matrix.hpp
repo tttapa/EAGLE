@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Array.hpp"
-#include <cmath>  // sqrt
+#include <cmath>  // sqrt, isfinite
 #include <iomanip>
 #include <ostream>
+#include <algorithm> // all_of
+
 
 template <class T, size_t R, size_t C>
 using TMatrix = Array<Array<T, C>, R>;
@@ -396,7 +398,15 @@ template <size_t R, size_t C>
 Matrix<R, C> round(const Matrix<R, C> &m, size_t digits) {
     auto result = m;
     for (auto &row : result)
-        for (auto &el : row) 
+        for (auto &el : row)
             el = round(el * pow(10, digits)) / pow(10, digits);
     return result;
+}
+
+template <size_t R, size_t C>
+bool isfinite(const Matrix<R, C> &m) {
+    return std::all_of(m.begin(), m.end(), [](auto row) {
+        return std::all_of(row.begin(), row.end(),
+                           [](auto el) { return std::isfinite(el); });
+    });
 }

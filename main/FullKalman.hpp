@@ -7,6 +7,16 @@
 
 #include "NonLinearFullDroneModel.hpp"
 
+/**
+ * @brief   The discrete Kalman filter/observer for the drone.
+ * 
+ * @tparam  Nx
+ *          The number of states.
+ * @tparam  Nu
+ *          The number of inputs.
+ * @tparam  Ny
+ *          The number of outputs.
+ */
 template <size_t Nx, size_t Nu, size_t Ny>
 class FullKalman : public DiscreteObserver<Nx, Nu, Ny> {
   public:
@@ -42,9 +52,6 @@ class FullKalman : public DiscreteObserver<Nx, Nu, Ny> {
     const Matrix<Nx, Nu> B;
     const Matrix<Ny, Nx> C;
     const Matrix<Nx - 1, Ny - 1> L;
-
-    const Params p = {};
-    NonLinearFullDroneModel fullnonlinmodel = {p};
 };
 
 template <size_t Nx, size_t Nu, size_t Ny>

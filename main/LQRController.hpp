@@ -3,6 +3,7 @@
 #include "MotorControl.hpp"
 #include <Model/Controller.hpp>
 #include <Model/System.hpp>
+#include <Quaternions/QuaternionStateAddSub.hpp>
 
 /**
  * @brief   A class for the LQR attitude controller for the drone.
@@ -58,10 +59,7 @@ class LQRController : public virtual Controller<10, 3, 7> {
         ColVector<nu> ueq     = getBlock<nx, nx + nu, 0, 1>(eq);
 
         // error
-        ColVector<nx> xdiff            = x - xeq;
-        Quaternion qx                  = getBlock<0, 4, 0, 1>(x);
-        Quaternion qe                  = getBlock<0, 4, 0, 1>(xeq);
-        assignBlock<0, 4, 0, 1>(xdiff) = quatDifference(qx, qe);
+        ColVector<nx> xdiff            = quaternionStatesSub(x, xeq);
 
         // controller
         ColVector<nu> u_ctrl = K * xdiff;

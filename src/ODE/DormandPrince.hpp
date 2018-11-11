@@ -19,7 +19,7 @@ ODEResultCode dormandPrince(IteratorTimeBegin timeresult,
                             const AdaptiveODEOptions &opt  // options
 ) {
     using namespace DormandPrinceConstants;
-
+    using std::isfinite;
     double t = opt.t_start;
     T x      = x_start;
     double h = opt.h_start;
@@ -30,9 +30,9 @@ ODEResultCode dormandPrince(IteratorTimeBegin timeresult,
     ODEResultCode resultCode = ODEResultCodes::SUCCESS;
 
     for (size_t i = 0; i < opt.maxiter; ++i) {
-        if (!std::all_of(x.begin(), x.end(), [](auto v){return std::isfinite(v[0]);}))
+        if (!isfinite(x))
             throw std::runtime_error{"Error: x is not finite"};
-        if (!std::isfinite(t))
+        if (!isfinite(t))
             throw std::runtime_error{"Error: t is not finite"};
         // Calculate all seven slopes
         T K1 = f(t, x);
