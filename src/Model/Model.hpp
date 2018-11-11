@@ -4,9 +4,9 @@
 #include "Kalman.hpp"
 #include "Params.hpp"
 #include <ODE/DormandPrince.hpp>
+#include <Quaternions/QuaternionStateAddSub.hpp>
 #include <Util/Time.hpp>
 #include <Util/TimeFunction.hpp>
-#include <Quaternions/QuaternionStateAddSub.hpp>
 
 /** 
  * @brief   An abstract class for general models that can be simulated.
@@ -263,29 +263,53 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
         result.estimatedSolution.reserve(N);
         result.control.reserve(N);
         result.output.reserve(N);
-        VecX_t curr_x               = x_start;
+        
+        // actual state = inital state
+        VecX_t curr_x = x_start;
+        // estimated state = inital state
         VecX_t curr_x_hat           = x_start;
         AdaptiveODEOptions curr_opt = opt;
-        for (size_t i = 0; i < N; ++i) {
-            double t         = opt.t_start + Ts * i;
+        // For each time step
+        for (size_t k = 0; k < N; ++k) {
+            // current time, and integration range
+            double t         = opt.t_start + Ts * k;
             curr_opt.t_start = t;
             curr_opt.t_end   = t + Ts;
-            auto w           = randFnW(t);
-            auto v           = randFnV(t);
-            VecR_t curr_ref  = r(t);
-            VecU_t curr_u    = controller(curr_x_hat, curr_ref);
+            // disturbance w and sensor noise v
+            auto w = randFnW(t);
+            auto v = randFnV(t);
+            // reference signal
+            VecR_t curr_ref = r(t);
+            // calculate the control signal, based on current estimated state
+            // and current reference
+            VecU_t curr_u = controller(curr_x_hat, curr_ref);
+            // the output of the real system is the output of the system, given
+            // the actual state and the control signal, plus the sensor
+            // noise
+            VecY_t clean_y = this->getOutput(curr_x, curr_u);  // no noise
+            VecY_t y       = quaternionStatesAdd(clean_y, v);  // add noise
+            // add the time, estimate state, control signal and output to the
+            // result vectors
             result.sampledTime.push_back(t);
             result.estimatedSolution.push_back(curr_x_hat);
             result.control.push_back(curr_u);
+            result.output.push_back(y);
+
+            // calculate the estimated state for the next time step
+            //  k+1                                   k      k    k
+            curr_x_hat = observer.getStateChange(curr_x_hat, y, curr_u);
+
+            // simulate the continuous system over this time step [t, t + Ts]
+            // and add the time points and states to the result
             result.resultCode |= simulate(std::back_inserter(result.time),
                                           std::back_inserter(result.solution),
                                           curr_u + w, curr_x, curr_opt);
-            curr_x   = result.solution.back();
-            VecY_t y = quaternionStatesAdd(this->getOutput(curr_x, curr_u), v);
-            result.output.push_back(y);
-            curr_x_hat = observer.getStateChange(curr_x_hat, y, curr_u);
-            result.time.pop_back();      // start and end point are included
-            result.solution.pop_back();  // by `simulate`, so remove doubles
+            // update the actual state using the result of the continuous
+            // simulation at t + Ts
+            curr_x = result.solution.back();
+            // start and end point are included by `simulate`, so remove doubles
+            result.time.pop_back();
+            result.solution.pop_back();
         }
         return result;
     }

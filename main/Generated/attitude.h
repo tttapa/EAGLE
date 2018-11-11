@@ -1,7 +1,12 @@
+#ifndef ATTITUDE_H
+#define ATTITUDE_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/* Keep in mind that these are array types, so they are passed by reference, 
+ * and they cannot be used as return type. */
 typedef double ControllerOutputU[3];
 typedef double ReferenceQuaternion[4];
 typedef double ReducedStateX[9];
@@ -23,3 +28,5 @@ void getControllerOutput(const ReducedStateX x_hat_r,
 #ifdef __cplusplus
 }
 #endif
+
+#endif  // ATTITUDE_H

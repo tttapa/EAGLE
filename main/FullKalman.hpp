@@ -20,7 +20,7 @@ class FullKalman : public DiscreteObserver<Nx, Nu, Ny> {
      *          current sensor reading, and the current control input.
      * 
      * Calculates   @f$ 
-     *                  \hat{x}_{k+1} = A \hat{x}_k + B u_k \oplus 
+     *                  \hat{x}_{k+1} = \left(A \hat{x}_k + B u_k\right) \oplus 
      *                  L \left(y_k \ominus C \hat{x}_k\right)
      *              @f$
      * 
