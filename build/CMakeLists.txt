@@ -81,6 +81,7 @@ add_executable(main ${MAIN})
 target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(main source ${PYTHON_LIBRARIES} lapacke)
 
+add_definitions(-DPLOT_CONTROLLER)
 add_definitions(-DPLOT_ACTUAL_VS_ESTIMATED_STATES)
 add_definitions(-DPLOT_OBSERVER)
 

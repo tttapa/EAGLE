@@ -34,11 +34,19 @@ struct TestReferenceFunction
             q = quatmultiply(q, qy);
         if (t >= 9 && t < 11)
             q = quatmultiply(q, qx);
+
         if (t >= 13 && t < 15)
+            q = quatmultiply(q, quatconjugate(qz));
+        if (t >= 17 && t < 19)
+            q = quatmultiply(q, quatconjugate(qy));
+        if (t >= 21 && t < 23)
+            q = quatmultiply(q, quatconjugate(qx));
+
+        if (t >= 25 && t < 27)
             q = quatmultiply(q, qz);
-        if (t >= 14 && t < 16)
+        if (t >= 26 && t < 28)
             q = quatmultiply(q, qy);
-        if (t >= 15 && t < 17)
+        if (t >= 27 && t < 29)
             q = quatmultiply(q, qx);
         assignBlock<0, 4, 0, 1>(ref) = q;
         return ref;

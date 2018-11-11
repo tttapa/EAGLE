@@ -104,31 +104,35 @@ int main(int argc, char const *argv[]) {
     plt::subplot(5, 1, 1);
     plotResults(t, refOrientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Reference orientation");
-    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
     plt::subplot(5, 1, 2);
     plotResults(t, orientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Orientation of drone");
-    plotResults(generatedTime, generatedOrientation, {0, 3}, {"gz", "gy", "gx"},
+    plotResults(generatedTime, generatedOrientation, {0, 3},
+                {"generated z", "generated y", "generated x"},
                 {"b--", "g--", "r--"});
-    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
     plt::subplot(5, 1, 3);
     plotResults(t, data, {4, 7}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of drone");
-    plotResults(generatedTime, generatedData, {4, 7}, {"gx", "gy", "gz"},
+    plotResults(generatedTime, generatedData, {4, 7},
+                {"generated x", "generated y", "generated z"},
                 {"r--", "g--", "b--"});
-    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
     plt::subplot(5, 1, 4);
     plotResults(t, data, {7, 10}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Angular velocity of motors");
-    plotResults(generatedTime, generatedData, {7, 10}, {"gx", "gy", "gz"},
+    plotResults(generatedTime, generatedData, {7, 10},
+                {"generated x", "generated y", "generated z"},
                 {"r--", "g--", "b--"});
-    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
     plt::subplot(5, 1, 5);
     plotResults(t, u, {0, 3}, {"x", "y", "z"}, {"r-", "g-", "b-"},
                 "Control signal");
-    plotResults(generatedTime, generatedU, {0, 3}, {"gx", "gy", "gz"},
+    plotResults(generatedTime, generatedU, {0, 3},
+                {"generated x", "generated y", "generated z"},
                 {"r--", "g--", "b--"});
-    plt::xlim(odeopt.t_start, odeopt.t_end + 1);
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
 
     plt::tight_layout();
     plt::show();
@@ -311,7 +315,7 @@ int main(int argc, char const *argv[]) {
     assert(sampledExpected.size() == sampledGenerated.size());
     bool equal = true;
     for (size_t i = 0; i < sampledExpected.size(); ++i)
-        if (!isAlmostEqual(sampledExpected[i], sampledGenerated[i], 1e-10)) {
+        if (!isAlmostEqual(sampledExpected[i], sampledGenerated[i], 1e-8)) {
             equal = false;
             break;
         }
