@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "ANSIColors.hpp"
 #include <ODE/ODEResult.hpp>
 
 template <class T, size_t N>
@@ -32,7 +33,8 @@ void printCSV(const std::string &filename, Args... args) {
     std::ofstream ofile;
     ofile.open(filename);
     if (!ofile)
-        std::cerr << "Error opening file" << std::endl;
+        std::cerr << ANSIColors::red << "Error opening file: `" << filename
+                  << "`" << ANSIColors::reset << std::endl;
     else
         printCSV(ofile, args...);
     ofile.close();

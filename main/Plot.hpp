@@ -52,8 +52,8 @@ void plotResults(const std::vector<double> &t,
         }
         if (legends.size() > 0)
             plt::legend();
-        plt::title(title);
-        plt::title(title);
+        if (!title.empty())
+            plt::title(title);
     } catch (std::runtime_error &e) {
         std::cerr << ANSIColors::red << "Error: " << e.what()
                   << ANSIColors::reset << std::endl;

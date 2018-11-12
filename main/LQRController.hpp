@@ -59,7 +59,7 @@ class LQRController : public virtual Controller<10, 3, 7> {
         ColVector<nu> ueq     = getBlock<nx, nx + nu, 0, 1>(eq);
 
         // error
-        ColVector<nx> xdiff            = quaternionStatesSub(x, xeq);
+        ColVector<nx> xdiff = quaternionStatesSub(x, xeq);
 
         // controller
         ColVector<nu> u_ctrl = K * xdiff;
@@ -105,6 +105,10 @@ class LQRController : public virtual Controller<10, 3, 7> {
 
     const Matrix<nu, nx> K;
     const Matrix<nx + nu, ny> G;
+
+    virtual const char *getName() const {
+        return "LQRController";
+    }
 };
 
 class ContinuousLQRController : public LQRController,
@@ -119,6 +123,9 @@ class ContinuousLQRController : public LQRController,
                             const Matrix<nu, nx> &K)
         : LQRController(continuousSystem.A, continuousSystem.B,
                         continuousSystem.C, continuousSystem.D, K, true) {}
+    const char *getName() const override {
+        return "ContinuousLQRController";
+    }
 };
 
 class DiscreteLQRController : public LQRController,
@@ -135,20 +142,27 @@ class DiscreteLQRController : public LQRController,
         : LQRController(discreteSystem.A, discreteSystem.B, discreteSystem.C,
                         discreteSystem.D, K, false),
           DiscreteController<nx, nu, ny>(discreteSystem.Ts) {}
+
+    const char *getName() const override {
+        return "DiscreteLQRController";
+    }
 };
 
 class ClampedDiscreteLQRController : public DiscreteLQRController {
   public:
     ClampedDiscreteLQRController(
-        const DiscreteLQRController &discreteController, double u_h)
-        : DiscreteLQRController{discreteController}, u_h(u_h) {}
+        const DiscreteLQRController &discreteController)
+        : DiscreteLQRController{discreteController} {}
 
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
         auto u = getRawControllerOutput(x, r);
-        u      = clampMotorControlSignal(u, u_h);
+        for (auto &row : u)
+            for (auto &el : row)
+                el = clamp(el, -1.0 / 3, 1.0 / 3);
         return u;
     }
 
-  private:
-    const double u_h;
+    const char *getName() const override {
+        return "ClampedDiscreteLQRController";
+    }
 };

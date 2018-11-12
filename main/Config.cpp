@@ -30,14 +30,14 @@ const bool clampController = true;
 
 static auto invsq = [](double x) { return 1.0 / (x * x); };
 
-const RowVector<3> Qn     = invsq(n_att_max) * ones<1, 3>();
-const RowVector<3> Qomega = 0.04 * ones<1, 3>();
-const RowVector<3> Qq     = 40.0 * ones<1, 3>();
+const RowVector<3> Qn     = {{1e-06, 1e-06, 0.00064052634}};
+const RowVector<3> Qomega = {{0.034129327, 0.034129327, 1e-06}};
+const RowVector<3> Qq     = {{127.26504, 127.26504, 17719.678}};
 
 /** Weighting matrix for states in LQR design. */
 const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
 /** Weighting matrix for inputs in LQR design. */
-const Matrix<3, 3> R = invsq(u_att_max) * eye<3>();
+const Matrix<3, 3> R = eye<3>();
 
 /* ------ Kalman variance matrices ------------------------------------------ */
 /** @todo   Tune */

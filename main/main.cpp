@@ -24,6 +24,7 @@ using namespace Config;
 
 int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
+    cout << boolalpha << clampController << endl;
 
 #if 1
 
@@ -33,11 +34,14 @@ int main(int argc, char const *argv[]) {
 
     /* ------ Design controller --------------------------------------------- */
     // auto controller = drone.getContinuousController(Q, R);
-    auto controller = clampController
-                          ? drone.getClampedDiscreteController(
-                                Q, R, Ts, DiscretizationMethod::Bilinear)
-                          : drone.getDiscreteController(
-                                Q, R, Ts, DiscretizationMethod::Bilinear);
+    auto clampedController = drone.getClampedDiscreteController(
+        Q, R, Ts, DiscretizationMethod::Bilinear);
+    auto discreteControler =
+        drone.getDiscreteController(Q, R, Ts, DiscretizationMethod::Bilinear);
+    DiscreteLQRController &controller =
+        clampController ? clampedController : discreteControler;
+
+    cout << controller.getName() << endl;
 
     GeneratedLQRController generatedController = {};
 
@@ -319,12 +323,17 @@ int main(int argc, char const *argv[]) {
             equal = false;
             break;
         }
-    assert(equal);
-    cout << ANSIColors::greenb
-         << "Success: Generated controller matches full controller"
-         << ANSIColors::reset << endl;
+        
+    if (equal)
+        cout << ANSIColors::greenb
+             << "Success: Generated controller matches full controller"
+             << ANSIColors::reset << endl;
+    else
+        cout << ANSIColors::redb
+             << "Error: Generated controller does not match full controller"
+             << ANSIColors::reset << endl;
 
-    // ---------------------------------------------------------------------- //
+        // ---------------------------------------------------------------------- //
 
 #endif
 

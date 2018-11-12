@@ -94,7 +94,8 @@ struct Drone {
     getClampedDiscreteController(const Matrix<Nx - 1, Nx - 1> &Q,
                                  const Matrix<Nu, Nu> &R, double Ts,
                                  DiscretizationMethod method) const {
-        return {getDiscreteController(Q, R, Ts, method), p.uh};
+        std::cout << "---------------" << std::endl;
+        return {getDiscreteController(Q, R, Ts, method)};
     }
 
 #pragma region Observers........................................................
