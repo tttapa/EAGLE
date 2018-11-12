@@ -90,12 +90,11 @@ struct Drone {
     /** 
      * @brief   TODO
      */
-    ClampedDiscreteLQRController
-    getClampedDiscreteController(const Matrix<Nx - 1, Nx - 1> &Q,
-                                 const Matrix<Nu, Nu> &R, double Ts,
-                                 DiscretizationMethod method) const {
-        std::cout << "---------------" << std::endl;
-        return {getDiscreteController(Q, R, Ts, method)};
+    ClampedDiscreteLQRController getClampedDiscreteController(
+        const ColVector<Nu> &clampMin, const ColVector<Nu> &clampMax,
+        const Matrix<Nx - 1, Nx - 1> &Q, const Matrix<Nu, Nu> &R, double Ts,
+        DiscretizationMethod method) const {
+        return {getDiscreteController(Q, R, Ts, method), clampMin, clampMax};
     }
 
 #pragma region Observers........................................................
@@ -117,9 +116,10 @@ struct Drone {
                         const RowVector<Ny - 1> &varSensors, double Ts,
                         DiscretizationMethod method) const {
         auto sys_red = getLinearReducedDiscreteSystem(Ts, method);
-        auto sys = getLinearFullDiscreteSystem(Ts, method);
-        auto L_red =
-            dlqe(sys_red.A, sys_red.B, sys_red.C, diag(varDynamics), diag(varSensors)).L;
+        auto sys     = getLinearFullDiscreteSystem(Ts, method);
+        auto L_red   = dlqe(sys_red.A, sys_red.B, sys_red.C, diag(varDynamics),
+                          diag(varSensors))
+                         .L;
         return {sys.A, sys.B, sys.C, L_red, Ts};
     }
 

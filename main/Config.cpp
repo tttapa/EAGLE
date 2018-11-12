@@ -23,8 +23,11 @@ const double Ts = 1.0 / fs;
 
 /* ------ Simulation settings ----------------------------------------------- */
 
-/** Clamp the motor control outputs between 0 and 1. */
+/** Clamp the motor control outputs. */
 const bool clampController = true;
+/** Clamping boundaries */
+const ColVector<3> clampMin = -1.0 / 3 * ones<3, 1>();
+const ColVector<3> clampMax = 1.0 / 3 * ones<3, 1>();
 
 /* ------ LQR weighting matrices Q and R ------------------------------------ */
 

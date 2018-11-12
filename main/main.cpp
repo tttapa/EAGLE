@@ -24,7 +24,6 @@ using namespace Config;
 
 int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
-    cout << boolalpha << clampController << endl;
 
 #if 1
 
@@ -35,13 +34,11 @@ int main(int argc, char const *argv[]) {
     /* ------ Design controller --------------------------------------------- */
     // auto controller = drone.getContinuousController(Q, R);
     auto clampedController = drone.getClampedDiscreteController(
-        Q, R, Ts, DiscretizationMethod::Bilinear);
+        clampMin, clampMax, Q, R, Ts, DiscretizationMethod::Bilinear);
     auto discreteControler =
         drone.getDiscreteController(Q, R, Ts, DiscretizationMethod::Bilinear);
     DiscreteLQRController &controller =
         clampController ? clampedController : discreteControler;
-
-    cout << controller.getName() << endl;
 
     GeneratedLQRController generatedController = {};
 
@@ -323,7 +320,7 @@ int main(int argc, char const *argv[]) {
             equal = false;
             break;
         }
-        
+
     if (equal)
         cout << ANSIColors::greenb
              << "Success: Generated controller matches full controller"
@@ -350,6 +347,7 @@ int main(int argc, char const *argv[]) {
     cout << endl;
 #endif
 
+#if 0
     auto method    = DiscretizationMethod::Bilinear;
     auto redsys    = drone.getLinearReducedDiscreteSystem(Ts, method);
     auto ATT_A_red = redsys.A;
@@ -361,7 +359,6 @@ int main(int argc, char const *argv[]) {
     auto ATT_L_red = drone.getReducedDiscreteObserverMatrixL(
         varDynamics, varSensors, Ts, method);
 
-#if 0
     cout << "A_red = " << ATT_A_red << endl;
     cout << "B_red = " << ATT_B_red << endl;
     cout << "K_red = " << ATT_LQR_red << endl;
@@ -369,9 +366,7 @@ int main(int argc, char const *argv[]) {
     cout << "R = " << R << endl;
     cout << "G = " << controller.G << endl;
     cout << "L = " << ATT_L_red << endl;
-#endif
 
-#if 0
     std::map<string, DynamicMatrix> matmap = {};
     matmap.insert(std::make_pair("ATT_A", ATT_A_red));
     matmap.insert(std::make_pair("ATT_B", ATT_B_red));
@@ -381,7 +376,6 @@ int main(int argc, char const *argv[]) {
 
     replaceTagsInFile(home + "/tmp/testTags.txt",
                       home + "/tmp/testTags.out.txt", matmap);
-
 #endif
 
     return equal ? EXIT_SUCCESS : 1;

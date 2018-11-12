@@ -22,8 +22,11 @@ extern const double CSV_Ts;
 extern const double fs;  // Sample frequency
 extern const double Ts;  // Sample time step
 
-// Clamp the motor control outputs between 0 and 1.
+// Clamp the motor control outputs.
 extern const bool clampController;
+// Clamping boundaries
+extern const ColVector<3> clampMin;
+extern const ColVector<3> clampMax;
 
 /* ------ Define drone parameters ------------------------------------------- */
 constexpr Drone drone = {};
