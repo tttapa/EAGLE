@@ -19,9 +19,9 @@ const ColVector<3> clampMax = 1.0 / 3 * ones<3, 1>();
 
 static auto invsq = [](double x) { return 1.0 / (x * x); };
 
-const RowVector<3> Qn_initial     = {{1e-06, 1e-06, 0.00064052634}};
-const RowVector<3> Qomega_initial = {{0.034129327, 0.034129327, 1e-06}};
-const RowVector<3> Qq_initial     = {{127.26504, 127.26504, 17719.678}};
+const RowVector<3> Qn_initial     = {{1, 1, 1}};
+const RowVector<3> Qomega_initial = {{1, 1, 1}};
+const RowVector<3> Qq_initial     = {{1, 1, 1}};
 
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial =
@@ -30,11 +30,11 @@ const ColVector<9> Q_diag_initial =
 const ColVector<3> R_diag_initial = ones<3, 1>();
 
 /* ------ Tuner mutation variance ------------------------------------------- */
-const double varQ[9] = {1e-2, 1e-2, 1e-2, 1e-2, 1e-2, 1e-2, 1e-2, 1e-2, 1e-2};
+const double varQ[9] = {1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
 const double varR[3] = {1e-2, 1e-2, 1e-2};
 
-const ColVector<9> Qmin = 1e-10 * ones<9, 1>();
-const ColVector<3> Rmin = 1e-10 * ones<3, 1>();
+const ColVector<9> Qmin = 1e-6 * ones<9, 1>();
+const ColVector<3> Rmin = 1e-6 * ones<3, 1>();
 
 const ColVector<9> Qmax = 1e6 * ones<9, 1>();
 const ColVector<3> Rmax = 1e6 * ones<3, 1>();

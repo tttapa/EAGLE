@@ -34,7 +34,8 @@ Balance_result_GEP<N> balance(const Matrix<N, N> &A, const Matrix<N, N> &B) {
                                p_balanced_mat2, n, &ilo, &ihi, plscale, prscale,
                                pwork);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dggbal_work: info = ") +
+                                 std::to_string(info));
 
     double *p_balancing_mat  = &result.balancing_matrix[0][0];
     double *p_balancing_mat2 = &result.balancing_matrix2[0][0];
@@ -42,12 +43,12 @@ Balance_result_GEP<N> balance(const Matrix<N, N> &A, const Matrix<N, N> &B) {
     info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, job, 'L', n, ilo, ihi, plscale,
                           prscale, n, p_balancing_mat, n);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") + std::to_string(info));
 
     info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, job, 'R', n, ilo, ihi, plscale,
                           prscale, n, p_balancing_mat2, n);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") + std::to_string(info));
     return result;
 }
 
@@ -81,7 +82,8 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
     info = LAPACKE_dggbal_work(LAPACK_ROW_MAJOR, bal_job, nn, paa, nn, pbb, nn,
                                &ilo, &ihi, lscale, rscale, work);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dggbal_work: info = ") +
+                                 std::to_string(info));
 
     // QR factorization of bb
     QR<double, Nx, Nx> qrRes = householderQR(B);
@@ -92,13 +94,13 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
     info = LAPACKE_dgghrd(LAPACK_ROW_MAJOR, comp_q, comp_z, nn, ilo, ihi, paa,
                           nn, pbb, nn, pqq, nn, pzz, nn);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dgghrd: info = ") + std::to_string(info));
 
     // Hessenberg
     info = LAPACKE_dgghrd(LAPACK_ROW_MAJOR, comp_q, comp_z, nn, ilo, ihi, paa,
                           nn, pbb, nn, pqq, nn, pzz, nn);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dgghrd: info = ") + std::to_string(info));
 
     constexpr char qz_job = 'S';
     // Schur
@@ -106,17 +108,18 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
                                ilo, ihi, paa, nn, pbb, nn, alphar, alphai,
                                betar, pqq, nn, pzz, nn, work, nn);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dhgeqz_work: info = ") +
+                                 std::to_string(info));
 
     info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, bal_job, 'L', nn, ilo, ihi, lscale,
                           rscale, nn, pqq, nn);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") + std::to_string(info));
 
     info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, bal_job, 'R', nn, ilo, ihi, lscale,
                           rscale, nn, pzz, nn);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") + std::to_string(info));
 
     lapack_logical select[Nx];
 
@@ -138,7 +141,8 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
                                nn, pzz, nn, &mm, &pl, &pr, nullptr, rwork3,
                                lrwork3, iwork, liwork);
     if (info != 0)
-        throw std::runtime_error("info != 0");
+        throw std::runtime_error(std::string("LAPACKE_dtgsen_work: info = ") +
+                                 std::to_string(info));
 
     return ZZ;
 }

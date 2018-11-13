@@ -10,3 +10,5 @@ build/googletest/Makefile
 build/Makefile
 CTestCostData.txt
 doc/html/
+*.png
+*.gif
