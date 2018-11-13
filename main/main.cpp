@@ -293,6 +293,12 @@ int main(int argc, char const *argv[]) {
     plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
     plt::show();
 
+    cout << fixed << setprecision(17) << obsRes.quatnorms.back() << endl;
+    plt::plot(obsRes.sampledTime, obsRes.quatnorms);
+    plt::title("Norm of ode45 quaternion");
+    plt::ylim(0.0, 1.1);
+    plt::show();
+
 #endif
 
     /* ------ Export the simulation result as CSV --------------------------- */
@@ -378,7 +384,7 @@ int main(int argc, char const *argv[]) {
                       home + "/tmp/testTags.out.txt", matmap);
 #endif
 
-    return equal ? EXIT_SUCCESS : 1;
+    return equal ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 void mydebug() { std::cerr << "ERROR" << std::endl; }

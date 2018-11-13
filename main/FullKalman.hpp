@@ -20,7 +20,7 @@
 template <size_t Nx, size_t Nu, size_t Ny>
 class FullKalman : public DiscreteObserver<Nx, Nu, Ny> {
   public:
-    FullKalman(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
+    FullKalman(const Matrix<Nx - 1, Nx - 1> &A_red, const Matrix<Nx - 1, Nu> &B_red,
                const Matrix<Ny, Nx> &C, const Matrix<Nx - 1, Ny - 1> &L,
                double Ts)
         : DiscreteObserver<Nx, Nu, Ny>{Ts}, A{A}, B{B}, C{C}, L{L} {}
@@ -48,8 +48,8 @@ class FullKalman : public DiscreteObserver<Nx, Nu, Ny> {
                                  const ColVector<Ny> &y_sensor,
                                  const ColVector<Nu> &u) override;
 
-    const Matrix<Nx, Nx> A;
-    const Matrix<Nx, Nu> B;
+    const Matrix<Nx - 1, Nx - 1> A_red;
+    const Matrix<Nx - 1, Nu> B_red;
     const Matrix<Ny, Nx> C;
     const Matrix<Nx - 1, Ny - 1> L;
 };
@@ -65,9 +65,9 @@ FullKalman<Nx, Nu, Ny>::getStateChange(const ColVector<Nx> &x_hat,
 
     ColVector<Ny - 1> ydiff_red   = getBlock<1, Ny, 0, 1>(ydiff);
     ColVector<Nx - 1> Ly_diff_red = L * ydiff_red;
-    ColVector<Nx> Ly_diff         = red2quat(Ly_diff_red);
 
-    ColVector<Nx> x_hat_model = A * x_hat + B * u;
-    ColVector<Nx> x_hat_new   = quaternionStatesAdd(x_hat_model, Ly_diff);
+    ColVector<Nx-1> x_hat_model_red = A_red * x_hat_red + B_red * u;
+    ColVector<Nx - 1> x_hat_new_red   = quaternionStatesAdd(x_hat_model, Ly_diff);
+    ColVector<Nx> x_hat_new         = red2quat(x_hat_re);
     return x_hat_new;
 }

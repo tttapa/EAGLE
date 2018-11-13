@@ -33,9 +33,9 @@ const ColVector<3> clampMax = 1.0 / 3 * ones<3, 1>();
 
 static auto invsq = [](double x) { return 1.0 / (x * x); };
 
-const RowVector<3> Qn     = {{1e-06, 1e-06, 0.00064052634}};
-const RowVector<3> Qomega = {{0.034129327, 0.034129327, 1e-06}};
-const RowVector<3> Qq     = {{127.26504, 127.26504, 17719.678}};
+const RowVector<3> Qq     = {{448.85340, 448.85340, 381.83708}};
+const RowVector<3> Qomega = {{0.17101848, 0.17101848, 0.0025328247}};
+const RowVector<3> Qn     = {{3.807243e-05, 3.807243e-05, 3.0956794e-06}};
 
 /** Weighting matrix for states in LQR design. */
 const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));

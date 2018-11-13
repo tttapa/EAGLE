@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/main",
+            "program": "${workspaceFolder}/build/bin/tuner",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

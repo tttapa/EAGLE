@@ -56,6 +56,19 @@ constexpr Matrix<N, N> diag(const RowVector<N> &diagElements) {
     return Tdiag<double, N>(diagElements);
 }
 
+template <class T, size_t N>
+constexpr TMatrix<T, N, N> Tdiag(const TColVector<T, N> &diagElements) {
+    TMatrix<T, N, N> matrix = {};
+    for (size_t i = 0; i < N; ++i)
+        matrix[i][i] = diagElements[i][0];
+    return matrix;
+}
+
+template <size_t N>
+constexpr Matrix<N, N> diag(const ColVector<N> &diagElements) {
+    return Tdiag<double, N>(diagElements);
+}
+
 // Identity matrix
 template <class T, size_t N>
 constexpr TMatrix<T, N, N> Teye() {
@@ -193,27 +206,42 @@ constexpr TMatrix<T, R, C> operator-(const TMatrix<T, R, C> &matrix) {
 
 // Norm
 template <class T, size_t R>
-constexpr double norm(const TRowVector<T, R> &rowvector) {
+constexpr double normsq(const TRowVector<T, R> &rowvector) {
     double sumsq = 0;
     for (size_t r = 0; r < R; ++r)
         sumsq += rowvector[r][0] * rowvector[r][0];
-    return sqrt(sumsq);
+    return sumsq;
+}
+
+template <class T, size_t R>
+constexpr double norm(const TRowVector<T, R> &rowvector) {
+    return sqrt(normsq(rowvector));
+}
+
+template <class T, size_t C>
+constexpr double normsq(const TColVector<T, C> &colvector) {
+    double sumsq = 0;
+    for (size_t c = 0; c < C; ++c)
+        sumsq += colvector[0][c] * colvector[0][c];
+    return sumsq;
 }
 
 template <class T, size_t C>
 constexpr double norm(const TColVector<T, C> &colvector) {
+    return sqrt(normsq(colvector));
+}
+
+template <class T, size_t N>
+constexpr double normsq(const Array<T, N> &vector) {
     double sumsq = 0;
-    for (size_t c = 0; c < C; ++c)
-        sumsq += colvector[0][c] * colvector[0][c];
-    return sqrt(sumsq);
+    for (size_t i = 0; i < N; ++i)
+        sumsq += vector[i] * vector[i];
+    return sumsq;
 }
 
 template <class T, size_t N>
 constexpr double norm(const Array<T, N> &vector) {
-    double sumsq = 0;
-    for (size_t i = 0; i < N; ++i)
-        sumsq += vector[i] * vector[i];
-    return sqrt(sumsq);
+    return sqrt(normsq(vector));
 }
 
 namespace MatrixPrinting {

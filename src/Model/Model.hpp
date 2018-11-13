@@ -27,6 +27,7 @@ class Model {
         std::vector<VecX_t> estimatedSolution;
         std::vector<VecU_t> control;
         std::vector<VecY_t> output;
+        std::vector<double> quatnorms;
     };
 
     /**
@@ -444,6 +445,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
         result.estimatedSolution.reserve(N);
         result.control.reserve(N);
         result.output.reserve(N);
+        result.quatnorms.reserve(N);
 
         // actual state = inital state
         VecX_t curr_x = x_start;
@@ -475,6 +477,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             result.estimatedSolution.push_back(curr_x_hat);
             result.control.push_back(curr_u);
             result.output.push_back(y);
+            result.quatnorms.push_back(norm(getBlock<0, 4, 0, 1>(curr_x)));
 
             // calculate the estimated state for the next time step
             //  k+1                                   k      k    k
