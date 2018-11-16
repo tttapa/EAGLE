@@ -120,7 +120,7 @@ struct Drone {
         auto L_red   = dlqe(sys_red.A, sys_red.B, sys_red.C, diag(varDynamics),
                           diag(varSensors))
                          .L;
-        return {sys.A, sys.B, sys.C, L_red, Ts};
+        return {sys_red.A, sys_red.B, sys.C, L_red, Ts};
     }
 
 #pragma region Models and Systems...............................................

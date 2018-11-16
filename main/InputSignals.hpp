@@ -27,34 +27,36 @@ struct TestReferenceFunction
         // ---------------------------------------------------------------------
         ContinuousLQRController::VecR_t ref = {};
 
+        constexpr double m = 0.25;
+
         Quaternion q = qu;
-        if (t >= 1 && t < 3)
+        if (t >= m*1 && t < m*3)
             q = quatmultiply(q, qz);
-        if (t >= 5 && t < 7)
+        if (t >= m*5 && t < m*7)
             q = quatmultiply(q, qy);
-        if (t >= 9 && t < 11)
+        if (t >= m*9 && t < m*11)
             q = quatmultiply(q, qx);
 
-        if (t >= 13 && t < 15)
+        if (t >= m*13 && t < m*15)
             q = quatmultiply(q, quatconjugate(qz));
-        if (t >= 17 && t < 19)
+        if (t >= m*17 && t < m*19)
             q = quatmultiply(q, quatconjugate(qy));
-        if (t >= 21 && t < 23)
+        if (t >= m*21 && t < m*23)
             q = quatmultiply(q, quatconjugate(qx));
 
-        if (t >= 25 && t < 27)
+        if (t >= m*25 && t < m*27)
             q = quatmultiply(q, qz);
-        if (t >= 26 && t < 28)
+        if (t >= m*26 && t < m*28)
             q = quatmultiply(q, qy);
-        if (t >= 27 && t < 29)
+        if (t >= m*27 && t < m*29)
             q = quatmultiply(q, qx);
         assignBlock<0, 4, 0, 1>(ref) = q;
         return ref;
         // ---------------------------------------------------------------------
     }
-    const Quaternion qz = eul2quat({M_PI / 8, 0, 0});
-    const Quaternion qy = eul2quat({0, M_PI / 16, 0});
-    const Quaternion qx = eul2quat({0, 0, M_PI / 16});
+    const Quaternion qz = eul2quat({M_PI / 16, 0, 0});
+    const Quaternion qy = eul2quat({0, M_PI / 32, 0});
+    const Quaternion qx = eul2quat({0, 0, M_PI / 32});
     const Quaternion qu = eul2quat({0, 0, 0});
 };
 

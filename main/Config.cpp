@@ -33,9 +33,9 @@ const ColVector<3> clampMax = 1.0 / 3 * ones<3, 1>();
 
 static auto invsq = [](double x) { return 1.0 / (x * x); };
 
-const RowVector<3> Qq     = {{448.85340, 448.85340, 381.83708}};
-const RowVector<3> Qomega = {{0.17101848, 0.17101848, 0.0025328247}};
-const RowVector<3> Qn     = {{3.807243e-05, 3.807243e-05, 3.0956794e-06}};
+const RowVector<3> Qq     = {{789.264, 789.264, 650.684}};
+const RowVector<3> Qomega = {{0.384275, 0.384275, 9.55652e-05}};
+const RowVector<3> Qn     = {{2.425268e-06, 2.425268e-06, 2.316292e-06}};
 
 /** Weighting matrix for states in LQR design. */
 const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
@@ -59,7 +59,7 @@ const RowVector<6> varSensors  = hcat(  //
 /** Options for numerical integration for simulation. */
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
-    .t_end   = 36,
+    .t_end   = 10,
     .epsilon = 1e-6,
     .h_start = 1e-2,
     .h_min   = 1e-6,

@@ -305,7 +305,7 @@ int main(int argc, char const *argv[]) {
 
     if (exportCSV) {
         // Sample/interpolate the simulation result using a fixed time step
-        auto sampled = sampleODEResult(result, odeopt.t_start, CSV_Ts, t_end);
+        auto sampled = sampleODEResult(obsRes, odeopt.t_start, CSV_Ts, t_end);
         vector<EulerAngles> sampledOrientation =
             NonLinearFullDroneModel::statesToEuler(sampled);
         // Export to the given output file
