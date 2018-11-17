@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_C_STANDARD 90) # ANSI
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -100,7 +100,8 @@ add_executable(tests ${TESTS})
 target_link_libraries(tests
                       gmock
                       source
-                      lapacke)
+                      lapacke
+                      stdc++fs)
 
 # Add tests
 gtest_discover_tests(tests)

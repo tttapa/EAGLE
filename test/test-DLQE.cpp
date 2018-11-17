@@ -27,8 +27,8 @@ TEST(DLQE, DLQE) {
         {881, 571, 293, 229, 1559},
         {1567, 1087, 2011, 2017, 2027},
     }};
-    Matrix<2, 2> W          = diag<2>({29, 31});
-    Matrix<3, 3> V          = diag<3>({47, 53, 59});
+    Matrix<2, 2> W          = diag<2>({{{29, 31}}});
+    Matrix<3, 3> V          = diag<3>({{{47, 53, 59}}});
     auto res                = dlqe(A, B, C, W, V);
     Matrix<5, 3> L          = res.L;
     Matrix<5, 5> P          = res.P;

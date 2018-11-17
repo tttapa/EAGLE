@@ -85,7 +85,7 @@ TEST(Matrix, scalarMultiply) {
 }
 
 TEST(Matrix, Tdiag) {
-    TMatrix<int, 3, 3> result   = Tdiag<int, 3>({11, 22, 33});
+    TMatrix<int, 3, 3> result   = Tdiag<int, 3>({{{11, 22, 33}}});
     TMatrix<int, 3, 3> expected = {{
         {11, 0, 0},
         {0, 22, 0},
@@ -95,7 +95,7 @@ TEST(Matrix, Tdiag) {
 }
 
 TEST(Matrix, diag) {
-    Matrix<3, 3> result   = diag<3>({11, 22, 33});
+    Matrix<3, 3> result   = diag<3>({{{11, 22, 33}}});
     Matrix<3, 3> expected = {{
         {11, 0, 0},
         {0, 22, 0},
