@@ -1,257 +1,345 @@
 #pragma once
 
-#include "FullKalman.hpp"
+#include "KalmanObserver.hpp"
 #include "LQRController.hpp"
-#include "NonLinearFullDroneModel.hpp"
-#include "Params.hpp"
+
+#include <Model/Model.hpp>
+
 #include <Matrix/DLQE.hpp>
 #include <Matrix/DLQR.hpp>
-#include <Matrix/LQR.hpp>
 
+#include <Util/AlmostEqual.hpp>
+#include <Util/FileLoader.hpp>
+
+#include <cassert>
+#include <filesystem>
 #include <iostream>
 
-struct Drone {
-    constexpr Drone() { compute(); }
+class DroneState {
+    ColVector<17> x = {1};
 
-    constexpr static size_t Nx = 10;
-    constexpr static size_t Nu = 3;
-    constexpr static size_t Ny = 7;
-
-#pragma region Parameters.......................................................
-
-    /** 
-     * @brief   Update all computed parameters and system matrices. 
-     *          Should be called each time one of the parameters is changed.
-     */
-    constexpr void compute() {
-        p.compute();
-        A = vcat(                                                //
-            zeros<1, 10>(),                                      //
-            hcat(zeros<3, 4>(), 0.5 * eye<3>(), zeros<3, 3>()),  //
-            hcat(zeros<3, 7>(), p.gamma_n),                      //
-            hcat(zeros<3, 7>(), -p.k2 * eye<3>())                //
-        );
-        B = vcat(                   //
-            zeros<4, 3>(),          //
-            p.gamma_u,              //
-            p.k2 * p.k1 * eye<3>()  //
-        );
-        C = hcat(eye<Ny>(), zeros<Ny, Nu>());
-        D = zeros<Ny, Nu>();
+  public:
+    DroneState() = default;
+    DroneState(const ColVector<17> &x) : x{x} {}
+    ColVector<Nx_att> getAttitudeState() const {
+        return getBlock<0, Nx_att, 0, 1>(x);
+    }
+    Quaternion getOrientation() const { return getBlock<0, 4, 0, 1>(x); }
+    ColVector<3> getAngularVelocity() const { return getBlock<4, 7, 0, 1>(x); }
+    ColVector<3> getMotorSpeed() const { return getBlock<7, 10, 0, 1>(x); }
+    ColVector<3> getVelocity() const { return getBlock<10, 13, 0, 1>(x); }
+    ColVector<3> getPosition() const { return getBlock<13, 16, 0, 1>(x); }
+    double getThrustMotorSpeed() const { return x[16][0]; }
+    ColVector<Nx_nav> getNavigationState() const {
+        return getBlock<Nx_att, Nx, 0, 1>(x);
     }
 
+    void setOrientation(const Quaternion &q) { assignBlock<0, 4, 0, 1>(x) = q; }
+    void setAngularVelocity(const ColVector<3> &w) {
+        assignBlock<4, 7, 0, 1>(x) = w;
+    }
+    void setMotorSpeed(const ColVector<3> &n) {
+        assignBlock<7, 10, 0, 1>(x) = n;
+    }
+    void setVelocity(const ColVector<3> &v) {
+        assignBlock<10, 13, 0, 1>(x) = v;
+    }
+    void setPosition(const ColVector<3> &z) {
+        assignBlock<13, 16, 0, 1>(x) = z;
+    }
+    void setThrustMotorSpeed(double t) { x[16][0] = t; }
+    operator ColVector<17>() const { return x; }
+};
+
+class DroneControl {
+    ColVector<4> u = {};
+
+  public:
+    DroneControl() = default;
+    DroneControl(const ColVector<4> &u) : u{u} {}
+    ColVector<3> getAttitudeControl() const { return getBlock<0, 3, 0, 1>(u); }
+    double getThrustControl() const { return u[3][0]; }
+    operator ColVector<4>() const { return u; }
+};
+
+class DroneOutput {
+    ColVector<10> y = {};
+
+  public:
+    DroneOutput() = default;
+    DroneOutput(const ColVector<10> &y) : y{y} {}
+    DroneOutput(const ColVector<Ny_att> &y_att, const ColVector<Ny_nav> &y_nav)
+        : y{vcat(y_att, y_nav)} {}
+    Quaternion getOrientation() const { return getBlock<0, 4, 0, 1>(y); }
+    ColVector<3> getAngularVelocity() const { return getBlock<4, 7, 0, 1>(y); }
+    ColVector<3> getPosition() const { return getBlock<7, 10, 0, 1>(y); }
+
+    void setOrientation(const Quaternion &q) { assignBlock<0, 4, 0, 1>(y) = q; }
+    void setAngularVelocity(const ColVector<3> &w) {
+        assignBlock<4, 7, 0, 1>(y) = w;
+    }
+    void setAttitudeOutput(const ColVector<7> &yy) {
+        assignBlock<0, 7, 0, 1>(y) = yy;
+    }
+    void setPosition(const ColVector<3> &z) { assignBlock<7, 10, 0, 1>(y) = z; }
+    operator ColVector<10>() const { return y; }
+};
+
+struct Drone : public ContinuousModel<Nx, Nu, Ny> {
+
+#pragma region Constructors.....................................................
+
     /**
-     * @brief   A struct containing the drone's parameters. 
+     * @brief   TODO
      * 
-     * @note    You can edit some of the parameters, however, this invalidates
-     *          some of the other derived/computed parameters, so you have to 
-     *          call `Drone::compute()` afterwards. 
      */
-    Params p = {};
+    Drone(const std::filesystem::path &loadPath) { load(loadPath); }
+
+    /** 
+     * @brief   Loads all system matrices and parameters from the respective 
+     *          files in the given folder. 
+     */
+    void load(const std::filesystem::path &loadPath) {
+        Aa = loadMatrix<Nx_att, Nx_att>(loadPath / "Aa");
+        Ba = loadMatrix<Nx_att, Nu_att>(loadPath / "Ba");
+        Ca = loadMatrix<Ny_att, Nx_att>(loadPath / "Ca");
+        Da = loadMatrix<Ny_att, Nu_att>(loadPath / "Da");
+
+        Ad = loadMatrix<Nx_att, Nx_att>(loadPath / "Ad");
+        Bd = loadMatrix<Nx_att, Nu_att>(loadPath / "Bd");
+        Cd = loadMatrix<Ny_att, Nx_att>(loadPath / "Cd");
+        Dd = loadMatrix<Ny_att, Nu_att>(loadPath / "Dd");
+
+        Ad_r = getBlock<1, Nx_att, 1, Nx_att>(Ad);
+        Bd_r = getBlock<1, Nx_att, 0, Nu_att>(Bd);
+        Cd_r = getBlock<1, Ny_att, 1, Nx_att>(Cd);
+
+        Ts = loadDouble(loadPath / "Ts");
+
+        gamma_n = loadMatrix<3, 3>(loadPath / "gamma_n");
+        gamma_u = loadMatrix<3, 3>(loadPath / "gamma_u");
+        I       = loadMatrix<3, 3>(loadPath / "I");
+        I_inv   = loadMatrix<3, 3>(loadPath / "I_inv");
+        k1      = loadDouble(loadPath / "k1");
+        k2      = loadDouble(loadPath / "k2");
+
+        assert(isAlmostEqual(I_inv, inv(I), 1e-12));
+    }
+
+#pragma region Continuous Model.................................................
+
+    /** 
+     * @brief   Calculate the derivative of the state vector, given the current
+     *          state x and the current input u.
+     * @param   x 
+     *          The current state of the drone.
+     * @param   u 
+     *          The current control input u.
+     * @return  The derivative of the state, x_dot.
+     */
+    VecX_t operator()(const VecX_t &x, const VecU_t &u) override {
+        DroneState xx   = {x};
+        DroneControl uu = {u};
+        DroneState x_dot;
+
+        // Attitude
+        Quaternion q       = xx.getOrientation();
+        ColVector<3> omega = xx.getAngularVelocity();
+        ColVector<3> n     = xx.getMotorSpeed();
+        ColVector<3> u_att = uu.getAttitudeControl();
+
+        Quaternion q_omega = vcat(zeros<1, 1>(), omega);
+        x_dot.setOrientation(0.5 * quatmultiply(q, q_omega));
+        x_dot.setAngularVelocity(gamma_n * n + gamma_u * u_att -
+                                 I_inv * cross(omega, I * omega));
+        x_dot.setMotorSpeed(k2 * (k1 * u_att - n));
+
+        // Navigation/Altitude
+        ColVector<3> v  = xx.getVelocity();
+        double n_thrust = xx.getThrustMotorSpeed();
+        double u_thrust = uu.getThrustControl();
+
+        double F_local_z     = ct * rho * pow(Dp, 4) * pow(n_thrust, 2);
+        ColVector<3> F_local = {0, 0, F_local_z};
+        ColVector<3> F_world = quatrotate(q, F_local);
+        ColVector<3> F_grav  = {0, 0, -g * m};
+        ColVector<3> a       = (F_world + F_grav) / m;
+
+        x_dot.setVelocity(a);
+        x_dot.setPosition(v);
+        x_dot.setThrustMotorSpeed(k2 * (k1 * u_thrust - n_thrust));
+
+        return x_dot;
+    }
+
+    VecY_t getOutput(const VecX_t &x, const VecU_t &u) override {
+        DroneState xx   = {x};
+        DroneControl uu = {u};
+        ColVector<Ny_att> y_att =
+            Ca * xx.getAttitudeState() + Da * uu.getAttitudeControl();
+        ColVector<Ny_nav> y_nav = xx.getPosition();
+        return DroneOutput{y_att, y_nav};
+    }
 
 #pragma region Controllers......................................................
 
-    /**
+    /** 
      * @brief   TODO
      */
-    ContinuousLQRController
-    getContinuousController(const Matrix<Nx - 1, Nx - 1> &Q,
-                            const Matrix<Nu, Nu> &R) const {
-        auto sys   = getLinearReducedContinuousSystem();
-        auto K_red = -lqr(sys.A, sys.B, Q, R).K;
-        auto K     = hcat(zeros<Nu, 1>(), K_red);
-        return {getLinearFullContinuousModel(), K};
+    Matrix<Nu_att, Nx_att - 1>
+    getAttitudeControllerMatrixK(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
+                                 const Matrix<Nu_att, Nu_att> &R) const {
+        return -dlqr(Ad_r, Bd_r, Q, R).K;
     }
 
     /** 
      * @brief   TODO
      */
-    Matrix<Nu, Nx - 1>
-    getReducedDiscreteControllerMatrixK(const Matrix<Nx - 1, Nx - 1> &Q,
-                                        const Matrix<Nu, Nu> &R, double Ts,
-                                        DiscretizationMethod method) const {
-        auto sys   = getLinearReducedDiscreteSystem(Ts, method);
-        auto K_red = -dlqr(sys.A, sys.B, Q, R).K;
-        return K_red;
+    Attitude::LQRController
+    getAttitudeController(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
+                          const Matrix<Nu_att, Nu_att> &R) const {
+        auto K_red = getAttitudeControllerMatrixK(Q, R);
+        return {Ad, Bd, Cd, Dd, K_red, Ts};
     }
 
     /** 
      * @brief   TODO
      */
-    DiscreteLQRController
-    getDiscreteController(const Matrix<Nx - 1, Nx - 1> &Q,
-                          const Matrix<Nu, Nu> &R, double Ts,
-                          DiscretizationMethod method) const {
-        auto K_red = getReducedDiscreteControllerMatrixK(Q, R, Ts, method);
-        auto K     = hcat(zeros<Nu, 1>(), K_red);
-        return {getLinearFullDiscreteSystem(Ts, method), K};
-    }
-
-    /** 
-     * @brief   TODO
-     */
-    ClampedDiscreteLQRController getClampedDiscreteController(
-        const ColVector<Nu> &clampMin, const ColVector<Nu> &clampMax,
-        const Matrix<Nx - 1, Nx - 1> &Q, const Matrix<Nu, Nu> &R, double Ts,
-        DiscretizationMethod method) const {
-        return {getDiscreteController(Q, R, Ts, method), clampMin, clampMax};
+    Attitude::ClampedLQRController
+    getClampedDiscreteController(const ColVector<Nu_att> &clampMin,
+                                 const ColVector<Nu_att> &clampMax,
+                                 const Matrix<Nx_att - 1, Nx_att - 1> &Q,
+                                 const Matrix<Nu_att, Nu_att> &R) const {
+        return {getAttitudeController(Q, R), clampMin, clampMax};
     }
 
 #pragma region Observers........................................................
 
-    Matrix<Nx - 1, Ny - 1> getReducedDiscreteObserverMatrixL(
-        const RowVector<Nu> &varDynamics, const RowVector<Ny - 1> &varSensors,
-        double Ts, DiscretizationMethod method) const {
-        auto sys = getLinearReducedDiscreteSystem(Ts, method);
-        auto L_red =
-            dlqe(sys.A, sys.B, sys.C, diag(varDynamics), diag(varSensors)).L;
-        return L_red;
+    /** 
+     * @brief   TODO
+     */
+    Matrix<Nx_att - 1, Ny_att - 1>
+    getAttitudeObserverMatrixL(const RowVector<Nu_att> &varDynamics,
+                               const RowVector<Ny_att - 1> &varSensors) const {
+        return dlqe(Ad_r, Bd_r, Cd_r, diag(varDynamics), diag(varSensors)).L;
     }
 
     /** 
      * @brief   TODO
      */
-    FullKalman<Nx, Nu, Ny>
-    getDiscreteObserver(const RowVector<Nu> &varDynamics,
-                        const RowVector<Ny - 1> &varSensors, double Ts,
-                        DiscretizationMethod method) const {
-        auto sys_red = getLinearReducedDiscreteSystem(Ts, method);
-        auto sys     = getLinearFullDiscreteSystem(Ts, method);
-        auto L_red   = dlqe(sys_red.A, sys_red.B, sys_red.C, diag(varDynamics),
-                          diag(varSensors))
-                         .L;
-        return {sys_red.A, sys_red.B, sys.C, L_red, Ts};
-    }
-
-#pragma region Models and Systems...............................................
-
-    /** 
-     * @brief   Get the true continuous-time, non-linear, full model of the 
-     *          drone.
-     */
-    NonLinearFullDroneModel getNonLinearFullModel() const { return {p}; }
-
-    /** 
-     * @brief   Get a continuous-time system representing the drone,
-     *          linearized around the equilibrium 
-     *          @f$ x = (1, 0, 0, 0, 0, 0, 0, 0, 0, 0), u = (0, 0, 0) @f$.
-     */
-    CTLTISystem<Nx, Nu, Ny> getLinearFullContinuousSystem() const {
-        return {A, B, C, D};
-    }
-
-    /** 
-     * @brief   Get a reduced continuous-time system representing the drone,
-     *          linearized around the equilibrium 
-     *          @f$ x = (0, 0, 0, 0, 0, 0, 0, 0, 0), u = (0, 0, 0) @f$.
-     *          The first state (the real part of the orienation quaternion)
-     *          has been removed from the state-space representation.  
-     *          It can be approximated by @f$ q_0 \approx \sqrt{1 - q_1^2 - 
-     *          q_2^2 - q_3^2} @f$.
-     */
-    CTLTISystem<Nx - 1, Nu, Ny - 1> getLinearReducedContinuousSystem() const {
-        auto A_red = getBlock<1, Nx, 1, Nx>(A);
-        auto B_red = getBlock<1, Nx, 0, Nu>(B);
-        auto C_red = getBlock<1, Ny, 1, Nx>(C);
-        auto D_red = getBlock<1, Ny, 0, Nu>(D);
-        return {A_red, B_red, C_red, D_red};
-    }
-
-    /** 
-     * @brief   Get a continuous-time model of the drone that has been 
-     *          linearized around the equilibrium 
-     *          @f$ x = (1, 0, 0, 0, 0, 0, 0, 0, 0, 0), u = (0, 0, 0) @f$.
-     */
-    CTLTIModel<Nx, Nu, Ny> getLinearFullContinuousModel() const {
-        return {getLinearFullContinuousSystem()};
-    }
-
-    /** 
-     * @brief   Get a discrete-time system representing the drone, a discretized
-     *          version of `getLinearFullContinuousSystem`, using the given 
-     *          sample time and discretization method.
-     */
-    DTLTISystem<Nx, Nu, Ny>
-    getLinearFullDiscreteSystem(double Ts, DiscretizationMethod method) const {
-        auto ctsys = getLinearFullContinuousSystem();
-        return ctsys.discretize(Ts, method);
-    }
-
-    /** 
-     * @brief   Get a reduced discrete-time system representing the drone,
-     *          linearized around the equilibrium 
-     *          @f$ x = (0, 0, 0, 0, 0, 0, 0, 0, 0), u = (0, 0, 0) @f$, and 
-     *          discretized using the given sample time and discretization 
-     *          method.  
-     *          The first state (the real part of the orienation quaternion)
-     *          has been removed from the state-space representation.  
-     *          It can be approximated by @f$ q_0 \approx \sqrt{1 - q_1^2 -
-     *          q_2^2 - q_3^2} @f$.
-     */
-    DTLTISystem<Nx - 1, Nu, Ny - 1>
-    getLinearReducedDiscreteSystem(double Ts,
-                                   DiscretizationMethod method) const {
-        auto discr  = getLinearFullDiscreteSystem(Ts, method);
-        auto Ad_red = getBlock<1, Nx, 1, Nx>(discr.A);
-        auto Bd_red = getBlock<1, Nx, 0, Nu>(discr.B);
-        auto Cd_red = getBlock<1, Ny, 1, Nx>(discr.C);
-        auto Dd_red = getBlock<1, Ny, 0, Nu>(discr.D);
-        return {Ad_red, Bd_red, Cd_red, Dd_red, Ts};
+    Attitude::KalmanObserver
+    getAttitudeObserver(const RowVector<Nu_att> &varDynamics,
+                        const RowVector<Ny_att - 1> &varSensors) const {
+        auto L_red = getAttitudeObserverMatrixL(varDynamics, varSensors);
+        return {Ad_r, Bd_r, Cd, L_red, Ts};
     }
 
 #pragma region System matrices..................................................
 
     /** 
      * ```
-     *  A =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]
-     *       [  ·   ·   ·   ·  ┌─────────┐  ·   ·   ·  ]
-     *       [  ·   ·   ·   ·  │  0.5 I3 │  ·   ·   ·  ]
-     *       [  ·   ·   ·   ·  └─────────┘  ·   ·   ·  ]
-     *       [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
-     *       [  ·   ·   ·   ·   ·   ·   ·  │   Γ_n   │ ]
-     *       [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ]
-     *       [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
-     *       [  ·   ·   ·   ·   ·   ·   ·  │ -k2 I3  │ ]
-     *       [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ] 
+     *  Aa =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]
+     *        [  ·   ·   ·   ·  ┌─────────┐  ·   ·   ·  ]
+     *        [  ·   ·   ·   ·  │  0.5 I3 │  ·   ·   ·  ]
+     *        [  ·   ·   ·   ·  └─────────┘  ·   ·   ·  ]
+     *        [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
+     *        [  ·   ·   ·   ·   ·   ·   ·  │   Γ_n   │ ]
+     *        [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ]
+     *        [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
+     *        [  ·   ·   ·   ·   ·   ·   ·  │ -k2 I3  │ ]
+     *        [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ] 
      * ``` */
-    Matrix<Nx, Nx> A = {};
+    Matrix<Nx_att, Nx_att> Aa = {};
+
+    /** 
+     * Discrete A 
+     */
+    Matrix<Nx_att, Nx_att> Ad = {};
+
+    /** 
+     * Discrete, reduced A 
+     */
+    Matrix<Nx_att - 1, Nx_att - 1> Ad_r = {};
 
     /** 
      * ```
-     *  B =  [  ·   ·   ·  ]
-     *       [  ·   ·   ·  ]
-     *       [  ·   ·   ·  ]
-     *       [  ·   ·   ·  ]
-     *       [ ┌─────────┐ ]
-     *       [ │   Γ_u   │ ]
-     *       [ └─────────┘ ]
-     *       [ ┌─────────┐ ]
-     *       [ │ k1k2 I3 │ ]
-     *       [ └─────────┘ ] 
+     *  Ba =  [  ·   ·   ·  ]
+     *        [  ·   ·   ·  ]
+     *        [  ·   ·   ·  ]
+     *        [  ·   ·   ·  ]
+     *        [ ┌─────────┐ ]
+     *        [ │   Γ_u   │ ]
+     *        [ └─────────┘ ]
+     *        [ ┌─────────┐ ]
+     *        [ │ k1k2 I3 │ ]
+     *        [ └─────────┘ ] 
      * ``` */
-    Matrix<Nx, Nu> B = {};
+    Matrix<Nx_att, Nu_att> Ba = {};
+
+    /** 
+     * Discrete B
+     */
+    Matrix<Nx_att, Nu_att> Bd = {};
+
+    /** 
+     * Discrete, reduced B
+     */
+    Matrix<Nx_att - 1, Nu_att> Bd_r = {};
 
     /**
      * ```
-     *  C =  [ 1  ·  ·  ·  ·  ·  ·  ·  ·  · ]
-     *       [ ·  1  ·  ·  ·  ·  ·  ·  ·  · ]
-     *       [ ·  ·  1  ·  ·  ·  ·  ·  ·  · ]
-     *       [ ·  ·  ·  1  ·  ·  ·  ·  ·  · ]
-     *       [ ·  ·  ·  ·  1  ·  ·  ·  ·  · ]
-     *       [ ·  ·  ·  ·  ·  1  ·  ·  ·  · ]
-     *       [ ·  ·  ·  ·  ·  ·  1  ·  ·  · ] 
+     *  Ca =  [ 1  ·  ·  ·  ·  ·  ·  ·  ·  · ]
+     *        [ ·  1  ·  ·  ·  ·  ·  ·  ·  · ]
+     *        [ ·  ·  1  ·  ·  ·  ·  ·  ·  · ]
+     *        [ ·  ·  ·  1  ·  ·  ·  ·  ·  · ]
+     *        [ ·  ·  ·  ·  1  ·  ·  ·  ·  · ]
+     *        [ ·  ·  ·  ·  ·  1  ·  ·  ·  · ]
+     *        [ ·  ·  ·  ·  ·  ·  1  ·  ·  · ] 
      * ``` */
-    Matrix<Ny, Nx> C = {};
+    Matrix<Ny_att, Nx_att> Ca = {};
+
+    /**
+     * Discrete C
+     */
+    Matrix<Ny_att, Nx_att> Cd = {};
+
+    /**
+     * Discrete, reduced C
+     */
+    Matrix<Ny_att - 1, Nx_att - 1> Cd_r = {};
 
     /** 
      * ```
-     *  D =  [ ·  ·  · ]
-     *       [ ·  ·  · ]
-     *       [ ·  ·  · ]
-     *       [ ·  ·  · ]
-     *       [ ·  ·  · ]
-     *       [ ·  ·  · ]
-     *       [ ·  ·  · ] 
+     *  Da =  [ ·  ·  · ]
+     *        [ ·  ·  · ]
+     *        [ ·  ·  · ]
+     *        [ ·  ·  · ]
+     *        [ ·  ·  · ]
+     *        [ ·  ·  · ]
+     *        [ ·  ·  · ] 
      * ``` */
-    Matrix<Ny, Nu> D = {};
+    Matrix<Ny_att, Nu_att> Da = {};
+
+    /**
+     * Discrete D
+     */
+    Matrix<Ny_att, Nu_att> Dd = {};
+
+#pragma region System parameters................................................
+
+    double Ts = 0;
+
+    Matrix<3, 3> gamma_n = {};
+    Matrix<3, 3> gamma_u = {};
+    Matrix<3, 3> I       = {};
+    Matrix<3, 3> I_inv   = {};
+    double k1            = 0;
+    double k2            = 0;
+
+    const double m   = 1.850;  ///< kg           total mass
+    const double ct  = 0.1;    ///< -            thrust coefficient
+    const double g   = 9.81;   ///< m/s2         gravitational acceleration
+    const double rho = 1.225;  ///< kg/m3        air density (nominal, at 15C,
+                               ///               sea level)
+    const double Dp = 12.0 * 0.0254;  ///< m       propeller diameter (12")
 };

@@ -61,7 +61,8 @@
         "algorithm": "cpp",
         "attitude.h": "c",
         "filesystem": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "cassert": "cpp"
     },
     "files.exclude": {
         "**/.git": true,

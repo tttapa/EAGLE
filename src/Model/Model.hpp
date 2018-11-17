@@ -22,7 +22,7 @@ class Model {
     typedef TimeFunctionT<VecR_t> ReferenceFunction;
     typedef ODEResultX<VecX_t> SimulationResult;
 
-    struct ObserverSimulationResult : public SimulationResult {
+    struct ObserverControllerSimulationResult : public SimulationResult {
         std::vector<double> sampledTime;
         std::vector<VecX_t> estimatedSolution;
         std::vector<VecU_t> control;
@@ -157,7 +157,7 @@ class Model {
      * @brief   Simulate the model with the given discrete controller and 
      *          observer.
      */
-    virtual ObserverSimulationResult
+    virtual ObserverControllerSimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller,
              DiscreteObserver<Nx, Nu, Ny> &observer,
              TimeFunctionT<VecU_t> &randFnW, TimeFunctionT<VecY_t> &randFnV,
@@ -178,8 +178,8 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
     using InputFunction     = typename Model<Nx, Nu, Ny>::InputFunction;
     using ReferenceFunction = typename Model<Nx, Nu, Ny>::ReferenceFunction;
     using SimulationResult  = typename Model<Nx, Nu, Ny>::SimulationResult;
-    using ObserverSimulationResult =
-        typename Model<Nx, Nu, Ny>::ObserverSimulationResult;
+    using ObserverControllerSimulationResult =
+        typename Model<Nx, Nu, Ny>::ObserverControllerSimulationResult;
 
     /**
      * @brief   Simulate the continuous model starting from the given initial 
@@ -429,15 +429,15 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
      *          A result code is given as well, to indicate whether the 
      *          integration was successful.
      */
-    ObserverSimulationResult
+    ObserverControllerSimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller,
              DiscreteObserver<Nx, Nu, Ny> &observer,
              TimeFunctionT<VecU_t> &randFnW, TimeFunctionT<VecY_t> &randFnV,
              ReferenceFunction &r, VecX_t x_start,
              const AdaptiveODEOptions &opt) override {
         assert(controller.Ts == observer.Ts);
-        ObserverSimulationResult result = {};
-        double Ts                       = controller.Ts;
+        ObserverControllerSimulationResult result = {};
+        double Ts                                 = controller.Ts;
         size_t N = numberOfSamplesInTimeRange(opt.t_start, Ts, opt.t_end);
 
         // pre-allocate memory for result vectors

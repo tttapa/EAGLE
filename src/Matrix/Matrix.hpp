@@ -422,6 +422,7 @@ constexpr auto vcat(const TMatrix<T, R, C> &t, Args... args)
     return vcat(t, vcat(args...));
 }
 
+// Rounding
 template <size_t R, size_t C>
 Matrix<R, C> round(const Matrix<R, C> &m, size_t digits) {
     auto result = m;
@@ -437,4 +438,16 @@ bool isfinite(const Matrix<R, C> &m) {
         return std::all_of(row.begin(), row.end(),
                            [](auto el) { return std::isfinite(el); });
     });
+}
+
+// Clamping
+template <class T>
+static T clamp(T v, T lo, T hi) {
+    return (v < lo) ? lo : ((hi < v) ? hi : v);
+}
+template <size_t R, size_t C>
+void clamp(Matrix<R, C> &m, const Matrix<R, C> &min, const Matrix<R, C> &max) {
+    for (size_t r = 0; r < R; ++r)
+        for (size_t c = 0; c < C; ++c)
+            m[r][c] = clamp(m[r][c], min[r][c], max[r][c]);
 }

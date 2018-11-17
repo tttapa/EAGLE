@@ -50,16 +50,44 @@ inline Quaternion eul2quat(const EulerAngles &eulerAngles) {
 }
 
 inline EulerAngles quat2eul(const Quaternion &q) {
-    double q0 = q[0][0];
-    double q1 = q[1][0];
-    double q2 = q[2][0];
-    double q3 = q[3][0];
+    const double &q0 = q[0][0];
+    const double &q1 = q[1][0];
+    const double &q2 = q[2][0];
+    const double &q3 = q[3][0];
 
-    double phi =
+    const double phi =
         atan2(2.0 * (q0 * q1 + q2 * q3), 1.0 - 2.0 * (q1 * q1 + q2 * q2));
-    double theta = asin(2.0 * (q0 * q2 - q3 * q1));
-    double psi =
+    const double theta = asin(2.0 * (q0 * q2 - q3 * q1));
+    const double psi =
         atan2(2.0 * (q0 * q3 + q1 * q2), 1.0 - 2.0 * (q2 * q2 + q3 * q3));
 
     return {psi, theta, phi};
+}
+
+static inline double sq(double r) { return r * r; }
+
+template <size_t C>
+inline Matrix<3, C> quatrotate(const Quaternion &q, const Matrix<3, C> &v) {
+    const double &q0 = q[0][0];
+    const double &q1 = q[1][0];
+    const double &q2 = q[2][0];
+    const double &q3 = q[3][0];
+    Matrix<3, 3> M   = {{
+        {
+            1 - 2 * sq(q2) - 2 * sq(q3),
+            2 * (q1 * q2 + q0 * q3),
+            2 * (q1 * q3 - q0 * q2),
+        },
+        {
+            2 * (q1 * q2 - q0 * q3),
+            1 - 2 * sq(q1) - 2 * sq(q3),
+            2 * (q2 * q3 + q0 * q1),
+        },
+        {
+            2 * (q1 * q3 + q0 * q2),
+            2 * (q2 * q3 - q0 * q1),
+            1 - 2 * sq(q1) - 2 * sq(q2),
+        },
+    }};
+    return M * v;
 }

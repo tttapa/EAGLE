@@ -24,15 +24,9 @@ convertMotorOutputsToControlSignal(const ColVector<4> &u_motors) {
     return u_model;
 }
 
-template <class T>
-T clamp(T v, T lo, T hi) {
-    return (v < lo) ? lo : ((hi < v) ? hi : v);
-}
-
 inline ColVector<4> clampMotorControlSignal(const ColVector<4> &u_model_raw) {
     ColVector<4> u_motors = convertControlSignalToMotorOutputs(u_model_raw);
-    for (auto &row : u_motors)
-        row[0] = clamp(row[0], 0.0, 1.0);
+    clamp(u_motors, zeros<4, 1>(), ones<4, 1>());
     return convertMotorOutputsToControlSignal(u_motors);
 }
 

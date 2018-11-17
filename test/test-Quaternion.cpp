@@ -1,5 +1,5 @@
-#include <Util/AlmostEqual.hpp>
 #include <Quaternions/ReducedQuaternion.hpp>
+#include <Util/AlmostEqual.hpp>
 #include <gtest/gtest.h>
 
 TEST(Quaternion, quatmultiply) {
@@ -23,6 +23,29 @@ TEST(Quaternion, quatmultiply) {
         {65},
     }};
     ASSERT_EQ(result, expected);
+}
+
+TEST(Quaternion, quatrotate) {
+    Quaternion q          = {{
+        {1},
+        {2},
+        {5},
+        {7},
+    }};
+    q = q / norm(q);
+    Matrix<3, 2> v        = {{
+        {1, 2},
+        {3, 4},
+        {5, 6},
+    }};
+    Matrix<3, 2> result   = quatrotate(q, v);
+    Matrix<3, 2> expected = {{
+        {1.556962025316456, 1.341772151898735},
+        {3.734177215189874, 4.405063291139241},
+        {4.316455696202532, 5.898734177215190},
+    }};
+    std::cout << result << std::endl;
+    ASSERT_TRUE(isAlmostEqual(result, expected, 1e-12));
 }
 
 TEST(Quaternion, conjugate) {
