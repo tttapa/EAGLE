@@ -59,7 +59,9 @@
         "typeindex": "cpp",
         "string": "cpp",
         "algorithm": "cpp",
-        "attitude.h": "c"
+        "attitude.h": "c",
+        "filesystem": "cpp",
+        "string_view": "cpp"
     },
     "files.exclude": {
         "**/.git": true,

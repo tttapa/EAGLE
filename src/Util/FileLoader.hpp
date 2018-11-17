@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Matrix/Matrix.hpp>
+#include <filesystem>
 #include <fstream>
 #include <string>
 
@@ -11,10 +12,6 @@ Matrix<R, C> loadMatrix(const std::string &name) {
     if (!in)
         throw std::runtime_error("Error: unable to open file");
     auto size = in.tellg();
-    std::cerr << size << std::endl;
-    if (size != R * C * sizeof(double) + 2)
-        throw std::runtime_error("Error: file size doesn't match expected "
-                                 "size. Is double size 64 bits?");
     uint8_t r, c;
     in.seekg(0, in.beg);
     in.read(reinterpret_cast<char *>(&r), 1);
@@ -25,7 +22,7 @@ Matrix<R, C> loadMatrix(const std::string &name) {
         sstr << "Error: number of rows in file doesn't match expected "
                 "number of rows. "
                 "Expected: "
-             << R << " File: " << r;
+             << R << " File: " << +r;
         throw std::runtime_error(sstr.str());
     }
     if (c != C) {
@@ -33,12 +30,32 @@ Matrix<R, C> loadMatrix(const std::string &name) {
         sstr << "Error: number of columns in file doesn't match expected "
                 "number of columns. "
                 "Expected: "
-             << C << " File: " << c;
+             << C << " File: " << +c;
         throw std::runtime_error(sstr.str());
     }
+    if (size != R * C * sizeof(double) + 2)
+        throw std::runtime_error("Error: file size doesn't match expected "
+                                 "size. Is double size correct?");
+
     Matrix<R, C> result;
     in.seekg(2, in.beg);
     in.read(reinterpret_cast<char *>(toArrayPointer(result)),
             R * C * sizeof(double));
+    return result;
+}
+
+double loadDouble(const std::string &name) {
+    auto filename = name + ".double";
+    std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
+    if (!in)
+        throw std::runtime_error("Error: unable to open file");
+    auto size = in.tellg();
+    if (size != sizeof(double))
+        throw std::runtime_error("Error: file size doesn't match expected "
+                                 "size. Is double size correct?");
+
+    double result;
+    in.seekg(0, in.beg);
+    in.read(reinterpret_cast<char *>(&result), sizeof(double));
     return result;
 }
