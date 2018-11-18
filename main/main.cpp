@@ -103,11 +103,6 @@ int main(int argc, char const *argv[]) {
 
 #endif
 
-    plotResults(time, states, {13, 16}, {"x", "y", "z"}, {"r.", "g.", "b."},
-                "Position");
-    plt::tight_layout();
-    plt::show();
-
     /* ------ Export the simulation result as CSV --------------------------- */
 
     if (exportCSV) {

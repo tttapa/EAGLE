@@ -127,6 +127,11 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         k1      = loadDouble(loadPath / "k1");
         k2      = loadDouble(loadPath / "k2");
 
+        m  = loadDouble(loadPath / "m");
+        ct = loadDouble(loadPath / "ct");
+        Dp = loadDouble(loadPath / "Dp");
+
+        nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
         uh = nh / k1;
 
         // TODO
@@ -410,23 +415,22 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
 #pragma region System parameters................................................
 
-    double Ts = 0;
+    double Ts;
 
-    Matrix<3, 3> gamma_n = {};
-    Matrix<3, 3> gamma_u = {};
-    Matrix<3, 3> Id      = {};
-    Matrix<3, 3> Id_inv  = {};
-    double k1            = 0;
-    double k2            = 0;
+    Matrix<3, 3> gamma_n;
+    Matrix<3, 3> gamma_u;
+    Matrix<3, 3> Id;
+    Matrix<3, 3> Id_inv;
+    double k1;
+    double k2;
 
-    const double m   = 1.850;  ///< kg           total mass
-    const double ct  = 0.1;    ///< -            thrust coefficient
+    const int Nm     = 4;      ///< -            number of motors
     const double g   = 9.81;   ///< m/s2         gravitational acceleration
     const double rho = 1.225;  ///< kg/m3        air density (nominal, at 15C,
                                ///               sea level)
-    const double Dp = 12.0 * 0.0254;  ///< m       propeller diameter (12")
-    const int Nm    = 4;              ///< -            number of motors
-
-    double nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
-    double uh = 0;
+    double m;                  ///< kg           total mass
+    double ct;                 ///< -            thrust coefficient
+    double Dp;                 ///< m            propeller diameter
+    double nh;                 ///< rps          hover propeller speed
+    double uh;                 ///< -            hover control
 };
