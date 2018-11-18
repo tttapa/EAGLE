@@ -45,7 +45,7 @@ struct TestReferenceFunction : public TimeFunctionT<ColVector<Ny>> {
         return ref;
         // ---------------------------------------------------------------------
     }
-    const Quaternion qz = eul2quat({M_PI / 32, 0, 0});
+    const Quaternion qz = eul2quat({M_PI / 4, 0, 0});
     const Quaternion qy = eul2quat({0, M_PI / 64, 0});
     const Quaternion qx = eul2quat({0, 0, M_PI / 64});
     const Quaternion qu = eul2quat({0, 0, 0});

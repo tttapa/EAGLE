@@ -114,10 +114,8 @@ int main(int argc, char const *argv[]) {
         // Sample/interpolate the simulation result using a fixed time step
         auto sampled = sampleODEResult(result, odeopt.t_start, CSV_Ts, t_end);
         vector<EulerAngles> sampledOrientation = Drone::statesToEuler(sampled);
-        vector<ColVector<3>> sampledLocation(sampled.size());
-        std::transform(
-            sampled.begin(), sampled.end(), sampledLocation.begin(),
-            [](const Drone::VecX_t &x) { return DroneState{x}.getPosition(); });
+        vector<ColVector<3>> sampledLocation =
+            Drone::extractState(sampled, &DroneState::getPosition);
         // Export to the given output file
         printCSV(rotationCSVFile, 0.0, CSV_Ts, sampledOrientation);
         printCSV(locationCSVFile, 0.0, CSV_Ts, sampledLocation);

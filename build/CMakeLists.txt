@@ -39,7 +39,7 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest/googletest-src
 SET (CMAKE_C_COMPILER "gcc-8")
 SET (CMAKE_CXX_COMPILER "g++-8")
 
-# set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
 
 include(GoogleTest)
 enable_testing()
@@ -49,6 +49,7 @@ SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
 -O3 \
 -Wall -Wextra \
 -Wsuggest-override \
+-Wno-register \
 -Wno-missing-braces -Wno-unknown-pragmas \
 -fdiagnostics-show-option \
 -fextended-identifiers -finput-charset=UTF-8")

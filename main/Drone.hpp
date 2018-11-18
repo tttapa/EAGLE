@@ -177,7 +177,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
         double F_local_z     = ct * rho * pow(Dp, 4) * pow(n_thrust, 2) * Nm;
         ColVector<3> F_local = {0, 0, F_local_z};
-        ColVector<3> F_world = quatrotate(quatconjugate(q), F_local); // TODO
+        ColVector<3> F_world = quatrotate(quatconjugate(q), F_local);  // TODO
         ColVector<3> F_grav  = {0, 0, -g * m};
         ColVector<3> a       = (F_world + F_grav) / m;
 
@@ -228,6 +228,20 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         transform(xs.begin(), xs.end(), orientation.begin(),
                   Drone::stateToEuler<R>);
         return orientation;
+    }
+
+    /** 
+     * @brief   Extract a certain part from the given vector of states.
+     */
+    template <size_t R>
+    static std::vector<ColVector<R>>
+    extractState(const std::vector<VecX_t> &xs,
+                 ColVector<R> (DroneState::*f)() const) {
+        std::vector<EulerAngles> result;
+        result.resize(xs.size());
+        transform(xs.begin(), xs.end(), result.begin(),
+                  [f](const VecX_t &x) { return (DroneState{x}.*f)(); });
+        return result;
     }
 
 #pragma region Controllers......................................................
