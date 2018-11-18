@@ -42,6 +42,13 @@ const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
 /** Weighting matrix for inputs in LQR design. */
 const Matrix<3, 3> R = eye<3>();
 
+/* ------ PI constants altitude controller ---------------------------------- */
+
+/** Proporional altitude controller */
+const double k_alt_p = 0.01;
+/** Integral altitude controller */
+const double k_alt_i = 0;
+
 /* ------ Kalman variance matrices ------------------------------------------ */
 /** @todo   Tune */
 const RowVector<3> varDynamics = {{
@@ -59,11 +66,11 @@ const RowVector<6> varSensors  = hcat(  //
 /** Options for numerical integration for simulation. */
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
-    .t_end   = 20,
-    .epsilon = 1e-5,
-    .h_start = 1e-5,
+    .t_end   = 32,
+    .epsilon = 1e-6,
+    .h_start = 1e-6,
     .h_min   = 1e-10,
-    .maxiter = (unsigned long) 1e5,
+    .maxiter = (unsigned long) 1e6,
 };
 
 }  // namespace Config

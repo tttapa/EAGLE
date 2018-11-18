@@ -19,7 +19,8 @@ int main(int argc, char const *argv[]) {
     Drone drone                  = {std::filesystem::path(home) /
                    "PO-EAGLE/Groups/ANC/MATLAB/Codegen"};
     Drone::Controller controller = {
-        drone.getClampedAttitudeController(clampMin, clampMax, Q, R), drone.uh};
+        drone.getClampedAttitudeController(clampMin, clampMax, Q, R), drone.uh,
+        k_alt_p, k_alt_i};
 
     Drone::VecX_t x0 = drone.getInitialState();
 
@@ -55,6 +56,13 @@ int main(int argc, char const *argv[]) {
         time.begin(), time.end(), refOrientation.begin(),
         [&ref](double t) { return quat2eul(getBlock<0, 4, 0, 1>(ref(t))); });
 
+    // Convert the quaternions of the reference to euler angles
+    vector<EulerAngles> refPosition;
+    refPosition.resize(time.size());
+    transform(
+        time.begin(), time.end(), refPosition.begin(),
+        [&ref](double t) { return DroneOutput{ref(t)}.getPosition(); });
+
 #ifdef PLOT_CONTROLLER
 
     const size_t r = 4;
@@ -64,6 +72,10 @@ int main(int argc, char const *argv[]) {
     plt::subplot(r, c, 1);
     plotResults(time, refOrientation, {0, 3}, {"z", "y", "x"},
                 {"b-", "g-", "r-"}, "Reference orientation");
+    plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
+    plt::subplot(r, c, 2);
+    plotResults(time, refPosition, {0, 3}, {"z", "y", "x"},
+                {"b-", "g-", "r-"}, "Reference position");
     plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
     plt::subplot(r, c, 3);
     plotResults(time, orientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
@@ -108,7 +120,8 @@ int main(int argc, char const *argv[]) {
     if (exportCSV) {
         // Sample/interpolate the simulation result using a fixed time step
         auto sampled = sampleODEResult(result, odeopt.t_start, CSV_Ts, t_end);
-        vector<EulerAngles> sampledOrientation = Drone::statesToEuler(sampled);
+        vector<Quaternion> sampledOrientation =
+            Drone::extractState(sampled, &DroneState::getOrientation);
         vector<ColVector<3>> sampledLocation =
             Drone::extractState(sampled, &DroneState::getPosition);
         // Export to the given output file

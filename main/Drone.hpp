@@ -191,7 +191,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     static std::vector<ColVector<R>>
     extractState(const std::vector<VecX_t> &xs,
                  ColVector<R> (DroneState::*f)() const) {
-        std::vector<EulerAngles> result;
+        std::vector<ColVector<R>> result;
         result.resize(xs.size());
         transform(xs.begin(), xs.end(), result.begin(),
                   [f](const VecX_t &x) { return (DroneState{x}.*f)(); });
@@ -232,15 +232,20 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     class Controller : public DiscreteController<Nx, Nu, Ny> {
       public:
-        Controller(const Attitude::ClampedLQRController &attCtrl, double uh)
+        Controller(const Attitude::ClampedLQRController &attCtrl, double uh,
+                   double k_alt_p, double k_alt_i)
             : DiscreteController<Nx, Nu, Ny>{attCtrl.Ts}, attCtrl{attCtrl},
-              uh(uh) {}
+              uh(uh), k_alt_p(k_alt_p), k_alt_i(k_alt_i) {}
 
         VecU_t operator()(const VecX_t &x, const VecR_t &r) override;
 
       private:
         Attitude::ClampedLQRController attCtrl;
-        double uh;
+        const double uh;
+        double x_alt = 0;
+        const double k_alt_p;
+        const double k_alt_i;
+        // TODO: integral wind-up?
     };
 
 #pragma region Observers........................................................

@@ -32,7 +32,7 @@ TEST(Quaternion, quatrotate) {
         {5},
         {7},
     }};
-    q = q / norm(q);
+    q                     = q / norm(q);
     Matrix<3, 2> v        = {{
         {1, 2},
         {3, 4},
@@ -78,10 +78,17 @@ TEST(Quaternion, eul2quat) {
 }
 
 TEST(Quaternion, quat2eul) {
-    EulerAngles e        = {0.3, 0.7, 0.9};
-    Quaternion q         = eul2quat(e);
-    EulerAngles result   = quat2eul(q);
-    EulerAngles expected = e;
+    EulerAngles e         = {0.3, -0.7, 0.9};
+    Quaternion q          = eul2quat(e);
+    EulerAngles result    = quat2eul(q);
+    EulerAngles expected  = e;
+    Quaternion q_expected = {
+        0.814068885161671,
+        0.450147392727527,
+        -0.244234643193019,
+        0.273877005417802,
+    };
+    ASSERT_TRUE(isAlmostEqual(q, q_expected, 1e-15));
     ASSERT_TRUE(isAlmostEqual(result, expected, 1e-15));
 }
 

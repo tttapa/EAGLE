@@ -344,6 +344,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             double t         = opt.t_start + Ts * i;
             curr_opt.t_start = t;
             curr_opt.t_end   = t + Ts;
+            curr_opt.maxiter = opt.maxiter - result.time.size();
             VecR_t curr_ref  = r(t);
             VecU_t curr_u    = controller(curr_x, curr_ref);
             result.resultCode |= this->simulate(

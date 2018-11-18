@@ -108,10 +108,13 @@ Drone::VecX_t Drone::getInitialState() const {
 Drone::Controller::VecU_t Drone::Controller::
 operator()(const Drone::Controller::VecX_t &x,
            const Drone::Controller::VecR_t &r) {
-    DroneState xx = {x};
+    DroneState xx  = {x};
+    DroneOutput rr = {r};
     DroneControl uu;
     uu.setAttitudeControl(
         attCtrl(xx.getAttitudeState(), getBlock<0, Ny_att, 0, 1>(r)));
-    uu.setThrustControl(uh);
+    double alt_err = rr.getPosition()[2][0] - xx.getPosition()[2][0];
+    x_alt += alt_err * Ts;  // Integral action
+    uu.setThrustControl(uh + k_alt_p * alt_err + k_alt_i * x_alt);
     return uu;
 }
