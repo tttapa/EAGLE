@@ -27,8 +27,10 @@ TEST(FileLoader, LoadMatrixWrongRows) {
         ASSERT_EQ(
             e.what(),
             std::string("Error: number of rows in file doesn't match expected "
-                        "number of rows. "
-                        "Expected: 3 File: 2"));
+                        "number of rows. ") +
+                "(" + (p / "test.matrix").string() +
+                ") "
+                "Expected: 3, File: 2");
     }
 }
 
@@ -42,8 +44,10 @@ TEST(FileLoader, LoadMatrixWrongCols) {
         ASSERT_EQ(e.what(),
                   std::string(
                       "Error: number of columns in file doesn't match expected "
-                      "number of columns. "
-                      "Expected: 4 File: 3"));
+                      "number of columns. ") +
+                      "(" + (p / "test.matrix").string() +
+                      ") "
+                      "Expected: 4, File: 3");
     }
 }
 

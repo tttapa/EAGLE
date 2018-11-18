@@ -10,6 +10,7 @@
 
 #include <Util/AlmostEqual.hpp>
 #include <Util/FileLoader.hpp>
+#include <Util/PerfTimer.hpp>
 
 #include <cassert>
 #include <filesystem>
@@ -103,115 +104,63 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      * @brief   Loads all system matrices and parameters from the respective 
      *          files in the given folder. 
      */
-    void load(const std::filesystem::path &loadPath) {
-        Aa = loadMatrix<Nx_att, Nx_att>(loadPath / "Aa");
-        Ba = loadMatrix<Nx_att, Nu_att>(loadPath / "Ba");
-        Ca = loadMatrix<Ny_att, Nx_att>(loadPath / "Ca");
-        Da = loadMatrix<Ny_att, Nu_att>(loadPath / "Da");
-
-        Ad = loadMatrix<Nx_att, Nx_att>(loadPath / "Ad");
-        Bd = loadMatrix<Nx_att, Nu_att>(loadPath / "Bd");
-        Cd = loadMatrix<Ny_att, Nx_att>(loadPath / "Cd");
-        Dd = loadMatrix<Ny_att, Nu_att>(loadPath / "Dd");
-
-        Ad_r = getBlock<1, Nx_att, 1, Nx_att>(Ad);
-        Bd_r = getBlock<1, Nx_att, 0, Nu_att>(Bd);
-        Cd_r = getBlock<1, Ny_att, 1, Nx_att>(Cd);
-
-        Ts = loadDouble(loadPath / "Ts");
-
-        gamma_n = loadMatrix<3, 3>(loadPath / "gamma_n");
-        gamma_u = loadMatrix<3, 3>(loadPath / "gamma_u");
-        Id      = loadMatrix<3, 3>(loadPath / "I");
-        Id_inv  = loadMatrix<3, 3>(loadPath / "I_inv");
-        k1      = loadDouble(loadPath / "k1");
-        k2      = loadDouble(loadPath / "k2");
-
-        m  = loadDouble(loadPath / "m");
-        ct = loadDouble(loadPath / "ct");
-        Dp = loadDouble(loadPath / "Dp");
-
-        nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
-        uh = nh / k1;
-
-        // TODO
-
-        double Fzh = ct * rho * pow(Dp, 4) * pow(nh, 2) * Nm;
-        double Fg  = -g * m;
-
-        std::cout << "nh = " << nh << std::endl;
-        std::cout << "uh = " << uh << std::endl;
-        std::cout << "Fzh = " << Fzh << std::endl;
-        std::cout << "Fg = " << Fg << std::endl;
-
-        assert(isAlmostEqual(Id_inv, inv(Id), 1e-12));
-    }
+    void load(const std::filesystem::path &loadPath);
 
 #pragma region Continuous Model.................................................
 
     /** 
      * @brief   Calculate the derivative of the state vector, given the current
      *          state x and the current input u.
+     * 
+     * @f$
+     *  \boldsymbol{\dot{q}} = \frac{1}{2} \boldsymbol{q} \otimes 
+     *      \begin{pmatrix} 0 \\ \vec{\omega} \end{pmatrix}
+     * @f$  
+     * 
+     * @f$
+     *  \dot{\vec{\omega}} = \Gamma_n \vec{n} + \Gamma_u \vec{u}
+     *      - I^{-1} \left(\vec{\omega} \times I \vec{\omega} \right)
+     * @f$
+     * 
+     * @f$
+     *  \dot{\vec{n}} = k_2 \left(k_1 \vec{u} - \vec{n}\right)
+     * @f$ 
+     * 
+     * @f$
+     *  \dot{\vec{v}} = \boldsymbol{q} \star 
+     *      \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix} 
+     *      \frac{F_{z'}}{m} - 
+     *      \begin{pmatrix} 0 \\ 0 \\ g \end{pmatrix}
+     * \quad @f$  where @f$ \star @f$ is the quaternion rotation of a vector and 
+     *      @f$ F_{z'} = C_t \rho Dp^4 n_t^2 N_m @f$ is the thrust along the 
+     *      local z-axis
+     * 
+     * @f$
+     *  \dot{\vec{x}} = \vec{v}
+     * @f$
+     * 
+     * @f$
+     *  \dot{n_t} = k_2 \left(k_1 u_t - n_t\right)
+     * @f$
+     * 
      * @param   x 
      *          The current state of the drone.
      * @param   u 
      *          The current control input u.
      * @return  The derivative of the state, x_dot.
      */
-    VecX_t operator()(const VecX_t &x, const VecU_t &u) override {
-        DroneState xx   = {x};
-        DroneControl uu = {u};
-        DroneState x_dot;
+    VecX_t operator()(const VecX_t &x, const VecU_t &u) override;
 
-        // Attitude
-        Quaternion q       = xx.getOrientation();
-        ColVector<3> omega = xx.getAngularVelocity();
-        ColVector<3> n     = xx.getMotorSpeed();
-        ColVector<3> u_att = uu.getAttitudeControl();
+    /** 
+     * @brief   Get the sensor output of the drone model.
+     */
+    VecY_t getOutput(const VecX_t &x, const VecU_t &u) override;
 
-        Quaternion q_omega = vcat(zeros<1, 1>(), omega);
-        x_dot.setOrientation(0.5 * quatmultiply(q, q_omega));
-        x_dot.setAngularVelocity(gamma_n * n + gamma_u * u_att -
-                                 Id_inv * cross(omega, Id * omega));
-        x_dot.setMotorSpeed(k2 * (k1 * u_att - n));
-
-        // Navigation/Altitude
-        ColVector<3> v  = xx.getVelocity();
-        double n_thrust = xx.getThrustMotorSpeed();
-        double u_thrust = uu.getThrustControl();
-
-        double F_local_z     = ct * rho * pow(Dp, 4) * pow(n_thrust, 2) * Nm;
-        ColVector<3> F_local = {0, 0, F_local_z};
-        ColVector<3> F_world = quatrotate(quatconjugate(q), F_local);  // TODO
-        ColVector<3> F_grav  = {0, 0, -g * m};
-        ColVector<3> a       = (F_world + F_grav) / m;
-
-        x_dot.setVelocity(a);
-        x_dot.setPosition(v);
-        x_dot.setThrustMotorSpeed(k2 * (k1 * u_thrust - n_thrust));
-
-        return x_dot;
-    }
-
-    VecY_t getOutput(const VecX_t &x, const VecU_t &u) override {
-        DroneState xx   = {x};
-        DroneControl uu = {u};
-        ColVector<Ny_att> y_att =
-            Ca * xx.getAttitudeState() + Da * uu.getAttitudeControl();
-        ColVector<Ny_nav> y_nav = xx.getPosition();
-        return DroneOutput{y_att, y_nav};
-    }
-
-    VecX_t getInitialState() const {
-        DroneState xx = {};
-        xx.setOrientation(eul2quat({0, 0, 0}));
-        xx.setAngularVelocity({0, 0, 0});
-        xx.setMotorSpeed({0, 0, 0});
-        xx.setVelocity({0, 0, 0});
-        xx.setPosition({0, 0, 0});
-        xx.setThrustMotorSpeed(nh);
-        return xx;
-    }
+    /**
+     * @brief   Get the initial state of the drone. (Upright orientation and 
+     *          hovering thrust.)
+     */
+    VecX_t getInitialState() const;
 
     /** 
      * @brief   Get the rotation in Euler angles, given a state vector x.
@@ -287,14 +236,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
             : DiscreteController<Nx, Nu, Ny>{attCtrl.Ts}, attCtrl{attCtrl},
               uh(uh) {}
 
-        VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
-            DroneState xx = {x};
-            DroneControl uu;
-            uu.setAttitudeControl(
-                attCtrl(xx.getAttitudeState(), getBlock<0, Ny_att, 0, 1>(r)));
-            uu.setThrustControl(uh);
-            return uu;
-        }
+        VecU_t operator()(const VecX_t &x, const VecR_t &r) override;
 
       private:
         Attitude::ClampedLQRController attCtrl;
