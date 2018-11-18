@@ -59,6 +59,10 @@ class DroneControl {
     DroneControl(const ColVector<4> &u) : u{u} {}
     ColVector<3> getAttitudeControl() const { return getBlock<0, 3, 0, 1>(u); }
     double getThrustControl() const { return u[3][0]; }
+    void setAttitudeControl(const ColVector<3> &u_att) {
+        assignBlock<0, 3, 0, 1>(u) = u_att;
+    }
+    void setThrustControl(double u_thrust) { u[3][0] = u_thrust; }
     operator ColVector<4>() const { return u; }
 };
 
@@ -118,12 +122,24 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
         gamma_n = loadMatrix<3, 3>(loadPath / "gamma_n");
         gamma_u = loadMatrix<3, 3>(loadPath / "gamma_u");
-        I       = loadMatrix<3, 3>(loadPath / "I");
-        I_inv   = loadMatrix<3, 3>(loadPath / "I_inv");
+        Id      = loadMatrix<3, 3>(loadPath / "I");
+        Id_inv  = loadMatrix<3, 3>(loadPath / "I_inv");
         k1      = loadDouble(loadPath / "k1");
         k2      = loadDouble(loadPath / "k2");
 
-        assert(isAlmostEqual(I_inv, inv(I), 1e-12));
+        uh = nh / k1;
+
+        // TODO
+
+        double Fzh = ct * rho * pow(Dp, 4) * pow(nh, 2) * Nm;
+        double Fg  = -g * m;
+
+        std::cout << "nh = " << nh << std::endl;
+        std::cout << "uh = " << uh << std::endl;
+        std::cout << "Fzh = " << Fzh << std::endl;
+        std::cout << "Fg = " << Fg << std::endl;
+
+        assert(isAlmostEqual(Id_inv, inv(Id), 1e-12));
     }
 
 #pragma region Continuous Model.................................................
@@ -151,7 +167,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         Quaternion q_omega = vcat(zeros<1, 1>(), omega);
         x_dot.setOrientation(0.5 * quatmultiply(q, q_omega));
         x_dot.setAngularVelocity(gamma_n * n + gamma_u * u_att -
-                                 I_inv * cross(omega, I * omega));
+                                 Id_inv * cross(omega, Id * omega));
         x_dot.setMotorSpeed(k2 * (k1 * u_att - n));
 
         // Navigation/Altitude
@@ -159,7 +175,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         double n_thrust = xx.getThrustMotorSpeed();
         double u_thrust = uu.getThrustControl();
 
-        double F_local_z     = ct * rho * pow(Dp, 4) * pow(n_thrust, 2);
+        double F_local_z     = ct * rho * pow(Dp, 4) * pow(n_thrust, 2) * Nm;
         ColVector<3> F_local = {0, 0, F_local_z};
         ColVector<3> F_world = quatrotate(q, F_local);
         ColVector<3> F_grav  = {0, 0, -g * m};
@@ -179,6 +195,39 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
             Ca * xx.getAttitudeState() + Da * uu.getAttitudeControl();
         ColVector<Ny_nav> y_nav = xx.getPosition();
         return DroneOutput{y_att, y_nav};
+    }
+
+    VecX_t getInitialState() const {
+        DroneState xx = {};
+        xx.setOrientation(eul2quat({0, 0, 0}));
+        xx.setAngularVelocity({0, 0, 0});
+        xx.setMotorSpeed({0, 0, 0});
+        xx.setVelocity({0, 0, 0});
+        xx.setPosition({0, 0, 0});
+        xx.setThrustMotorSpeed(nh);
+        return xx;
+    }
+
+    /** 
+     * @brief   Get the rotation in Euler angles, given a state vector x.
+     */
+    template <size_t R>
+    static EulerAngles stateToEuler(const ColVector<R> &x) {
+        Quaternion q = getBlock<0, 4, 0, 1>(x);
+        return quat2eul(q);
+    }
+
+    /** 
+     * @brief   Convert the vector of states to a vector of Euler angles.
+     */
+    template <size_t R>
+    static std::vector<EulerAngles>
+    statesToEuler(const std::vector<ColVector<R>> &xs) {
+        std::vector<EulerAngles> orientation;
+        orientation.resize(xs.size());
+        transform(xs.begin(), xs.end(), orientation.begin(),
+                  Drone::stateToEuler<R>);
+        return orientation;
     }
 
 #pragma region Controllers......................................................
@@ -206,12 +255,32 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      * @brief   TODO
      */
     Attitude::ClampedLQRController
-    getClampedDiscreteController(const ColVector<Nu_att> &clampMin,
+    getClampedAttitudeController(const ColVector<Nu_att> &clampMin,
                                  const ColVector<Nu_att> &clampMax,
                                  const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                                  const Matrix<Nu_att, Nu_att> &R) const {
         return {getAttitudeController(Q, R), clampMin, clampMax};
     }
+
+    class Controller : public DiscreteController<Nx, Nu, Ny> {
+      public:
+        Controller(const Attitude::ClampedLQRController &attCtrl, double uh)
+            : DiscreteController<Nx, Nu, Ny>{attCtrl.Ts}, attCtrl{attCtrl},
+              uh(uh) {}
+
+        VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
+            DroneState xx = {x};
+            DroneControl uu;
+            uu.setAttitudeControl(
+                attCtrl(xx.getAttitudeState(), getBlock<0, Ny_att, 0, 1>(r)));
+            uu.setThrustControl(uh);
+            return uu;
+        }
+
+      private:
+        Attitude::ClampedLQRController attCtrl;
+        double uh;
+    };
 
 #pragma region Observers........................................................
 
@@ -331,8 +400,8 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     Matrix<3, 3> gamma_n = {};
     Matrix<3, 3> gamma_u = {};
-    Matrix<3, 3> I       = {};
-    Matrix<3, 3> I_inv   = {};
+    Matrix<3, 3> Id      = {};
+    Matrix<3, 3> Id_inv  = {};
     double k1            = 0;
     double k2            = 0;
 
@@ -342,4 +411,8 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     const double rho = 1.225;  ///< kg/m3        air density (nominal, at 15C,
                                ///               sea level)
     const double Dp = 12.0 * 0.0254;  ///< m       propeller diameter (12")
+    const int Nm    = 4;              ///< -            number of motors
+
+    double nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
+    double uh = 0;
 };

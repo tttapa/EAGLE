@@ -78,7 +78,11 @@ include_directories("../main")
 file(GLOB_RECURSE MAIN "../main/*.cpp" "../main/*.c")
 add_executable(main ${MAIN})
 target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
-target_link_libraries(main source ${PYTHON_LIBRARIES} lapacke)
+target_link_libraries(main 
+                      source
+                      ${PYTHON_LIBRARIES}
+                      lapacke
+                      stdc++fs)
 
 add_definitions(-DPLOT_CONTROLLER)
 add_definitions(-DPLOT_ACTUAL_VS_ESTIMATED_STATES)

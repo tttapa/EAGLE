@@ -1,15 +1,12 @@
 #pragma once
 
 #include "Def.hpp"
+#include "LQRController.hpp"  // Nx, Nu, Ny
 #include <Model/Kalman.hpp>
 #include <Quaternions/QuaternionStateAddSub.hpp>
 #include <Quaternions/ReducedQuaternion.hpp>
 
 namespace Attitude {
-
-constexpr size_t Nx = Nx_att;
-constexpr size_t Nu = Nu_att;
-constexpr size_t Ny = Ny_att;
 
 /**
  * @brief   The discrete Kalman filter/observer for the drone.

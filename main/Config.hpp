@@ -28,13 +28,7 @@ extern const bool clampController;
 extern const ColVector<3> clampMin;
 extern const ColVector<3> clampMax;
 
-/* ------ Define drone parameters ------------------------------------------- */
-constexpr Drone drone = {};
-
 /* ------ LQR weighting matrices Q and R ------------------------------------ */
-constexpr double u_att_max = 1 - drone.p.nh / drone.p.k1;
-constexpr double n_att_max = drone.p.k1 * u_att_max;
-
 extern const RowVector<3> Qn;
 extern const RowVector<3> Qomega;
 extern const RowVector<3> Qq;

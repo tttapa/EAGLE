@@ -31,8 +31,6 @@ const ColVector<3> clampMax = 1.0 / 3 * ones<3, 1>();
 
 /* ------ LQR weighting matrices Q and R ------------------------------------ */
 
-static auto invsq = [](double x) { return 1.0 / (x * x); };
-
 const RowVector<3> Qq     = {{789.264, 789.264, 650.684}};
 const RowVector<3> Qomega = {{0.384275, 0.384275, 9.55652e-05}};
 const RowVector<3> Qn     = {{2.425268e-06, 2.425268e-06, 2.316292e-06}};

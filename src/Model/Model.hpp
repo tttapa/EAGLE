@@ -8,6 +8,8 @@
 #include <Util/Time.hpp>
 #include <Util/TimeFunction.hpp>
 
+#include <cassert>
+
 /** 
  * @brief   An abstract class for general models that can be simulated.
  */
@@ -138,13 +140,6 @@ class Model {
         ConstantTimeFunctionT<VecU_t> fu = {u};
         return simulate(timeresult, xresult, fu, x_start, opt);
     }
-
-    /** 
-     * @brief   Simulate the model with the given continuous controller.
-     */
-    virtual SimulationResult
-    simulate(ContinuousController<Nx, Nu, Ny> &controller, ReferenceFunction &r,
-             VecX_t x_start, const AdaptiveODEOptions &opt) = 0;
 
     /** 
      * @brief   Simulate the model with the given discrete controller.
@@ -311,40 +306,6 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             return model(x, u);
         };
         return dormandPrince(timeresult, xresult, f, x_start, opt);
-    }
-
-    /**
-     * @brief   Simulate the closed-loop continuous model using the given 
-     *          state-less continuous controller, starting from the given
-     *          initial state, evaluating the given input function, 
-     *          using the given integration options.
-     * 
-     * @param   controller
-     *          The state-less continuous controller that produces a control 
-     *          output u, given the system state x and reference state r.
-     * @param   r
-     *          The reference function that can be evaluated at any given time
-     *          in the integration interval.
-     * @param   x_start
-     *          The inital state, which is the initial condition for the ODE
-     *          solver.
-     * @param   opt
-     *          A struct of options for the ODE solver.
-     * 
-     * @return
-     *          A struct containing a vector of time points, and a vector of
-     *          states that have equal lenghts.  
-     *          A result code is given as well, to indicate whether the 
-     *          integration was successful.
-     */
-    SimulationResult simulate(ContinuousController<Nx, Nu, Ny> &controller,
-                              ReferenceFunction &r, VecX_t x_start,
-                              const AdaptiveODEOptions &opt) override {
-        ContinuousModel &model = *this;
-        auto f = [&model, &controller, &r](double t, const VecX_t &x) {
-            return model(x, controller(x, r(t)));
-        };
-        return dormandPrince(f, x_start, opt);
     }
 
     /**
