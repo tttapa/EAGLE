@@ -46,6 +46,12 @@ TEST(Array, equality) {
     EXPECT_TRUE(a != c);
 }
 
+TEST(Array, operatorT) {
+    Array<int, 1> a = {42};
+    int i = a;
+    EXPECT_EQ(i, 42);
+}
+
 // -------------------------------------------------------------------------- //
 
 TEST(generateArray, simple) {

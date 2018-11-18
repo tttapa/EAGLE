@@ -45,6 +45,18 @@ TEST(Matrix, notEquals) {
     ASSERT_FALSE(b == a);
 }
 
+TEST(Matrix, operatorTMatrix) {
+    TMatrix<int, 1, 1> a = {42};
+    int i = a;
+    ASSERT_EQ(i, 42);
+}
+
+TEST(Matrix, operatorTMatrixConst) {
+    const TMatrix<int, 1, 1> a = {42};
+    int i = a;  
+    ASSERT_EQ(i, 42);
+}
+
 TEST(Matrix, multiply) {
     TMatrix<int, 3, 2> a = {{
         {11, 12},

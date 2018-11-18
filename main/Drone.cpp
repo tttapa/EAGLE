@@ -113,8 +113,13 @@ operator()(const Drone::Controller::VecX_t &x,
     DroneControl uu;
     uu.setAttitudeControl(
         attCtrl(xx.getAttitudeState(), getBlock<0, Ny_att, 0, 1>(r)));
-    double alt_err = rr.getPosition()[2][0] - xx.getPosition()[2][0];
-    x_alt += alt_err * Ts;  // Integral action
-    uu.setThrustControl(uh + k_alt_p * alt_err + k_alt_i * x_alt);
+    ColVector<3> alt_err = {{
+        -xx.getThrustMotorSpeed(),                        // n
+        rr.getPosition()[2][0] - xx.getPosition()[2][0],  // z
+        -xx.getVelocity()[2][0],                          // v
+    }};
+    integral_alt += alt_err * Ts;  // Integral action
+    double u_att = K_alt_p * alt_err + K_alt_i * integral_alt;
+    uu.setThrustControl(uh + u_att);
     return uu;
 }

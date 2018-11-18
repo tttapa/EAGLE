@@ -1,6 +1,32 @@
 #pragma once
 
 #include <cstddef>
+#include <type_traits>
+
+template <class T, size_t N>
+struct Array;
+
+template <class T>
+struct getArrayTypeBase {
+    using type = void;
+};
+template <class T, size_t N>
+struct getArrayTypeBase<Array<T, N>> {
+    using type = T;
+};
+template <typename T>
+struct getArrayType : getArrayTypeBase<T> {};
+
+template <class T>
+struct getArrayLengthBase {
+    static constexpr size_t length = 0;
+};
+template <class T, size_t N>
+struct getArrayLengthBase<Array<T, N>> {
+    static constexpr size_t length = N;
+};
+template <typename T>
+struct getArrayLength : getArrayLengthBase<T> {};
 
 template <class T, size_t N>
 struct Array {
@@ -62,5 +88,61 @@ struct Array {
         return !(*this == rhs);
     }
 
+    /**
+     * @brief   Implicit conversion from Array<T, 1> to T&.
+     */
+    template <bool EnableBool = true>
+    operator typename std::add_lvalue_reference<
+        typename std::enable_if<N == 1 && EnableBool, T>::type>::type() {
+        return data[0];
+    }
+
+    /**
+     * @brief   Implicit conversion from const Array<T, 1> to const T&.
+     */
+    template <bool EnableBool = true>
+    operator typename std::add_lvalue_reference<typename std::add_const<
+        typename std::enable_if<N == 1 && EnableBool, T>::type>::type>::type()
+        const {
+        return data[0];
+    }
+
+    /**
+     * @brief   Implicit conversion from Array<Array<T, 1>, 1> to T&.
+     */
+    template <bool EnableBool = true>
+    operator typename std::add_lvalue_reference<typename std::enable_if<
+        N == 1 && getArrayLength<T>::length == 1 && EnableBool,
+        typename getArrayType<T>::type>::type>::type() {
+        return data[0][0];
+    }
+
+    /**
+     * @brief   Implicit conversion from const Array<Array<T, 1>, 1> to const T&.
+     */
+    template <bool EnableBool = true>
+    operator typename std::add_lvalue_reference<
+        typename std::add_const<typename std::enable_if<
+            N == 1 && getArrayLength<T>::length == 1 && EnableBool,
+            typename getArrayType<T>::type>::type>::type>::type() const {
+        return data[0][0];
+    }
+
+    // template <
+    //     typename = std::enable_if<N == 1 && getArrayLength<T>::length == 1>>
+    // operator typename std::add_lvalue_reference<
+    //     typename getArrayType<T>::type>::type() {
+    //     return data[0][0];
+    // }
+    //
+    // template <
+    //     typename = std::enable_if<N == 1 && getArrayLength<T>::length == 1>>
+    // operator typename std::add_lvalue_reference<
+    //     typename std::add_const<typename getArrayType<T>::type>::type>::type()
+    //     const {
+    //     return data[0][0];
+    // }
+
     static constexpr size_t length = N;
+    using type                     = T;
 };

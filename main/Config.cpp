@@ -45,9 +45,9 @@ const Matrix<3, 3> R = eye<3>();
 /* ------ PI constants altitude controller ---------------------------------- */
 
 /** Proporional altitude controller */
-const double k_alt_p = 0.01;
+const Matrix<1, 3> K_alt_p = {0.001, 0.5, 0.25};  // n, z, v
 /** Integral altitude controller */
-const double k_alt_i = 0;
+const Matrix<1, 3> K_alt_i = {0, 0, 0};
 
 /* ------ Kalman variance matrices ------------------------------------------ */
 /** @todo   Tune */

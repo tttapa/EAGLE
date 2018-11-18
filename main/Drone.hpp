@@ -233,18 +233,18 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     class Controller : public DiscreteController<Nx, Nu, Ny> {
       public:
         Controller(const Attitude::ClampedLQRController &attCtrl, double uh,
-                   double k_alt_p, double k_alt_i)
+                   const Matrix<1, 3> &K_alt_p, const Matrix<1, 3> &K_alt_i)
             : DiscreteController<Nx, Nu, Ny>{attCtrl.Ts}, attCtrl{attCtrl},
-              uh(uh), k_alt_p(k_alt_p), k_alt_i(k_alt_i) {}
+              uh(uh), K_alt_p(K_alt_p), K_alt_i(K_alt_i) {}
 
         VecU_t operator()(const VecX_t &x, const VecR_t &r) override;
 
       private:
         Attitude::ClampedLQRController attCtrl;
         const double uh;
-        double x_alt = 0;
-        const double k_alt_p;
-        const double k_alt_i;
+        ColVector<3> integral_alt;
+        const Matrix<1, 3> K_alt_p;
+        const Matrix<1, 3> K_alt_i;
         // TODO: integral wind-up?
     };
 

@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]) {
                    "PO-EAGLE/Groups/ANC/MATLAB/Codegen"};
     Drone::Controller controller = {
         drone.getClampedAttitudeController(clampMin, clampMax, Q, R), drone.uh,
-        k_alt_p, k_alt_i};
+        K_alt_p, K_alt_i};
 
     Drone::VecX_t x0 = drone.getInitialState();
 

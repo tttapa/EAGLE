@@ -38,8 +38,8 @@ extern const Matrix<9, 9> Q;
 extern const Matrix<3, 3> R;
 
 /* ------ PI constants altitude controller ---------------------------------- */
-extern const double k_alt_p;
-extern const double k_alt_i;
+extern const Matrix<1, 3> K_alt_p;
+extern const Matrix<1, 3> K_alt_i;
 
 /* ------ Kalman variance matrices ------------------------------------------ */
 extern const RowVector<3> varDynamics;
