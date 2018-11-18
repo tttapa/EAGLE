@@ -9,8 +9,9 @@ namespace Config {
 // Home directory
 const std::string home = getenv("HOME");
 
-// Filename for simulation output
-extern const std::string outputFile;
+// Filenames for simulation output
+extern const std::string rotationCSVFile;
+extern const std::string locationCSVFile;
 // Export the simulation data as CSV.
 extern const bool exportCSV;
 // Sample frequency for CSV output (fps).

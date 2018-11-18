@@ -4,9 +4,11 @@ namespace Config {
 
 /* ------ CSV export settings ----------------------------------------------- */
 
-/** Filename for simulation output. */
-const std::string outputFile =
+/** Filenames for simulation output. */
+const std::string rotationCSVFile =
     home + "/PO-EAGLE/Groups/ANC/Blender/Animation-Data/rotation.csv";
+const std::string locationCSVFile =
+    home + "/PO-EAGLE/Groups/ANC/Blender/Animation-Data/location.csv";
 /** Export the simulation data as CSV. */
 const bool exportCSV = true;
 /** Sample frequency for CSV output (fps). */
@@ -57,11 +59,11 @@ const RowVector<6> varSensors  = hcat(  //
 /** Options for numerical integration for simulation. */
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
-    .t_end   = 10,
-    .epsilon = 1e-6,
-    .h_start = 1e-2,
-    .h_min   = 1e-6,
-    .maxiter = (unsigned long) 1e6,
+    .t_end   = 20,
+    .epsilon = 1e-5,
+    .h_start = 1e-5,
+    .h_min   = 1e-10,
+    .maxiter = (unsigned long) 1e5,
 };
 
 }  // namespace Config

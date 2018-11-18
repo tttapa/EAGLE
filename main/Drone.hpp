@@ -177,7 +177,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
         double F_local_z     = ct * rho * pow(Dp, 4) * pow(n_thrust, 2) * Nm;
         ColVector<3> F_local = {0, 0, F_local_z};
-        ColVector<3> F_world = quatrotate(q, F_local);
+        ColVector<3> F_world = quatrotate(quatconjugate(q), F_local); // TODO
         ColVector<3> F_grav  = {0, 0, -g * m};
         ColVector<3> a       = (F_world + F_grav) / m;
 
