@@ -60,7 +60,7 @@ template <class T, size_t N>
 constexpr TMatrix<T, N, N> Tdiag(const TColVector<T, N> &diagElements) {
     TMatrix<T, N, N> matrix = {};
     for (size_t i = 0; i < N; ++i)
-        matrix[i][i] = diagElements[i][0];
+        matrix[i][i] = diagElements[i];
     return matrix;
 }
 
@@ -209,7 +209,7 @@ template <class T, size_t R>
 constexpr double normsq(const TRowVector<T, R> &rowvector) {
     double sumsq = 0;
     for (size_t r = 0; r < R; ++r)
-        sumsq += rowvector[r][0] * rowvector[r][0];
+        sumsq += rowvector[r] * rowvector[r];
     return sumsq;
 }
 
@@ -345,9 +345,9 @@ template <class T>
 constexpr TColVector<T, 3> cross(const TColVector<T, 3> &u,
                                  const TColVector<T, 3> &v) {
     return {{
-        {u[1][0] * v[2][0] - u[2][0] * v[1][0]},
-        {u[2][0] * v[0][0] - u[0][0] * v[2][0]},
-        {u[0][0] * v[1][0] - u[1][0] * v[0][0]},
+        {u[1] * v[2] - u[2] * v[1]},
+        {u[2] * v[0] - u[0] * v[2]},
+        {u[0] * v[1] - u[1] * v[0]},
     }};
 }
 

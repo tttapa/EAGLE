@@ -114,9 +114,9 @@ operator()(const Drone::Controller::VecX_t &x,
     uu.setAttitudeControl(
         attCtrl(xx.getAttitudeState(), getBlock<0, Ny_att, 0, 1>(r)));
     ColVector<3> alt_err = {{
-        -xx.getThrustMotorSpeed(),                        // n
-        rr.getPosition()[2][0] - xx.getPosition()[2][0],  // z
-        -xx.getVelocity()[2][0],                          // v
+        -xx.getThrustMotorSpeed(),                  // n
+        rr.getPosition()[2] - xx.getPosition()[2],  // z
+        -xx.getVelocity()[2],                       // v
     }};
     integral_alt += alt_err * Ts;  // Integral action
     double u_att = K_alt_p * alt_err + K_alt_i * integral_alt;

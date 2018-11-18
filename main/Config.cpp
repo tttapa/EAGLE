@@ -66,7 +66,7 @@ const RowVector<6> varSensors  = hcat(  //
 /** Options for numerical integration for simulation. */
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
-    .t_end   = 32,
+    .t_end   = 16,
     .epsilon = 1e-6,
     .h_start = 1e-6,
     .h_min   = 1e-10,

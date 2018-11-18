@@ -84,6 +84,25 @@ struct Array {
         return *this;
     }
 
+    constexpr Array<T, N> operator-(const Array<T, N> &rhs) const {
+        Array<T, N> result = *this;
+        result -= rhs;
+        return result;
+    }
+
+    constexpr Array<T, N> &operator-=(const Array<T, N> &rhs) {
+        for (size_t i = 0; i < N; ++i)
+            (*this)[i] -= rhs[i];
+        return *this;
+    }
+
+    constexpr Array<T, N> operator-() const {
+        Array<T, N> result = *this;
+        for (size_t i = 0; i < N; ++i)
+            (result)[i] = -(result)[i];
+        return result;
+    }
+
     constexpr bool operator!=(const Array<T, N> &rhs) const {
         return !(*this == rhs);
     }
@@ -127,21 +146,6 @@ struct Array {
             typename getArrayType<T>::type>::type>::type>::type() const {
         return data[0][0];
     }
-
-    // template <
-    //     typename = std::enable_if<N == 1 && getArrayLength<T>::length == 1>>
-    // operator typename std::add_lvalue_reference<
-    //     typename getArrayType<T>::type>::type() {
-    //     return data[0][0];
-    // }
-    //
-    // template <
-    //     typename = std::enable_if<N == 1 && getArrayLength<T>::length == 1>>
-    // operator typename std::add_lvalue_reference<
-    //     typename std::add_const<typename getArrayType<T>::type>::type>::type()
-    //     const {
-    //     return data[0][0];
-    // }
 
     static constexpr size_t length = N;
     using type                     = T;

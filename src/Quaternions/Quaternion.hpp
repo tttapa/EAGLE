@@ -6,23 +6,19 @@ using Quaternion = ColVector<4>;
 
 inline Quaternion quatmultiply(const Quaternion &q, const Quaternion &r) {
     return {{
-        {r[0][0] * q[0][0] - r[1][0] * q[1][0] - r[2][0] * q[2][0] -
-         r[3][0] * q[3][0]},
-        {r[0][0] * q[1][0] + r[1][0] * q[0][0] - r[2][0] * q[3][0] +
-         r[3][0] * q[2][0]},
-        {r[0][0] * q[2][0] + r[1][0] * q[3][0] + r[2][0] * q[0][0] -
-         r[3][0] * q[1][0]},
-        {r[0][0] * q[3][0] - r[1][0] * q[2][0] + r[2][0] * q[1][0] +
-         r[3][0] * q[0][0]},
+        {r[0] * q[0] - r[1] * q[1] - r[2] * q[2] - r[3] * q[3]},
+        {r[0] * q[1] + r[1] * q[0] - r[2] * q[3] + r[3] * q[2]},
+        {r[0] * q[2] + r[1] * q[3] + r[2] * q[0] - r[3] * q[1]},
+        {r[0] * q[3] - r[1] * q[2] + r[2] * q[1] + r[3] * q[0]},
     }};
 }
 
 inline Quaternion quatconjugate(const Quaternion &q) {
     return {{
-        {q[0][0]},
-        {-q[1][0]},
-        {-q[2][0]},
-        {-q[3][0]},
+        {q[0]},
+        {-q[1]},
+        {-q[2]},
+        {-q[3]},
     }};
 }
 
@@ -33,9 +29,9 @@ inline Quaternion quatDifference(const Quaternion &p, const Quaternion &q) {
 using EulerAngles = ColVector<3>;
 
 inline Quaternion eul2quat(const EulerAngles &eulerAngles) {
-    double phi   = eulerAngles[2][0];
-    double theta = eulerAngles[1][0];
-    double psi   = eulerAngles[0][0];
+    double phi   = eulerAngles[2];
+    double theta = eulerAngles[1];
+    double psi   = eulerAngles[0];
 
     double a = phi / 2;
     double b = theta / 2;
@@ -50,10 +46,10 @@ inline Quaternion eul2quat(const EulerAngles &eulerAngles) {
 }
 
 inline EulerAngles quat2eul(const Quaternion &q) {
-    const double &q0 = q[0][0];
-    const double &q1 = q[1][0];
-    const double &q2 = q[2][0];
-    const double &q3 = q[3][0];
+    const double &q0 = q[0];
+    const double &q1 = q[1];
+    const double &q2 = q[2];
+    const double &q3 = q[3];
 
     const double phi =
         atan2(2.0 * (q0 * q1 + q2 * q3), 1.0 - 2.0 * (q1 * q1 + q2 * q2));
@@ -68,10 +64,10 @@ static inline double sq(double r) { return r * r; }
 
 template <size_t C>
 inline Matrix<3, C> quatrotate(const Quaternion &q, const Matrix<3, C> &v) {
-    const double &q0 = q[0][0];
-    const double &q1 = q[1][0];
-    const double &q2 = q[2][0];
-    const double &q3 = q[3][0];
+    const double &q0 = q[0];
+    const double &q1 = q[1];
+    const double &q2 = q[2];
+    const double &q3 = q[3];
     Matrix<3, 3> M   = {{
         {
             1 - 2 * sq(q2) - 2 * sq(q3),

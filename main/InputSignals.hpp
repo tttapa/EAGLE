@@ -7,7 +7,7 @@
  */
 struct TestReferenceFunction : public TimeFunctionT<ColVector<Ny>> {
     ColVector<Ny> operator()(double t) override {
-        constexpr double m = 0.5;
+        constexpr double m = 0.4;
 
         Quaternion q = qu;
         if (t >= m * 1 && t < m * 3)
@@ -24,14 +24,14 @@ struct TestReferenceFunction : public TimeFunctionT<ColVector<Ny>> {
         if (t >= m * 21 && t < m * 23)
             q = quatmultiply(q, quatconjugate(qz));
 
-        if (t >= m * 25 && t < m * 28)
+        if (t >= m * 27 && t < m * 30)
             q = quatmultiply(q, qy);
-        if (t >= m * 26 && t < m * 29)
+        if (t >= m * 28 && t < m * 31)
             q = quatmultiply(q, qx);
 
-        if (t >= m * 31 && t < m * 34)
+        if (t >= m * 33 && t < m * 36)
             q = quatmultiply(q, quatconjugate(qx));
-        if (t >= m * 32 && t < m * 35)
+        if (t >= m * 34 && t < m * 37)
             q = quatmultiply(q, quatconjugate(qy));
 
         DroneOutput rr;

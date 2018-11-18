@@ -21,7 +21,7 @@ std::vector<T> extractRow(const std::vector<TColVector<T, N>> &in, size_t row) {
     std::vector<T> out;
     out.reserve(in.size());
     for (const auto &el : in)
-        out.push_back(el[row][0]);
+        out.push_back(el[row]);
     return out;
 }
 

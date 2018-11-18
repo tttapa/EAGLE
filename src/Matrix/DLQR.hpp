@@ -17,8 +17,8 @@ template <size_t N>
 Balance_result_GEP<N> balance(const Matrix<N, N> &A, const Matrix<N, N> &B) {
     Balance_result_GEP<N> result = {eye<N>(), eye<N>(), A, B};
 
-    double *p_balanced_mat  = &result.balanced_matrix[0][0];
-    double *p_balanced_mat2 = &result.balanced_matrix2[0][0];
+    double *p_balanced_mat  = toArrayPointer(result.balanced_matrix);
+    double *p_balanced_mat2 = toArrayPointer(result.balanced_matrix2);
 
     char job = 'B';
 
@@ -37,8 +37,8 @@ Balance_result_GEP<N> balance(const Matrix<N, N> &A, const Matrix<N, N> &B) {
         throw std::runtime_error(std::string("LAPACKE_dggbal_work: info = ") +
                                  std::to_string(info));
 
-    double *p_balancing_mat  = &result.balancing_matrix[0][0];
-    double *p_balancing_mat2 = &result.balancing_matrix2[0][0];
+    double *p_balancing_mat  = toArrayPointer(result.balancing_matrix);
+    double *p_balancing_mat2 = toArrayPointer(result.balancing_matrix2);
 
     info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, job, 'L', n, ilo, ihi, plscale,
                           prscale, n, p_balancing_mat, n);
@@ -57,15 +57,15 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
     lapack_int nn = Nx;
 
     Matrix<Nx, Nx> aa = A;
-    double *paa       = &aa[0][0];
+    double *paa       = toArrayPointer(aa);
 
     Matrix<Nx, Nx> bb = B;
-    double *pbb       = &bb[0][0];
+    double *pbb       = toArrayPointer(bb);
 
     Matrix<Nx, Nx> QQ = eye<Nx>();
-    double *pqq       = &QQ[0][0];
+    double *pqq       = toArrayPointer(QQ);
     Matrix<Nx, Nx> ZZ = eye<Nx>();
-    double *pzz       = &ZZ[0][0];
+    double *pzz       = toArrayPointer(ZZ);
     double alphar[Nx];
     double alphai[Nx];
     double betar[Nx];

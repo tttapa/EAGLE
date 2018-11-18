@@ -30,7 +30,7 @@ class DroneState {
     ColVector<3> getMotorSpeed() const { return getBlock<7, 10, 0, 1>(x); }
     ColVector<3> getVelocity() const { return getBlock<10, 13, 0, 1>(x); }
     ColVector<3> getPosition() const { return getBlock<13, 16, 0, 1>(x); }
-    double getThrustMotorSpeed() const { return x[16][0]; }
+    double getThrustMotorSpeed() const { return x[16]; }
     ColVector<Nx_nav> getNavigationState() const {
         return getBlock<Nx_att, Nx, 0, 1>(x);
     }
@@ -48,7 +48,7 @@ class DroneState {
     void setPosition(const ColVector<3> &z) {
         assignBlock<13, 16, 0, 1>(x) = z;
     }
-    void setThrustMotorSpeed(double t) { x[16][0] = t; }
+    void setThrustMotorSpeed(double t) { x[16] = {t}; }
     operator ColVector<17>() const { return x; }
 };
 
@@ -59,11 +59,11 @@ class DroneControl {
     DroneControl() = default;
     DroneControl(const ColVector<4> &u) : u{u} {}
     ColVector<3> getAttitudeControl() const { return getBlock<0, 3, 0, 1>(u); }
-    double getThrustControl() const { return u[3][0]; }
+    double getThrustControl() const { return u[3]; }
     void setAttitudeControl(const ColVector<3> &u_att) {
         assignBlock<0, 3, 0, 1>(u) = u_att;
     }
-    void setThrustControl(double u_thrust) { u[3][0] = u_thrust; }
+    void setThrustControl(double u_thrust) { u[3] = {u_thrust}; }
     operator ColVector<4>() const { return u; }
 };
 

@@ -65,8 +65,8 @@ Schur_result<N> schur(const Matrix<N, N> &A, const std::string &ord,
         U = {};
     S = A;
 
-    double *s = &S[0][0];
-    double *q = &U[0][0];
+    double *s = toArrayPointer(S);
+    double *q = toArrayPointer(U);
 
     double pwr[N];
     double pwi[N];
@@ -112,7 +112,7 @@ Balance_result<N> balance(const Matrix<N, N> &A, bool noperm = false,
                           bool noscal = false) {
     Balance_result<N> result;
     result.balanced_mat = A;
-    double *a           = &result.balanced_mat[0][0];
+    double *a           = toArrayPointer(result.balanced_mat);
     char job            = noperm ? (noscal ? 'N' : 'S') : (noscal ? 'P' : 'B');
     double scale[N];
     lapack_int ilo, ihi;
@@ -124,7 +124,7 @@ Balance_result<N> balance(const Matrix<N, N> &A, bool noperm = false,
 
     result.balancing_mat = eye<N>();
     char side            = 'R';
-    double *b            = &result.balancing_mat[0][0];
+    double *b            = toArrayPointer(result.balancing_mat);
     info = LAPACKE_dgebak(LAPACK_ROW_MAJOR, job, side, n, ilo, ihi, scale, n, b,
                           n);
     if (info != 0)
