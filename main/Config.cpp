@@ -5,10 +5,10 @@ namespace Config {
 /* ------ CSV export settings ----------------------------------------------- */
 
 /** Filenames for simulation output. */
-const std::string rotationCSVFile =
-    home + "/PO-EAGLE/Groups/ANC/Blender/Animation-Data/rotation.csv";
-const std::string locationCSVFile =
-    home + "/PO-EAGLE/Groups/ANC/Blender/Animation-Data/location.csv";
+const std::filesystem::path rotationCSVFile =
+    home / "PO-EAGLE/Groups/ANC/Blender/Animation-Data/rotation.csv";
+const std::filesystem::path locationCSVFile =
+    home / "PO-EAGLE/Groups/ANC/Blender/Animation-Data/location.csv";
 /** Export the simulation data as CSV. */
 const bool exportCSV = true;
 /** Sample frequency for CSV output (fps). */
@@ -16,20 +16,9 @@ const double CSV_fs = 30.0;
 /** Time step for discrete controller. */
 const double CSV_Ts = 1.0 / CSV_fs;
 
-/* ------ Discretization options -------------------------------------------- */
-
-/** Sample frequency for discrete controller. */
-const double fs = 238.0;
-/** Time step for discrete controller. */
-const double Ts = 1.0 / fs;
-
-/* ------ Simulation settings ----------------------------------------------- */
-
-/** Clamp the motor control outputs. */
-const bool clampController = true;
-/** Clamping boundaries */
-const ColVector<3> clampMin = -1.0 / 3 * ones<3, 1>();
-const ColVector<3> clampMax = 1.0 / 3 * ones<3, 1>();
+/* ------ Matrix & Parameter data loading ----------------------------------- */
+const std::filesystem::path loadPath =
+    home / "PO-EAGLE/Groups/ANC/MATLAB/Codegen";
 
 /* ------ LQR weighting matrices Q and R ------------------------------------ */
 
@@ -45,9 +34,9 @@ const Matrix<3, 3> R = eye<3>();
 /* ------ PI constants altitude controller ---------------------------------- */
 
 /** Proporional altitude controller */
-const Matrix<1, 3> K_alt_p = {0.0001, 1.0, 0.5};  // n, z, v
+const Matrix<1, 3> K_alt_p = {0.0001, 1.2, 0.54};  // n, z, v
 /** Integral altitude controller */
-const Matrix<1, 3> K_alt_i = {0.0, 0.01, 0.0};
+const Matrix<1, 3> K_alt_i = {0.0, 0.001, 0.0};
 
 /* ------ Kalman variance matrices ------------------------------------------ */
 /** @todo   Tune */

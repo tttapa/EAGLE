@@ -46,7 +46,7 @@ enable_testing()
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
--O3 \
+-O2 \
 -Wall -Wextra \
 -Wsuggest-override \
 -Wno-register \

@@ -101,22 +101,6 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
     const Matrix<Nx + Nu, Ny> G;
 };
 
-class ClampedLQRController : public LQRController {
-  public:
-    ClampedLQRController(const LQRController &controller,
-                         const ColVector<Nu> &min, const ColVector<Nu> &max)
-        : LQRController{controller}, min{min}, max{max} {}
-
-    VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
-        auto u = getRawControllerOutput(x, r);
-        clamp(u, min, max);
-        return u;
-    }
-
-    const ColVector<Nu> min;
-    const ColVector<Nu> max;
-};
-
 }  // namespace Attitude
 
 namespace Altitude {
@@ -153,11 +137,11 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
     LQRController(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                   const Matrix<Ny, Nx> &C, const Matrix<Ny, Nu> &D,
                   const Matrix<Nu, Nx> &K_p, const Matrix<Nu, Nx> &K_i,
-                  const VecU_t &uh, double Ts)
+                  double Ts)
         : DiscreteController<Nx, Nu, Ny>{Ts}, K_p(K_p), K_i(K_i),
-          G(calculateG(A, B, C, D)), uh{uh} {
-              std::cout << "Altitude::LQRController::G = " << G << std::endl;
-          }
+          G(calculateG(A, B, C, D)) {
+        std::cout << "Altitude::LQRController::G = " << G << std::endl;
+    }
 
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
         return getRawControllerOutput(x, r);
@@ -178,13 +162,12 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
         // controller
         VecU_t u_ctrl = K_p * xdiff + K_i * integral;
         VecU_t u      = u_ctrl + ueq;
-        return u + uh;
+        return u;
     }
 
     const Matrix<Nu, Nx> K_p;
     const Matrix<Nu, Nx> K_i;
     const Matrix<Nx + Nu, Ny> G;
-    const VecU_t uh;
 
     VecX_t integral = {};
 };

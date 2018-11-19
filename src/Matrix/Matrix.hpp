@@ -64,9 +64,18 @@ constexpr TMatrix<T, N, N> Tdiag(const TColVector<T, N> &diagElements) {
     return matrix;
 }
 
+template <class T>
+constexpr TMatrix<T, 1, 1> Tdiag(const TMatrix<T, 1, 1> &diagElements) {
+    return diagElements;
+}
+
 template <size_t N>
 constexpr Matrix<N, N> diag(const ColVector<N> &diagElements) {
     return Tdiag<double, N>(diagElements);
+}
+
+constexpr Matrix<1, 1> diag(const Matrix<1, 1> &diagElements) {
+    return diagElements;
 }
 
 // Identity matrix
@@ -129,19 +138,19 @@ constexpr TMatrix<T, R, C> operator*(const TMatrix<T, R, M> &lhs,
 }
 
 // Scalar multiplication
-template <class T, size_t R, size_t C>
-constexpr TMatrix<T, R, C> operator*(T scalar, const TMatrix<T, R, C> &matrix) {
-    TMatrix<T, R, C> result = matrix;
-    for (auto &row : result)
-        for (auto &el : row)
-            el *= scalar;
-    return result;
-}
+// template <class T, size_t R, size_t C>
+// constexpr TMatrix<T, R, C> operator*(T scalar, const TMatrix<T, R, C> &matrix) {
+//     TMatrix<T, R, C> result = matrix;
+//     for (auto &row : result)
+//         for (auto &el : row)
+//             el *= scalar;
+//     return result;
+// }
 
-template <class T, size_t R, size_t C>
-constexpr TMatrix<T, R, C> operator*(const TMatrix<T, R, C> &matrix, T scalar) {
-    return scalar * matrix;
-}
+// template <class T, size_t R, size_t C>
+// constexpr TMatrix<T, R, C> operator*(const TMatrix<T, R, C> &matrix, T scalar) {
+//     return scalar * matrix;
+// }
 
 // Matrix addition
 template <class T, class U, size_t R, size_t C>

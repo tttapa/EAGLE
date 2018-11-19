@@ -150,3 +150,15 @@ struct Array {
     static constexpr size_t length = N;
     using type                     = T;
 };
+
+template <class T, size_t N>
+constexpr Array<T, N> operator*(double lhs, const Array<T, N> &rhs) {
+    Array<T, N> result = rhs;
+    result *= lhs;
+    return result;
+}
+
+template <class T>
+constexpr Array<T, 1> operator*(Array<T, 1> lhs, Array<T, 1> rhs) {
+    return {T{lhs} * T{rhs}};
+}

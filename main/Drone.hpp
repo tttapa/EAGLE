@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DroneStateControlOutput.hpp"
+
 #include "KalmanObserver.hpp"
 #include "LQRController.hpp"
 
@@ -15,86 +17,6 @@
 #include <cassert>
 #include <filesystem>
 #include <iostream>
-
-class DroneState {
-    ColVector<17> x = {1};
-
-  public:
-    DroneState() = default;
-    DroneState(const ColVector<17> &x) : x{x} {}
-    ColVector<Nx_att> getAttitude() const {
-        return getBlock<0, Nx_att, 0, 1>(x);
-    }
-    Quaternion getOrientation() const { return getBlock<0, 4, 0, 1>(x); }
-    ColVector<3> getAngularVelocity() const { return getBlock<4, 7, 0, 1>(x); }
-    ColVector<3> getMotorSpeed() const { return getBlock<7, 10, 0, 1>(x); }
-    ColVector<3> getVelocity() const { return getBlock<10, 13, 0, 1>(x); }
-    ColVector<3> getPosition() const { return getBlock<13, 16, 0, 1>(x); }
-    double getThrustMotorSpeed() const { return x[16]; }
-    ColVector<3> getAltitude() const {
-        return vcat(getBlock<16, 17, 0, 1>(x),  // n
-                    getBlock<15, 16, 0, 1>(x),  // z
-                    getBlock<12, 13, 0, 1>(x)   // v_z
-        );
-    }
-
-    void setOrientation(const Quaternion &q) { assignBlock<0, 4, 0, 1>(x) = q; }
-    void setAngularVelocity(const ColVector<3> &w) {
-        assignBlock<4, 7, 0, 1>(x) = w;
-    }
-    void setMotorSpeed(const ColVector<3> &n) {
-        assignBlock<7, 10, 0, 1>(x) = n;
-    }
-    void setVelocity(const ColVector<3> &v) {
-        assignBlock<10, 13, 0, 1>(x) = v;
-    }
-    void setPosition(const ColVector<3> &z) {
-        assignBlock<13, 16, 0, 1>(x) = z;
-    }
-    void setThrustMotorSpeed(double t) { x[16] = {t}; }
-    operator ColVector<17>() const { return x; }
-};
-
-class DroneControl {
-    ColVector<4> u = {};
-
-  public:
-    DroneControl() = default;
-    DroneControl(const ColVector<4> &u) : u{u} {}
-    ColVector<3> getAttitudeControl() const { return getBlock<0, 3, 0, 1>(u); }
-    double getThrustControl() const { return u[3]; }
-    void setAttitudeControl(const ColVector<3> &u_att) {
-        assignBlock<0, 3, 0, 1>(u) = u_att;
-    }
-    void setThrustControl(double u_thrust) { u[3] = {u_thrust}; }
-    operator ColVector<4>() const { return u; }
-};
-
-class DroneOutput {
-    ColVector<10> y = {};
-
-  public:
-    DroneOutput() = default;
-    DroneOutput(const ColVector<10> &y) : y{y} {}
-    DroneOutput(const ColVector<Ny_att> &y_att,
-                const ColVector<Ny_nav + Ny_alt> &y_pos)
-        : y{vcat(y_att, y_pos)} {}
-    Quaternion getOrientation() const { return getBlock<0, 4, 0, 1>(y); }
-    ColVector<3> getAngularVelocity() const { return getBlock<4, 7, 0, 1>(y); }
-    ColVector<7> getAttitude() const { return getBlock<0, 7, 0, 1>(y); }
-    ColVector<3> getPosition() const { return getBlock<7, 10, 0, 1>(y); }
-    ColVector<1> getAltitude() const { return getBlock<9, 10, 0, 1>(y); }
-
-    void setOrientation(const Quaternion &q) { assignBlock<0, 4, 0, 1>(y) = q; }
-    void setAngularVelocity(const ColVector<3> &w) {
-        assignBlock<4, 7, 0, 1>(y) = w;
-    }
-    void setAttitudeOutput(const ColVector<7> &yy) {
-        assignBlock<0, 7, 0, 1>(y) = yy;
-    }
-    void setPosition(const ColVector<3> &z) { assignBlock<7, 10, 0, 1>(y) = z; }
-    operator ColVector<10>() const { return y; }
-};
 
 struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
@@ -166,7 +88,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      * @brief   Get the initial state of the drone. (Upright orientation and 
      *          hovering thrust.)
      */
-    VecX_t getInitialState() const;
+    VecX_t getStableState() const;
 
     /** 
      * @brief   Get the rotation in Euler angles, given a state vector x.
@@ -225,41 +147,45 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         return {Ad_att, Bd_att, Cd_att, Dd_att, K_red, Ts_att};
     }
 
-    /** 
-     * @brief   TODO
-     */
-    Attitude::ClampedLQRController
-    getClampedAttitudeController(const ColVector<Nu_att> &clampMin,
-                                 const ColVector<Nu_att> &clampMax,
-                                 const Matrix<Nx_att - 1, Nx_att - 1> &Q,
-                                 const Matrix<Nu_att, Nu_att> &R) const {
-        return {getAttitudeController(Q, R), clampMin, clampMax};
-    }
-
     Altitude::LQRController getAltitudeController(const Matrix<1, 3> &K_p,
                                                   const Matrix<1, 3> &K_i) {
-        return {Ad_alt, Bd_alt, Cd_alt, Dd_alt, K_p, K_i, {uh}, Ts_alt};
+        return {Ad_alt, Bd_alt, Cd_alt, Dd_alt, K_p, K_i, Ts_alt};
     }
 
     class Controller : public DiscreteController<Nx, Nu, Ny> {
       public:
-        Controller(const Attitude::ClampedLQRController &attCtrl,
-                   const Altitude::LQRController &altCtrl)
+        Controller(const Attitude::LQRController &attCtrl,
+                   const Altitude::LQRController &altCtrl, double uh)
             : DiscreteController<Nx, Nu, Ny>{attCtrl.Ts}, attCtrl{attCtrl},
-              altCtrl{altCtrl}, subsampleAlt{
-                                    size_t(round(altCtrl.Ts / attCtrl.Ts))} {
+              altCtrl{altCtrl},
+              subsampleAlt{size_t(round(altCtrl.Ts / attCtrl.Ts))}, uh{uh} {
             assert(attCtrl.Ts < altCtrl.Ts);
         }
 
         VecU_t operator()(const VecX_t &x, const VecR_t &r) override;
 
+      protected:
+        /** Clamp the marginal thrust between 0.1 and -0.1 */
+        ColVector<1> clampThrust(ColVector<1> u_thrust) const;
+        /** 2.2: Clamp [ux;uy;uz] such that all motor inputs ui <= 1. */
+        ColVector<3> clampAttitude(const ColVector<3> &u_raw) const;
+
       private:
-        Attitude::ClampedLQRController attCtrl;
+        Attitude::LQRController attCtrl;
         Altitude::LQRController altCtrl;
         const size_t subsampleAlt;
         size_t subsampleCounter = 0;
         Altitude::LQRController::VecU_t u_alt;
+        const ColVector<1> uh;
     };
+
+    Controller getController(const Matrix<Nx_att - 1, Nx_att - 1> &Q_att,
+                             const Matrix<Nu_att, Nu_att> &R_att,
+                             const Matrix<1, 3> &K_p_alt,
+                             const Matrix<1, 3> &K_i_alt) {
+        return {getAttitudeController(Q_att, R_att),
+                getAltitudeController(K_p_alt, K_i_alt), uh};
+    }
 
 #pragma region Observers........................................................
 
@@ -282,6 +208,54 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
                         const RowVector<Ny_att - 1> &varSensors) const {
         auto L_red = getAttitudeObserverMatrixL(varDynamics, varSensors);
         return {Ad_att_r, Bd_att_r, Cd_att, L_red, Ts_att};
+    }
+
+    /** 
+     * @brief   TODO
+     */
+    Matrix<Nx_alt, Ny_alt>
+    getAltitudeObserverMatrixL(const RowVector<Nu_alt> &varDynamics,
+                               const RowVector<Ny_alt> &varSensors) const {
+        return dlqe(Ad_alt, Bd_alt, Cd_alt, diag(varDynamics), diag(varSensors))
+            .L;
+    }
+
+    /** 
+     * @brief   TODO
+     */
+    Altitude::KalmanObserver
+    getAltitudeObserver(const RowVector<Nu_alt> &varDynamics,
+                        const RowVector<Ny_alt> &varSensors) const {
+        auto L = getAltitudeObserverMatrixL(varDynamics, varSensors);
+        return {Ad_alt, Bd_alt, Cd_alt, L, Ts_alt};
+    }
+
+    class Observer : public DiscreteObserver<Nx, Nu, Ny> {
+      public:
+        Observer(const Attitude::KalmanObserver &attObsv,
+                 const Altitude::KalmanObserver &altObsv)
+            : DiscreteObserver<Nx, Nu, Ny>{attObsv.Ts}, attObsv{attObsv},
+              altObsv{altObsv}, subsampleAlt{
+                                    size_t(round(altObsv.Ts / attObsv.Ts))} {
+            assert(attObsv.Ts < altObsv.Ts);
+        }
+
+        VecX_t getStateChange(const VecX_t &x_hat, const VecY_t &y_sensor,
+                              const VecU_t &u) override;
+
+      private:
+        Attitude::KalmanObserver attObsv;
+        Altitude::KalmanObserver altObsv;
+        const size_t subsampleAlt;
+        size_t subsampleCounter = 0;
+    };
+
+    Observer getObserver(const RowVector<Nu_att> &varDynamics_att,
+                         const RowVector<Ny_att - 1> &varSensors_att,
+                         const RowVector<Nu_alt> &varDynamics_alt,
+                         const RowVector<Ny_alt> &varSensors_alt) {
+        return {getAttitudeObserver(varDynamics_att, varSensors_att),
+                getAltitudeObserver(varDynamics_alt, varSensors_alt)};
     }
 
 #pragma region System matrices Attitude.........................................

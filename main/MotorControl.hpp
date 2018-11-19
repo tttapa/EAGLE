@@ -4,11 +4,13 @@
 
 namespace MotorControlTransformation {
 constexpr Matrix<4, 4> M     = {{
-    {1, 1, 1, -1},
+    // nx ny nz nt
     {1, 1, -1, 1},
     {1, -1, 1, 1},
-    {1, -1, -1, -1},
+    {-1, 1, 1, 1},
+    {-1, -1, -1, 1},
 }};
+
 constexpr Matrix<4, 4> M_inv = 0.25 * transpose(M);
 };  // namespace MotorControlTransformation
 
@@ -34,4 +36,16 @@ inline ColVector<3> clampMotorControlSignal(const ColVector<3> &u_model_raw,
                                             double u_c) {
     return getBlock<1, 4, 0, 1>(
         clampMotorControlSignal(vcat(u_c * eye<1>(), u_model_raw)));
+}
+
+inline void checkControlSignal(const ColVector<4> &u_model_raw) {
+    auto u_motors = convertControlSignalToMotorOutputs(u_model_raw);
+    for (double u_i : u_motors) {
+        if (u_i > 1.0 || u_i < 0.0) {
+            std::stringstream ss;
+            ss << "Error: control signal out of bounds. u_model = "
+               << u_model_raw << ", u_motors = " << u_motors;
+            throw std::runtime_error(ss.str());
+        }
+    }
 }

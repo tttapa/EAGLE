@@ -2,16 +2,17 @@
 
 #include "Drone.hpp"
 #include <ODE/ODEOptions.hpp>
-#include <string>
+#include <filesystem>
 
 namespace Config {
 
 // Home directory
-const std::string home = getenv("HOME");
+const std::filesystem::path home = getenv("HOME");
 
+/* ------ CSV export settings ----------------------------------------------- */
 // Filenames for simulation output
-extern const std::string rotationCSVFile;
-extern const std::string locationCSVFile;
+extern const std::filesystem::path rotationCSVFile;
+extern const std::filesystem::path locationCSVFile;
 // Export the simulation data as CSV.
 extern const bool exportCSV;
 // Sample frequency for CSV output (fps).
@@ -19,15 +20,8 @@ extern const double CSV_fs;
 // Time step for discrete controller.
 extern const double CSV_Ts;
 
-// Sample rate for simulation output
-extern const double fs;  // Sample frequency
-extern const double Ts;  // Sample time step
-
-// Clamp the motor control outputs.
-extern const bool clampController;
-// Clamping boundaries
-extern const ColVector<3> clampMin;
-extern const ColVector<3> clampMax;
+/* ------ Matrix & Parameter data loading ----------------------------------- */
+extern const std::filesystem::path loadPath;
 
 /* ------ LQR weighting matrices Q and R ------------------------------------ */
 extern const RowVector<3> Qn;

@@ -5,6 +5,10 @@
 template <size_t Nx, size_t Nu, size_t Ny>
 class DiscreteObserver {
   public:
+    typedef ColVector<Nx> VecX_t;  // state vectors
+    typedef ColVector<Nu> VecU_t;  // input vectors
+    typedef ColVector<Ny> VecY_t;  // output vectors
+
     DiscreteObserver(double Ts) : Ts{Ts} {}
 
     /**
@@ -18,9 +22,8 @@ class DiscreteObserver {
      * @param   u
      *          The current control input.
      */
-    virtual ColVector<Nx> getStateChange(const ColVector<Nx> &x_hat,
-                                         const ColVector<Ny> &y_sensor,
-                                         const ColVector<Nu> &u) = 0;
+    virtual VecX_t getStateChange(const VecX_t &x_hat, const VecY_t &y_sensor,
+                                  const VecU_t &u) = 0;
 
     const double Ts;
 };

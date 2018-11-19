@@ -1,4 +1,5 @@
 #include "Drone.hpp"
+#include "MotorControl.hpp"
 
 void Drone::load(const std::filesystem::path &loadPath) {
     PerfTimer timer;
@@ -116,7 +117,7 @@ Drone::VecY_t Drone::getOutput(const Drone::VecX_t &x, const Drone::VecU_t &u) {
     return DroneOutput{y_att, y_nav};
 }
 
-Drone::VecX_t Drone::getInitialState() const {
+Drone::VecX_t Drone::getStableState() const {
     DroneState xx = {};
     xx.setOrientation(eul2quat({0, 0, 0}));
     xx.setAngularVelocity({0, 0, 0});
@@ -127,19 +128,63 @@ Drone::VecX_t Drone::getInitialState() const {
     return xx;
 }
 
+#pragma region Controllers......................................................
+
 Drone::Controller::VecU_t Drone::Controller::
 operator()(const Drone::Controller::VecX_t &x,
            const Drone::Controller::VecR_t &r) {
     DroneState xx  = {x};
     DroneOutput rr = {r};
     DroneControl uu;
+
     if (subsampleCounter == 0) {
-        u_alt            = altCtrl(xx.getAltitude(), rr.getAltitude());
+        u_alt = uh + clampThrust(altCtrl(xx.getAltitude(), rr.getAltitude()));
         subsampleCounter = subsampleAlt;
     }
     --subsampleCounter;
-    uu.setAttitudeControl(attCtrl(xx.getAttitude(), rr.getAttitude()));
+
+    auto u_att = attCtrl(xx.getAttitude(), rr.getAttitude());
+    u_att      = clampAttitude(u_att);
+    uu.setAttitudeControl(u_att);
     uu.setThrustControl(u_alt);
-    // TODO: clamp
+    checkControlSignal(uu);
     return uu;
+}
+
+ColVector<1> Drone::Controller::clampThrust(ColVector<1> u_thrust) const {
+    clamp(u_thrust, {-0.1}, {0.1});
+    return u_thrust;
+}
+
+ColVector<3> Drone::Controller::clampAttitude(const ColVector<3> &u_raw) const {
+    ColVector<3> u      = u_raw;
+    double other_max    = 1 - abs(u_alt);
+    double other_actual = abs(u_raw[0]) + abs(u_raw[1]) + abs(u_raw[2]);
+    if (other_actual > other_max) {
+        u[0] = {other_max / other_actual * u_raw[0]};
+        u[1] = {other_max / other_actual * u_raw[1]};
+        u[2] = {other_max / other_actual * u_raw[2]};
+    }
+    return u;
+}
+
+#pragma region Observers........................................................
+
+Drone::Observer::VecX_t Drone::Observer::getStateChange(const VecX_t &x_hat,
+                                                        const VecY_t &y_sensor,
+                                                        const VecU_t &u) {
+    DroneState xx_hat = {x_hat};
+    DroneOutput yy    = {y_sensor};
+    DroneControl uu   = {u};
+
+    if (subsampleCounter == 0) {
+        xx_hat.setAltitude(altObsv.getStateChange(
+            xx_hat.getAltitude(), yy.getAltitude(), {uu.getThrustControl()}));
+        subsampleCounter = subsampleAlt;
+    }
+    --subsampleCounter;
+
+    xx_hat.setAttitude(attObsv.getStateChange(
+        xx_hat.getAttitude(), yy.getAttitude(), uu.getAttitudeControl()));
+    return xx_hat;
 }

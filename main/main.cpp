@@ -16,13 +16,11 @@ using namespace Config;
 int main(int argc, char const *argv[]) {
     (void) argc, (void) argv;
 
-    Drone drone  = {std::filesystem::path(home) /
-                   "PO-EAGLE/Groups/ANC/MATLAB/Codegen"};
-    auto attCtrl = drone.getClampedAttitudeController(clampMin, clampMax, Q, R);
-    auto altCtrl = drone.getAltitudeController(K_alt_p, K_alt_i);
-    Drone::Controller controller = {attCtrl, altCtrl};
+    Drone drone = loadPath;
 
-    Drone::VecX_t x0 = drone.getInitialState();
+    Drone::Controller controller = drone.getController(Q, R, K_alt_p, K_alt_i);
+
+    Drone::VecX_t x0 = drone.getStableState();
 
     /* ------ Reference function -------------------------------------------- */
     TestReferenceFunction ref = {};
@@ -79,7 +77,7 @@ int main(int argc, char const *argv[]) {
                 "Reference position");
     plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
     plt::subplot(r, c, 3);
-    plotResults(time, orientation, {0, 3}, {"x", "y", "z"}, {"r-", "g-", "b-"},
+    plotResults(time, orientation, {0, 3}, {"z", "y", "x"}, {"b-", "g-", "r-"},
                 "Orientation of drone");
     plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
     plt::subplot(r, c, 5);
@@ -110,14 +108,6 @@ int main(int argc, char const *argv[]) {
     plotResults(discrtime, controlsignal, {3}, {"t"}, {"r.-"},
                 "Thrust motor control");
     plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
-
-    // TODO
-    // plotResults(time, u, {0, 3}, {"x", "y", "z"}, {"r-", "g-", "b-"},
-    //             "Control signal");
-    // plotResults(generatedTime, generatedU, {0, 3},
-    //             {"generated x", "generated y", "generated z"},
-    //             {"r--", "g--", "b--"});
-    // plt::xlim(odeopt.t_start, odeopt.t_end * 1.1);
 
     plt::tight_layout();
     plt::show();
