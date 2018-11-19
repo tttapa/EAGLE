@@ -18,9 +18,9 @@ int main(int argc, char const *argv[]) {
 
     Drone drone                  = {std::filesystem::path(home) /
                    "PO-EAGLE/Groups/ANC/MATLAB/Codegen"};
-    Drone::Controller controller = {
-        drone.getClampedAttitudeController(clampMin, clampMax, Q, R), drone.uh,
-        K_alt_p, K_alt_i};
+    auto attCtrl = drone.getClampedAttitudeController(clampMin, clampMax, Q, R);
+    auto altCtrl = drone.getAltitudeController(K_alt_p, K_alt_i);
+    Drone::Controller controller = {attCtrl, altCtrl};
 
     Drone::VecX_t x0 = drone.getInitialState();
 

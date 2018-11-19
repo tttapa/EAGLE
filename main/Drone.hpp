@@ -22,7 +22,7 @@ class DroneState {
   public:
     DroneState() = default;
     DroneState(const ColVector<17> &x) : x{x} {}
-    ColVector<Nx_att> getAttitudeState() const {
+    ColVector<Nx_att> getAttitude() const {
         return getBlock<0, Nx_att, 0, 1>(x);
     }
     Quaternion getOrientation() const { return getBlock<0, 4, 0, 1>(x); }
@@ -31,8 +31,11 @@ class DroneState {
     ColVector<3> getVelocity() const { return getBlock<10, 13, 0, 1>(x); }
     ColVector<3> getPosition() const { return getBlock<13, 16, 0, 1>(x); }
     double getThrustMotorSpeed() const { return x[16]; }
-    ColVector<Nx_nav> getNavigationState() const {
-        return getBlock<Nx_att, Nx, 0, 1>(x);
+    ColVector<3> getAltitude() const {
+        return vcat(getBlock<16, 17, 0, 1>(x),  // n
+                    getBlock<15, 16, 0, 1>(x),  // z
+                    getBlock<12, 13, 0, 1>(x)   // v_z
+        );
     }
 
     void setOrientation(const Quaternion &q) { assignBlock<0, 4, 0, 1>(x) = q; }
@@ -73,11 +76,14 @@ class DroneOutput {
   public:
     DroneOutput() = default;
     DroneOutput(const ColVector<10> &y) : y{y} {}
-    DroneOutput(const ColVector<Ny_att> &y_att, const ColVector<Ny_nav> &y_nav)
-        : y{vcat(y_att, y_nav)} {}
+    DroneOutput(const ColVector<Ny_att> &y_att,
+                const ColVector<Ny_nav + Ny_alt> &y_pos)
+        : y{vcat(y_att, y_pos)} {}
     Quaternion getOrientation() const { return getBlock<0, 4, 0, 1>(y); }
     ColVector<3> getAngularVelocity() const { return getBlock<4, 7, 0, 1>(y); }
+    ColVector<7> getAttitude() const { return getBlock<0, 7, 0, 1>(y); }
     ColVector<3> getPosition() const { return getBlock<7, 10, 0, 1>(y); }
+    ColVector<1> getAltitude() const { return getBlock<9, 10, 0, 1>(y); }
 
     void setOrientation(const Quaternion &q) { assignBlock<0, 4, 0, 1>(y) = q; }
     void setAngularVelocity(const ColVector<3> &w) {
@@ -206,7 +212,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     Matrix<Nu_att, Nx_att - 1>
     getAttitudeControllerMatrixK(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                                  const Matrix<Nu_att, Nu_att> &R) const {
-        return -dlqr(Ad_r, Bd_r, Q, R).K;
+        return -dlqr(Ad_att_r, Bd_att_r, Q, R).K;
     }
 
     /** 
@@ -216,7 +222,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     getAttitudeController(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                           const Matrix<Nu_att, Nu_att> &R) const {
         auto K_red = getAttitudeControllerMatrixK(Q, R);
-        return {Ad, Bd, Cd, Dd, K_red, Ts};
+        return {Ad_att, Bd_att, Cd_att, Dd_att, K_red, Ts_att};
     }
 
     /** 
@@ -230,22 +236,23 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         return {getAttitudeController(Q, R), clampMin, clampMax};
     }
 
+    Altitude::LQRController getAltitudeController(const Matrix<1, 3> &K_p,
+                                                  const Matrix<1, 3> &K_i) {
+        return {Ad_alt, Bd_alt, Cd_alt, Dd_alt, K_p, K_i, {uh}, Ts_alt};
+    }
+
     class Controller : public DiscreteController<Nx, Nu, Ny> {
       public:
-        Controller(const Attitude::ClampedLQRController &attCtrl, double uh,
-                   const Matrix<1, 3> &K_alt_p, const Matrix<1, 3> &K_alt_i)
-            : DiscreteController<Nx, Nu, Ny>{attCtrl.Ts}, attCtrl{attCtrl},
-              uh(uh), K_alt_p(K_alt_p), K_alt_i(K_alt_i) {}
+        Controller(const Attitude::ClampedLQRController &attCtrl,
+                   const Altitude::LQRController &altCtrl)
+            : DiscreteController<Nx, Nu, Ny>{std::min(attCtrl.Ts, altCtrl.Ts)},
+              attCtrl{attCtrl}, altCtrl{altCtrl} {}
 
         VecU_t operator()(const VecX_t &x, const VecR_t &r) override;
 
       private:
         Attitude::ClampedLQRController attCtrl;
-        const double uh;
-        ColVector<3> integral_alt;
-        const Matrix<1, 3> K_alt_p;
-        const Matrix<1, 3> K_alt_i;
-        // TODO: integral wind-up?
+        Altitude::LQRController altCtrl;
     };
 
 #pragma region Observers........................................................
@@ -256,7 +263,9 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     Matrix<Nx_att - 1, Ny_att - 1>
     getAttitudeObserverMatrixL(const RowVector<Nu_att> &varDynamics,
                                const RowVector<Ny_att - 1> &varSensors) const {
-        return dlqe(Ad_r, Bd_r, Cd_r, diag(varDynamics), diag(varSensors)).L;
+        return dlqe(Ad_att_r, Bd_att_r, Cd_att_r, diag(varDynamics),
+                    diag(varSensors))
+            .L;
     }
 
     /** 
@@ -266,103 +275,154 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     getAttitudeObserver(const RowVector<Nu_att> &varDynamics,
                         const RowVector<Ny_att - 1> &varSensors) const {
         auto L_red = getAttitudeObserverMatrixL(varDynamics, varSensors);
-        return {Ad_r, Bd_r, Cd, L_red, Ts};
+        return {Ad_att_r, Bd_att_r, Cd_att, L_red, Ts_att};
     }
 
-#pragma region System matrices..................................................
+#pragma region System matrices Attitude.........................................
 
     /** 
      * ```
-     *  Aa =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]
-     *        [  ·   ·   ·   ·  ┌─────────┐  ·   ·   ·  ]
-     *        [  ·   ·   ·   ·  │  0.5 I3 │  ·   ·   ·  ]
-     *        [  ·   ·   ·   ·  └─────────┘  ·   ·   ·  ]
-     *        [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
-     *        [  ·   ·   ·   ·   ·   ·   ·  │   Γ_n   │ ]
-     *        [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ]
-     *        [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
-     *        [  ·   ·   ·   ·   ·   ·   ·  │ -k2 I3  │ ]
-     *        [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ] 
+     *  Aa_att =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]
+     *            [  ·   ·   ·   ·  ┌─────────┐  ·   ·   ·  ]
+     *            [  ·   ·   ·   ·  │  0.5 I3 │  ·   ·   ·  ]
+     *            [  ·   ·   ·   ·  └─────────┘  ·   ·   ·  ]
+     *            [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
+     *            [  ·   ·   ·   ·   ·   ·   ·  │   Γ_n   │ ]
+     *            [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ]
+     *            [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
+     *            [  ·   ·   ·   ·   ·   ·   ·  │ -k2 I3  │ ]
+     *            [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ] 
      * ``` */
-    Matrix<Nx_att, Nx_att> Aa = {};
+    Matrix<Nx_att, Nx_att> Aa_att = {};
 
     /** 
      * Discrete A 
      */
-    Matrix<Nx_att, Nx_att> Ad = {};
+    Matrix<Nx_att, Nx_att> Ad_att = {};
 
     /** 
      * Discrete, reduced A 
      */
-    Matrix<Nx_att - 1, Nx_att - 1> Ad_r = {};
+    Matrix<Nx_att - 1, Nx_att - 1> Ad_att_r = {};
 
     /** 
      * ```
-     *  Ba =  [  ·   ·   ·  ]
-     *        [  ·   ·   ·  ]
-     *        [  ·   ·   ·  ]
-     *        [  ·   ·   ·  ]
-     *        [ ┌─────────┐ ]
-     *        [ │   Γ_u   │ ]
-     *        [ └─────────┘ ]
-     *        [ ┌─────────┐ ]
-     *        [ │ k1k2 I3 │ ]
-     *        [ └─────────┘ ] 
+     *  Ba_att =  [  ·   ·   ·  ]
+     *            [  ·   ·   ·  ]
+     *            [  ·   ·   ·  ]
+     *            [  ·   ·   ·  ]
+     *            [ ┌─────────┐ ]
+     *            [ │   Γ_u   │ ]
+     *            [ └─────────┘ ]
+     *            [ ┌─────────┐ ]
+     *            [ │ k1k2 I3 │ ]
+     *            [ └─────────┘ ] 
      * ``` */
-    Matrix<Nx_att, Nu_att> Ba = {};
+    Matrix<Nx_att, Nu_att> Ba_att = {};
 
     /** 
      * Discrete B
      */
-    Matrix<Nx_att, Nu_att> Bd = {};
+    Matrix<Nx_att, Nu_att> Bd_att = {};
 
     /** 
      * Discrete, reduced B
      */
-    Matrix<Nx_att - 1, Nu_att> Bd_r = {};
+    Matrix<Nx_att - 1, Nu_att> Bd_att_r = {};
 
     /**
      * ```
-     *  Ca =  [ 1  ·  ·  ·  ·  ·  ·  ·  ·  · ]
-     *        [ ·  1  ·  ·  ·  ·  ·  ·  ·  · ]
-     *        [ ·  ·  1  ·  ·  ·  ·  ·  ·  · ]
-     *        [ ·  ·  ·  1  ·  ·  ·  ·  ·  · ]
-     *        [ ·  ·  ·  ·  1  ·  ·  ·  ·  · ]
-     *        [ ·  ·  ·  ·  ·  1  ·  ·  ·  · ]
-     *        [ ·  ·  ·  ·  ·  ·  1  ·  ·  · ] 
+     *  Ca_att =  [ 1  ·  ·  ·  ·  ·  ·  ·  ·  · ]
+     *            [ ·  1  ·  ·  ·  ·  ·  ·  ·  · ]
+     *            [ ·  ·  1  ·  ·  ·  ·  ·  ·  · ]
+     *            [ ·  ·  ·  1  ·  ·  ·  ·  ·  · ]
+     *            [ ·  ·  ·  ·  1  ·  ·  ·  ·  · ]
+     *            [ ·  ·  ·  ·  ·  1  ·  ·  ·  · ]
+     *            [ ·  ·  ·  ·  ·  ·  1  ·  ·  · ] 
      * ``` */
-    Matrix<Ny_att, Nx_att> Ca = {};
+    Matrix<Ny_att, Nx_att> Ca_att = {};
 
     /**
      * Discrete C
      */
-    Matrix<Ny_att, Nx_att> Cd = {};
+    Matrix<Ny_att, Nx_att> Cd_att = {};
 
     /**
      * Discrete, reduced C
      */
-    Matrix<Ny_att - 1, Nx_att - 1> Cd_r = {};
+    Matrix<Ny_att - 1, Nx_att - 1> Cd_att_r = {};
 
     /** 
      * ```
-     *  Da =  [ ·  ·  · ]
-     *        [ ·  ·  · ]
-     *        [ ·  ·  · ]
-     *        [ ·  ·  · ]
-     *        [ ·  ·  · ]
-     *        [ ·  ·  · ]
-     *        [ ·  ·  · ] 
+     *  Da_att =  [ ·  ·  · ]
+     *            [ ·  ·  · ]
+     *            [ ·  ·  · ]
+     *            [ ·  ·  · ]
+     *            [ ·  ·  · ]
+     *            [ ·  ·  · ]
+     *            [ ·  ·  · ] 
      * ``` */
-    Matrix<Ny_att, Nu_att> Da = {};
+    Matrix<Ny_att, Nu_att> Da_att = {};
 
     /**
      * Discrete D
      */
-    Matrix<Ny_att, Nu_att> Dd = {};
+    Matrix<Ny_att, Nu_att> Dd_att = {};
+
+#pragma region System matrices Altitude.........................................
+
+    /** 
+     * ```
+     *  Aa_alt =  [ -k2  ·   ·   ]
+     *            [  ·   ·   1   ]
+     *            [  a   ·   ·   ]
+     * ``` */
+    Matrix<Nx_alt, Nx_alt> Aa_alt = {};
+
+    /** 
+     * Discrete A 
+     */
+    Matrix<Nx_alt, Nx_alt> Ad_alt = {};
+
+    /** 
+     * ```
+     *  Ba_alt =  [ k1 k2 ]
+     *            [   ·   ]
+     *            [   ·   ]
+     * ``` */
+    Matrix<Nx_alt, Nu_alt> Ba_alt = {};
+
+    /** 
+     * Discrete B
+     */
+    Matrix<Nx_alt, Nu_alt> Bd_alt = {};
+
+    /**
+     * ```
+     *  Ca_alt =  [ ·  1  ·  ]
+     * ``` */
+    Matrix<Ny_alt, Nx_alt> Ca_alt = {};
+
+    /**
+     * Discrete C
+     */
+    Matrix<Ny_alt, Nx_alt> Cd_alt = {};
+
+    /** 
+     * ```
+     *  Da_alt =  [ · ]
+     * ``` */
+    Matrix<Ny_alt, Nu_alt> Da_alt = {};
+
+    /**
+     * Discrete D
+     */
+    Matrix<Ny_alt, Nu_alt> Dd_alt = {};
 
 #pragma region System parameters................................................
 
-    double Ts;
+    double Ts_att;
+    double Ts_alt;
 
     Matrix<3, 3> gamma_n;
     Matrix<3, 3> gamma_u;

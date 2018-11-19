@@ -2,24 +2,44 @@
 
 void Drone::load(const std::filesystem::path &loadPath) {
     PerfTimer timer;
-    Aa = loadMatrix<Nx_att, Nx_att>(loadPath / "Aa");
-    Ba = loadMatrix<Nx_att, Nu_att>(loadPath / "Ba");
-    Ca = loadMatrix<Ny_att, Nx_att>(loadPath / "Ca");
-    Da = loadMatrix<Ny_att, Nu_att>(loadPath / "Da");
 
-    Ad = loadMatrix<Nx_att, Nx_att>(loadPath / "Ad");
-    Bd = loadMatrix<Nx_att, Nu_att>(loadPath / "Bd");
-    Cd = loadMatrix<Ny_att, Nx_att>(loadPath / "Cd");
-    Dd = loadMatrix<Ny_att, Nu_att>(loadPath / "Dd");
+    /* Attitude */
 
-    Ad_r = getBlock<1, Nx_att, 1, Nx_att>(Ad);
-    Bd_r = getBlock<1, Nx_att, 0, Nu_att>(Bd);
-    Cd_r = getBlock<1, Ny_att, 1, Nx_att>(Cd);
+    Aa_att = loadMatrix<Nx_att, Nx_att>(loadPath / "attitude" / "Aa");
+    Ba_att = loadMatrix<Nx_att, Nu_att>(loadPath / "attitude" / "Ba");
+    Ca_att = loadMatrix<Ny_att, Nx_att>(loadPath / "attitude" / "Ca");
+    Da_att = loadMatrix<Ny_att, Nu_att>(loadPath / "attitude" / "Da");
 
-    Ts = loadDouble(loadPath / "Ts");
+    Ad_att = loadMatrix<Nx_att, Nx_att>(loadPath / "attitude" / "Ad");
+    Bd_att = loadMatrix<Nx_att, Nu_att>(loadPath / "attitude" / "Bd");
+    Cd_att = loadMatrix<Ny_att, Nx_att>(loadPath / "attitude" / "Cd");
+    Dd_att = loadMatrix<Ny_att, Nu_att>(loadPath / "attitude" / "Dd");
 
-    gamma_n = loadMatrix<3, 3>(loadPath / "gamma_n");
-    gamma_u = loadMatrix<3, 3>(loadPath / "gamma_u");
+    Ad_att_r = getBlock<1, Nx_att, 1, Nx_att>(Ad_att);
+    Bd_att_r = getBlock<1, Nx_att, 0, Nu_att>(Bd_att);
+    Cd_att_r = getBlock<1, Ny_att, 1, Nx_att>(Cd_att);
+
+    Ts_att = loadDouble(loadPath / "attitude" / "Ts");
+
+    gamma_n = loadMatrix<3, 3>(loadPath / "attitude" / "gamma_n");
+    gamma_u = loadMatrix<3, 3>(loadPath / "attitude" / "gamma_u");
+
+    /* Altitude */
+
+    Aa_alt = loadMatrix<Nx_alt, Nx_alt>(loadPath / "altitude" / "Aa");
+    Ba_alt = loadMatrix<Nx_alt, Nu_alt>(loadPath / "altitude" / "Ba");
+    Ca_alt = loadMatrix<Ny_alt, Nx_alt>(loadPath / "altitude" / "Ca");
+    Da_alt = loadMatrix<Ny_alt, Nu_alt>(loadPath / "altitude" / "Da");
+
+    Ad_alt = loadMatrix<Nx_alt, Nx_alt>(loadPath / "altitude" / "Ad");
+    Bd_alt = loadMatrix<Nx_alt, Nu_alt>(loadPath / "altitude" / "Bd");
+    Cd_alt = loadMatrix<Ny_alt, Nx_alt>(loadPath / "altitude" / "Cd");
+    Dd_alt = loadMatrix<Ny_alt, Nu_alt>(loadPath / "altitude" / "Dd");
+
+    Ts_alt = loadDouble(loadPath / "altitude" / "Ts");
+
+    /* General */
+
     Id      = loadMatrix<3, 3>(loadPath / "I");
     Id_inv  = loadMatrix<3, 3>(loadPath / "I_inv");
     k1      = loadDouble(loadPath / "k1");
@@ -89,8 +109,8 @@ Drone::VecY_t Drone::getOutput(const Drone::VecX_t &x, const Drone::VecU_t &u) {
     DroneState xx   = {x};
     DroneControl uu = {u};
     ColVector<Ny_att> y_att =
-        Ca * xx.getAttitudeState() + Da * uu.getAttitudeControl();
-    ColVector<Ny_nav> y_nav = xx.getPosition();
+        Ca_att * xx.getAttitude() + Da_att * uu.getAttitudeControl();
+    ColVector<Ny_nav + Ny_alt> y_nav = xx.getPosition();
     return DroneOutput{y_att, y_nav};
 }
 
@@ -111,15 +131,8 @@ operator()(const Drone::Controller::VecX_t &x,
     DroneState xx  = {x};
     DroneOutput rr = {r};
     DroneControl uu;
-    uu.setAttitudeControl(
-        attCtrl(xx.getAttitudeState(), getBlock<0, Ny_att, 0, 1>(r)));
-    ColVector<3> alt_err = {{
-        -xx.getThrustMotorSpeed(),                  // n
-        rr.getPosition()[2] - xx.getPosition()[2],  // z
-        -xx.getVelocity()[2],                       // v
-    }};
-    integral_alt += alt_err * Ts;  // Integral action
-    double u_att = K_alt_p * alt_err + K_alt_i * integral_alt;
-    uu.setThrustControl(uh + u_att);
+    uu.setAttitudeControl(attCtrl(xx.getAttitude(), rr.getAttitude()));
+    uu.setThrustControl(altCtrl(xx.getAltitude(), rr.getAltitude()));
+    // TODO: clamp
     return uu;
 }

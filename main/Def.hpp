@@ -21,27 +21,44 @@ constexpr size_t Nu_att = 3;
  */
 constexpr size_t Ny_att = 7;
 
-/** 
- * Number of states of the navigation model.
- *  - Velocity (3)
- *  - Position (3)
+/**
+ * Number of states of the altitude model.
+ *  - Velocity (1)
+ *  - Position (1)
  *  - Motor speed (1)
  */
-constexpr size_t Nx_nav = 7;
+constexpr size_t Nx_alt = 3;
 /** 
- * Number of inputs of the navigation model.
+ * Number of inputs of the altitude model.
  *  - Motor thrust control (1)
  */
-constexpr size_t Nu_nav = 1;
+constexpr size_t Nu_alt = 1;
+/**
+ * Number of outputs of the altitude model.
+ *  - Position (1)
+ */
+constexpr size_t Ny_alt = 1;
+
+/** 
+ * Number of states of the navigation model.
+ *  - Velocity (2)
+ *  - Position (2)
+ */
+constexpr size_t Nx_nav = 4;
+/** 
+ * Number of inputs of the navigation model.
+ *  - None (0)
+ */
+constexpr size_t Nu_nav = 0;
 /** 
  * Number of outputs of the navigation model.
- *  - Position (3)
+ *  - Position (2)
  */
-constexpr size_t Ny_nav = 3;
+constexpr size_t Ny_nav = 2;
 
 /** Number of states. */
-constexpr size_t Nx = Nx_att + Nx_nav;
+constexpr size_t Nx = Nx_att + Nx_alt + Nx_nav;
 /** Number of inputs. */
-constexpr size_t Nu = Nu_att + Nu_nav;
+constexpr size_t Nu = Nu_att + Nu_alt + Nu_nav;
 /** Number of outputs. */
-constexpr size_t Ny = Ny_att + Ny_nav;
+constexpr size_t Ny = Ny_att + Ny_alt + Ny_nav;
