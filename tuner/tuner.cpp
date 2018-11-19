@@ -12,17 +12,6 @@
 using namespace std;
 using namespace Config;
 
-template <class T>
-static T clamp(T v, T lo, T hi) {
-    return (v < lo) ? lo : ((hi < v) ? hi : v);
-}
-template <size_t R, size_t C>
-void clamp(Matrix<R, C> &m, const Matrix<R, C> &min, const Matrix<R, C> &max) {
-    for (size_t r = 0; r < R; ++r)
-        for (size_t c = 0; c < C; ++c)
-            m[r][c] = clamp(m[r][c], min[r][c], max[r][c]);
-}
-
 struct Weights {
     constexpr static size_t Nq = 9;
     constexpr static size_t Nr = 3;

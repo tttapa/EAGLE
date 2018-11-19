@@ -40,10 +40,10 @@ void Drone::load(const std::filesystem::path &loadPath) {
 
     /* General */
 
-    Id      = loadMatrix<3, 3>(loadPath / "I");
-    Id_inv  = loadMatrix<3, 3>(loadPath / "I_inv");
-    k1      = loadDouble(loadPath / "k1");
-    k2      = loadDouble(loadPath / "k2");
+    Id     = loadMatrix<3, 3>(loadPath / "I");
+    Id_inv = loadMatrix<3, 3>(loadPath / "I_inv");
+    k1     = loadDouble(loadPath / "k1");
+    k2     = loadDouble(loadPath / "k2");
 
     m  = loadDouble(loadPath / "m");
     ct = loadDouble(loadPath / "ct");
@@ -65,6 +65,8 @@ void Drone::load(const std::filesystem::path &loadPath) {
     std::cout << "uh  = " << uh << std::endl;
     std::cout << "Fzh = " << Fzh << std::endl;
     std::cout << "Fg  = " << Fg << std::endl;
+
+    std::cout << "Ts_alt / Ts_att = " << (Ts_alt / Ts_att) << std::endl;
 
     assert(isAlmostEqual(Id_inv, inv(Id), 1e-12));
 }
@@ -131,8 +133,13 @@ operator()(const Drone::Controller::VecX_t &x,
     DroneState xx  = {x};
     DroneOutput rr = {r};
     DroneControl uu;
+    if (subsampleCounter == 0) {
+        u_alt            = altCtrl(xx.getAltitude(), rr.getAltitude());
+        subsampleCounter = subsampleAlt;
+    }
+    --subsampleCounter;
     uu.setAttitudeControl(attCtrl(xx.getAttitude(), rr.getAttitude()));
-    uu.setThrustControl(altCtrl(xx.getAltitude(), rr.getAltitude()));
+    uu.setThrustControl(u_alt);
     // TODO: clamp
     return uu;
 }

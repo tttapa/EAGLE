@@ -33,9 +33,9 @@ const ColVector<3> clampMax = 1.0 / 3 * ones<3, 1>();
 
 /* ------ LQR weighting matrices Q and R ------------------------------------ */
 
-const RowVector<3> Qq     = {{789.264, 789.264, 650.684}};
-const RowVector<3> Qomega = {{0.384275, 0.384275, 9.55652e-05}};
-const RowVector<3> Qn     = {{2.425268e-06, 2.425268e-06, 2.316292e-06}};
+const RowVector<3> Qq     = {{510.2525, 510.2525, 477.639736}};
+const RowVector<3> Qomega = {{0.20163231, 0.20163231, 0.00032853691}};
+const RowVector<3> Qn = {{3.789056346e-06, 3.789056346e-06, 7.8752933747e-08}};
 
 /** Weighting matrix for states in LQR design. */
 const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
@@ -45,9 +45,9 @@ const Matrix<3, 3> R = eye<3>();
 /* ------ PI constants altitude controller ---------------------------------- */
 
 /** Proporional altitude controller */
-const Matrix<1, 3> K_alt_p = {0.001, 2, 0.55};  // n, z, v
+const Matrix<1, 3> K_alt_p = {0.0001, 1.0, 0.5};  // n, z, v
 /** Integral altitude controller */
-const Matrix<1, 3> K_alt_i = {0.0, 0.005, 0.0};
+const Matrix<1, 3> K_alt_i = {0.0, 0.01, 0.0};
 
 /* ------ Kalman variance matrices ------------------------------------------ */
 /** @todo   Tune */

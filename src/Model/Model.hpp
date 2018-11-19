@@ -32,6 +32,11 @@ class Model {
         std::vector<double> quatnorms;
     };
 
+    struct ControllerSimulationResult : public SimulationResult {
+        std::vector<double> sampledTime;
+        std::vector<VecU_t> control;
+    };
+
     /**
      * @brief   Get the state change of the model, given current state
      *          @f$ x @f$ and input @f$ u @f$.
@@ -144,7 +149,7 @@ class Model {
     /** 
      * @brief   Simulate the model with the given discrete controller.
      */
-    virtual SimulationResult
+    virtual ControllerSimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller, ReferenceFunction &r,
              VecX_t x_start, const AdaptiveODEOptions &opt) = 0;
 
@@ -332,12 +337,14 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
      *          A result code is given as well, to indicate whether the 
      *          integration was successful.
      */
-    SimulationResult simulate(DiscreteController<Nx, Nu, Ny> &controller,
-                              ReferenceFunction &r, VecX_t x_start,
-                              const AdaptiveODEOptions &opt) override {
-        SimulationResult result     = {};
-        double Ts                   = controller.Ts;
-        size_t N                    = floor((opt.t_end - opt.t_start) / Ts) + 1;
+    typename Model<Nx, Nu, Ny>::ControllerSimulationResult
+    simulate(DiscreteController<Nx, Nu, Ny> &controller, ReferenceFunction &r,
+             VecX_t x_start, const AdaptiveODEOptions &opt) override {
+        typename Model<Nx, Nu, Ny>::ControllerSimulationResult result = {};
+        double Ts                         = controller.Ts;
+        size_t N = floor((opt.t_end - opt.t_start) / Ts) + 1;
+        result.sampledTime.reserve(N);
+        result.control.reserve(N);
         VecX_t curr_x               = x_start;
         AdaptiveODEOptions curr_opt = opt;
         for (size_t i = 0; i < N; ++i) {
@@ -347,6 +354,8 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             curr_opt.maxiter = opt.maxiter - result.time.size();
             VecR_t curr_ref  = r(t);
             VecU_t curr_u    = controller(curr_x, curr_ref);
+            result.sampledTime.push_back(t);
+            result.control.push_back(curr_u);
             result.resultCode |= this->simulate(
                 std::back_inserter(result.time),
                 std::back_inserter(result.solution), curr_u, curr_x, curr_opt);

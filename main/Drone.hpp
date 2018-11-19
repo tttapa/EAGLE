@@ -245,14 +245,20 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
       public:
         Controller(const Attitude::ClampedLQRController &attCtrl,
                    const Altitude::LQRController &altCtrl)
-            : DiscreteController<Nx, Nu, Ny>{std::min(attCtrl.Ts, altCtrl.Ts)},
-              attCtrl{attCtrl}, altCtrl{altCtrl} {}
+            : DiscreteController<Nx, Nu, Ny>{attCtrl.Ts}, attCtrl{attCtrl},
+              altCtrl{altCtrl}, subsampleAlt{
+                                    size_t(round(altCtrl.Ts / attCtrl.Ts))} {
+            assert(attCtrl.Ts < altCtrl.Ts);
+        }
 
         VecU_t operator()(const VecX_t &x, const VecR_t &r) override;
 
       private:
         Attitude::ClampedLQRController attCtrl;
         Altitude::LQRController altCtrl;
+        const size_t subsampleAlt;
+        size_t subsampleCounter = 0;
+        Altitude::LQRController::VecU_t u_alt;
     };
 
 #pragma region Observers........................................................
