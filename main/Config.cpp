@@ -20,8 +20,9 @@ const double CSV_Ts = 1.0 / CSV_fs;
 const std::filesystem::path loadPath =
     home / "PO-EAGLE/Groups/ANC/MATLAB/Codegen";
 
-/* ------ LQR weighting matrices Q and R ------------------------------------ */
+/* ------ Attitude LQR & LQE ------------------------------------------------ */
 
+namespace Attitude {
 const RowVector<3> Qq     = {{510.2525, 510.2525, 477.639736}};
 const RowVector<3> Qomega = {{0.20163231, 0.20163231, 0.00032853691}};
 const RowVector<3> Qn = {{3.789056346e-06, 3.789056346e-06, 7.8752933747e-08}};
@@ -31,14 +32,6 @@ const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
 /** Weighting matrix for inputs in LQR design. */
 const Matrix<3, 3> R = eye<3>();
 
-/* ------ PI constants altitude controller ---------------------------------- */
-
-/** Proporional altitude controller */
-const Matrix<1, 3> K_alt_p = {0.0001, 1.2, 0.54};  // n, z, v
-/** Integral altitude controller */
-const Matrix<1, 3> K_alt_i = {0.0, 0.001, 0.0};
-
-/* ------ Kalman variance matrices ------------------------------------------ */
 /** @todo   Tune */
 const RowVector<3> varDynamics = {{
     1e-4,
@@ -49,6 +42,19 @@ const RowVector<6> varSensors  = hcat(  //
     M_PI / 180.0 * ones<1, 3>(),       //
     0.005 * ones<1, 3>()               //
 );
+}  // namespace Attitude
+
+/* ------ Altitude PI controller and LQE ------------------------------------ */
+
+namespace Altitude {
+/** Proporional altitude controller */
+const Matrix<1, 3> K_p = {0.0001, 1.2, 0.54};  // n, z, v
+/** Integral altitude controller */
+const Matrix<1, 3> K_i = {0.0, 0.001, 0.0};
+
+const RowVector<1> varDynamics = {0.01};
+const RowVector<1> varSensors = {0.02}; // 2 cm
+}  // namespace Altitude
 
 /* ------ Simulation options (for ODE solver) ------------------------------- */
 

@@ -113,7 +113,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     }
 
     /** 
-     * @brief   Extract a certain part from the given vector of states.
+     * @brief   Extract a specific part from the given vector of states.
      */
     template <size_t R>
     static std::vector<ColVector<R>>
@@ -123,6 +123,23 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         result.resize(xs.size());
         transform(xs.begin(), xs.end(), result.begin(),
                   [f](const VecX_t &x) { return (DroneState{x}.*f)(); });
+        return result;
+    }
+
+    /** 
+     * @brief   Extract a specific element from the given vector of signals 
+     *          (states, inputs or outputs).
+     */
+    template <class S, size_t RS, size_t RP>
+    static std::vector<typename ColVector<RP>::type::type>
+    extractSignal(const std::vector<ColVector<RS>> &xs,
+                  ColVector<RP> (S::*f)() const, size_t idx) {
+        assert(idx < RP);
+        std::vector<typename ColVector<RP>::type::type> result;
+        result.resize(xs.size());
+        transform(
+            xs.begin(), xs.end(), result.begin(),
+            [f, idx](const ColVector<RS> &x) { return (S(x).*f)()[idx]; });
         return result;
     }
 

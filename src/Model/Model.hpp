@@ -2,6 +2,7 @@
 
 #include "Controller.hpp"
 #include "Kalman.hpp"
+#include "NoiseGenerator.hpp"
 #include "Params.hpp"
 #include <ODE/DormandPrince.hpp>
 #include <Quaternions/QuaternionStateAddSub.hpp>
@@ -24,17 +25,17 @@ class Model {
     typedef TimeFunctionT<VecR_t> ReferenceFunction;
     typedef ODEResultX<VecX_t> SimulationResult;
 
-    struct ObserverControllerSimulationResult : public SimulationResult {
-        std::vector<double> sampledTime;
-        std::vector<VecX_t> estimatedSolution;
-        std::vector<VecU_t> control;
-        std::vector<VecY_t> output;
-        std::vector<double> quatnorms;
-    };
-
     struct ControllerSimulationResult : public SimulationResult {
         std::vector<double> sampledTime;
         std::vector<VecU_t> control;
+        std::vector<VecY_t> reference;
+    };
+
+    struct ObserverControllerSimulationResult
+        : public ControllerSimulationResult {
+        std::vector<VecX_t> estimatedSolution;
+        std::vector<VecY_t> output;
+        std::vector<double> quatnorms;
     };
 
     /**
@@ -160,7 +161,7 @@ class Model {
     virtual ObserverControllerSimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller,
              DiscreteObserver<Nx, Nu, Ny> &observer,
-             TimeFunctionT<VecU_t> &randFnW, TimeFunctionT<VecY_t> &randFnV,
+             NoiseGenerator<Nu> &randFnW, NoiseGenerator<Ny> &randFnV,
              ReferenceFunction &r, VecX_t x_start,
              const AdaptiveODEOptions &opt) = 0;
 };
@@ -178,6 +179,8 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
     using InputFunction     = typename Model<Nx, Nu, Ny>::InputFunction;
     using ReferenceFunction = typename Model<Nx, Nu, Ny>::ReferenceFunction;
     using SimulationResult  = typename Model<Nx, Nu, Ny>::SimulationResult;
+    using ControllerSimulationResult =
+        typename Model<Nx, Nu, Ny>::ControllerSimulationResult;
     using ObserverControllerSimulationResult =
         typename Model<Nx, Nu, Ny>::ObserverControllerSimulationResult;
 
@@ -341,10 +344,11 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
     simulate(DiscreteController<Nx, Nu, Ny> &controller, ReferenceFunction &r,
              VecX_t x_start, const AdaptiveODEOptions &opt) override {
         typename Model<Nx, Nu, Ny>::ControllerSimulationResult result = {};
-        double Ts                         = controller.Ts;
-        size_t N = floor((opt.t_end - opt.t_start) / Ts) + 1;
+        double Ts = controller.Ts;
+        size_t N  = floor((opt.t_end - opt.t_start) / Ts) + 1;
         result.sampledTime.reserve(N);
         result.control.reserve(N);
+        result.reference.reserve(N);
         VecX_t curr_x               = x_start;
         AdaptiveODEOptions curr_opt = opt;
         for (size_t i = 0; i < N; ++i) {
@@ -356,6 +360,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             VecU_t curr_u    = controller(curr_x, curr_ref);
             result.sampledTime.push_back(t);
             result.control.push_back(curr_u);
+            result.reference.push_back(curr_ref);
             result.resultCode |= this->simulate(
                 std::back_inserter(result.time),
                 std::back_inserter(result.solution), curr_u, curr_x, curr_opt);
@@ -403,7 +408,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
     ObserverControllerSimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller,
              DiscreteObserver<Nx, Nu, Ny> &observer,
-             TimeFunctionT<VecU_t> &randFnW, TimeFunctionT<VecY_t> &randFnV,
+             NoiseGenerator<Nu> &randFnW, NoiseGenerator<Ny> &randFnV,
              ReferenceFunction &r, VecX_t x_start,
              const AdaptiveODEOptions &opt) override {
         assert(controller.Ts == observer.Ts);
@@ -429,9 +434,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             double t         = opt.t_start + Ts * k;
             curr_opt.t_start = t;
             curr_opt.t_end   = t + Ts;
-            // disturbance w and sensor noise v
-            auto w = randFnW(t);
-            auto v = randFnV(t);
+            curr_opt.maxiter = opt.maxiter - result.time.size();
             // reference signal
             VecR_t curr_ref = r(t);
             // calculate the control signal, based on current estimated state
@@ -441,7 +444,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             // the actual state and the control signal, plus the sensor
             // noise
             VecY_t clean_y = this->getOutput(curr_x, curr_u);  // no noise
-            VecY_t y       = quaternionStatesAdd(clean_y, v);  // add noise
+            VecY_t y       = randFnV(t, clean_y);  // add sensor noise
             // add the time, estimate state, control signal and output to the
             // result vectors
             result.sampledTime.push_back(t);
@@ -454,11 +457,13 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             //  k+1                                   k      k    k
             curr_x_hat = observer.getStateChange(curr_x_hat, y, curr_u);
 
+            // disturbances
+            VecU_t disturbed_u = randFnW(t, curr_u);
             // simulate the continuous system over this time step [t, t + Ts]
             // and add the time points and states to the result
             result.resultCode |=
                 this->simulate(std::back_inserter(result.time),
-                               std::back_inserter(result.solution), curr_u + w,
+                               std::back_inserter(result.solution), disturbed_u,
                                curr_x, curr_opt);
             // update the actual state using the result of the continuous
             // simulation at t + Ts

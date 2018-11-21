@@ -158,8 +158,8 @@ ColVector<1> Drone::Controller::clampThrust(ColVector<1> u_thrust) const {
 
 ColVector<3> Drone::Controller::clampAttitude(const ColVector<3> &u_raw) const {
     ColVector<3> u      = u_raw;
-    double other_max    = 1 - abs(u_alt);
-    double other_actual = abs(u_raw[0]) + abs(u_raw[1]) + abs(u_raw[2]);
+    double other_max    = 1 - fabs(u_alt);
+    double other_actual = fabs(u_raw[0]) + fabs(u_raw[1]) + fabs(u_raw[2]);
     if (other_actual > other_max) {
         u[0] = {other_max / other_actual * u_raw[0]};
         u[1] = {other_max / other_actual * u_raw[1]};

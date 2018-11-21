@@ -14,11 +14,14 @@ class DroneState {
         return getBlock<0, Nx_att, 0, 1>(x);
     }
     Quaternion getOrientation() const { return getBlock<0, 4, 0, 1>(x); }
+    EulerAngles getOrientationEuler() const {
+        return quat2eul(getOrientation());
+    }
     ColVector<3> getAngularVelocity() const { return getBlock<4, 7, 0, 1>(x); }
     ColVector<3> getMotorSpeed() const { return getBlock<7, 10, 0, 1>(x); }
     ColVector<3> getVelocity() const { return getBlock<10, 13, 0, 1>(x); }
     ColVector<3> getPosition() const { return getBlock<13, 16, 0, 1>(x); }
-    double getThrustMotorSpeed() const { return x[16]; }
+    ColVector<1> getThrustMotorSpeed() const { return {x[16]}; }
     ColVector<3> getAltitude() const {
         return vcat(getBlock<16, 17, 0, 1>(x),  // n
                     getBlock<15, 16, 0, 1>(x),  // z
@@ -58,7 +61,7 @@ class DroneControl {
     DroneControl() = default;
     DroneControl(const ColVector<4> &u) : u{u} {}
     ColVector<3> getAttitudeControl() const { return getBlock<0, 3, 0, 1>(u); }
-    double getThrustControl() const { return u[3]; }
+    ColVector<1> getThrustControl() const { return {u[3]}; }
     void setAttitudeControl(const ColVector<3> &u_att) {
         assignBlock<0, 3, 0, 1>(u) = u_att;
     }
@@ -76,6 +79,9 @@ class DroneOutput {
                 const ColVector<Ny_nav + Ny_alt> &y_pos)
         : y{vcat(y_att, y_pos)} {}
     Quaternion getOrientation() const { return getBlock<0, 4, 0, 1>(y); }
+    EulerAngles getOrientationEuler() const {
+        return quat2eul(getOrientation());
+    }
     ColVector<3> getAngularVelocity() const { return getBlock<4, 7, 0, 1>(y); }
     ColVector<7> getAttitude() const { return getBlock<0, 7, 0, 1>(y); }
     ColVector<3> getPosition() const { return getBlock<7, 10, 0, 1>(y); }
