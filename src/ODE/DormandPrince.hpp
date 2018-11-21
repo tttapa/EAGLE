@@ -2,8 +2,8 @@
 
 #include <cmath>    // pow
 #include <cstddef>  // size_t
-#include <limits>   // epsilon
 #include <exception>
+#include <limits>  // epsilon
 
 #include "DormandPrinceConstants.hpp"
 #include "ODEOptions.hpp"

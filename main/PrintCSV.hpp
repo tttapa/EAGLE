@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "ANSIColors.hpp"
+#include <Util/ANSIColors.hpp>
 #include <ODE/ODEResult.hpp>
 
 template <class T, size_t N>

@@ -1,6 +1,8 @@
 #pragma once
 
+#include <Util/ANSIColors.hpp>
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 enum ODEResultCodes : uint8_t {
@@ -54,6 +56,17 @@ struct ODEResultCode {
 
     explicit operator uint8_t() const { return this->code; }
     explicit operator bool() const { return this->code != 0; }
+
+    void verbose() const {
+        if (code & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED)
+            std::cerr << ANSIColors::redb
+                      << "Error: maximum number of iterations exceeded"
+                      << ANSIColors::reset << std::endl;
+        if (code & ODEResultCodes::MINIMUM_STEP_SIZE_REACHED)
+            std::cerr << ANSIColors::yellow
+                      << "Warning: minimum step size reached"
+                      << ANSIColors::reset << std::endl;
+    }
 };
 
 template <class V>

@@ -1,12 +1,10 @@
 #include "InputSignals.hpp"
 #include "PrintCSV.hpp"
 
-#include "ANSIColors.hpp"
 #include "Config.hpp"
 #include "Plot.hpp"
-#include <ODE/ODEEval.hpp>
 
-#include "CodeGen/CodeGen.hpp"
+#include <ODE/ODEEval.hpp>
 
 #include <iostream>
 
@@ -32,18 +30,7 @@ int main(int argc, char const *argv[]) {
 
     /* ------ Simulate the drone with the controller ------------------------ */
     auto result = drone.simulate(controller, ref, x0, odeopt);
-
-    double t_end = odeopt.t_end;
-    if (result.resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED) {
-        std::cerr << ANSIColors::redb
-                  << "Error: maximum number of iterations exceeded"
-                  << ANSIColors::reset << endl;
-        t_end = result.time.back();
-    }
-    if (result.resultCode & ODEResultCodes::MINIMUM_STEP_SIZE_REACHED)
-        std::cerr << ANSIColors::yellow << "Warning: minimum step size reached"
-                  << ANSIColors::reset << endl;
-
+    result.resultCode.verbose();
 
 #ifdef PLOT_CONTROLLER
 
@@ -57,9 +44,12 @@ int main(int argc, char const *argv[]) {
 
     if (exportCSV) {
         // Sample/interpolate the simulation result using a fixed time step
-        auto sampled = sampleODEResult(result, odeopt.t_start, CSV_Ts, t_end);
+        auto sampled =
+            sampleODEResult(result, odeopt.t_start, CSV_Ts, odeopt.t_end);
+        // Extract Quaternion orientation
         vector<Quaternion> sampledOrientation =
             Drone::extractState(sampled, &DroneState::getOrientation);
+        // Extract position
         vector<ColVector<3>> sampledLocation =
             Drone::extractState(sampled, &DroneState::getPosition);
         // Export to the given output file

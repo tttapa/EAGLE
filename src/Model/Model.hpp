@@ -3,7 +3,6 @@
 #include "Controller.hpp"
 #include "Kalman.hpp"
 #include "NoiseGenerator.hpp"
-#include "Params.hpp"
 #include <ODE/DormandPrince.hpp>
 #include <Quaternions/QuaternionStateAddSub.hpp>
 #include <Util/Time.hpp>
