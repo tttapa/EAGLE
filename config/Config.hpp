@@ -50,4 +50,32 @@ extern const RowVector<1> varSensors;
 /* ------ Simulation options (for ODE solver) ------------------------------- */
 extern const AdaptiveODEOptions odeopt;
 
+/* ------ Tuner settings ---------------------------------------------------- */
+namespace Tuner {
+/* ------ Matrix & Parameter data loading ----------------------------------- */
+extern const std::filesystem::path loadPath;
+
+extern const AdaptiveODEOptions odeopt;
+
+/* ------ LQR --------------------------------------------------------------- */
+extern const ColVector<9> Q_diag_initial;
+extern const ColVector<3> R_diag_initial;
+
+/* ------ Tuner mutation variance ------------------------------------------- */
+extern const double varQ[9];
+extern const double varR[3];
+
+extern const ColVector<9> Qmin;
+extern const ColVector<3> Rmin;
+
+extern const ColVector<9> Qmax;
+extern const ColVector<3> Rmax;
+
+/* ------ Genetic algorithm settings ---------------------------------------- */
+extern const size_t populationSize;
+extern const size_t generations;
+extern const size_t survivors;
+
+}  // namespace Tuner
+
 }  // namespace Config

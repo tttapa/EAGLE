@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Drone.hpp"
+#include <Drone/Drone.hpp>
 
 /** 
  * @brief   Reference function for controller simulations.

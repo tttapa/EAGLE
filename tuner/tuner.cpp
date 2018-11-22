@@ -14,27 +14,6 @@ using namespace std;
 constexpr static size_t Nq = ::Attitude::Nx - 1;
 constexpr static size_t Nr = ::Attitude::Nu;
 
-/* ------ Config ------------------------------------------------------------ */
-constexpr RowVector<3> Qn_initial     = {1, 1, 1};
-constexpr RowVector<3> Qomega_initial = {1, 1, 1};
-constexpr RowVector<3> Qq_initial     = {1, 1, 1};
-
-/** Weighting matrix for states in LQR design. */
-constexpr ColVector<9> Q_diag_initial =
-    transpose(hcat(Qq_initial, Qomega_initial, Qn_initial));
-/** Weighting matrix for inputs in LQR design. */
-constexpr ColVector<3> R_diag_initial = ones<3, 1>();
-
-/* ------ Tuner mutation variance ------------------------------------------- */
-constexpr double varQ[9] = {1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
-constexpr double varR[3] = {1e-2, 1e-2, 1e-2};
-
-constexpr ColVector<9> Qmin = 1e-6 * ones<9, 1>();
-constexpr ColVector<3> Rmin = 1e-6 * ones<3, 1>();
-
-constexpr ColVector<9> Qmax = 1e6 * ones<9, 1>();
-constexpr ColVector<3> Rmax = 1e6 * ones<3, 1>();
-
 struct Weights {
     ColVector<Nq> Q_diag;
     ColVector<Nr> R_diag;
@@ -44,12 +23,12 @@ struct Weights {
     bool operator<(const Weights &rhs) const { return this->cost < rhs.cost; }
 
     void mutate() {
-        auto dQ = randn(varQ);
+        auto dQ = randn(Config::Tuner::varQ);
         Q_diag += dQ;
-        clamp(Q_diag, Qmin, Qmax);
-        auto dR = randn(varR);
+        clamp(Q_diag, Config::Tuner::Qmin, Config::Tuner::Qmax);
+        auto dR = randn(Config::Tuner::varR);
         R_diag += dR;
-        clamp(R_diag, Rmin, Rmax);
+        clamp(R_diag, Config::Tuner::Rmin, Config::Tuner::Rmax);
     }
 
     void crossOver(const Weights &parent1, const Weights &parent2) {
@@ -91,6 +70,8 @@ double getCost(Drone::FixedClampAttitudeController &ctrl,
         resultCode |=
             model.simulate(std::back_inserter(time), std::back_inserter(states),
                            curr_u, x, opt);
+        if (resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED)
+            return std::numeric_limits<double>::infinity();
         x = states.back();
         if (normsq(getBlock<0, Ny_att, 0, 1>(x) - xref) < xrefnormsqthres)
             return i;
@@ -99,32 +80,56 @@ double getCost(Drone::FixedClampAttitudeController &ctrl,
 }
 
 int main(int argc, char const *argv[]) {
-    (void) argc, (void) argv;
+    filesystem::path loadPath = Config::Tuner::loadPath;
+    filesystem::path outPath  = "";
 
-    Drone drone = Config::loadPath;
+    cout << "argc = " << argc << endl;
+    for (int i = 0; i < argc; ++i) {
+        cout << i << ": " << argv[i] << endl;
+        if (strcmp(argv[i], "--load") == 0) {
+            ++i;
+            if (i == argc) {
+                cerr << "Error: `--load` expects the load path as an argument"
+                     << endl;
+                exit(-1);
+            } else {
+                cout << "Setting load path to: " << argv[i] << endl;
+                loadPath = argv[i];
+            }
+        }
+        if (strcmp(argv[i], "--out") == 0) {
+            ++i;
+            if (i == argc) {
+                cerr << "Error: `--out` expects the output path as an argument"
+                     << endl;
+                exit(-1);
+            } else {
+                cout << "Setting output path to: " << argv[i] << endl;
+                outPath = argv[i];
+            }
+        }
+    }
+
+    Drone drone = loadPath;
 
     Drone::AttitudeModel model = drone.getAttitudeModel();
 
-    constexpr size_t populationSize      = 16 * 64;
-    constexpr size_t numberOfGenerations = 50;
-    constexpr size_t survivors           = populationSize / 64;
-
     vector<Weights> populationWeights;
-    populationWeights.resize(populationSize);
+    populationWeights.resize(Config::Tuner::populationSize);
 
-    populationWeights[0].Q_diag = Q_diag_initial;
-    populationWeights[0].R_diag = R_diag_initial;
+    populationWeights[0].Q_diag = Config::Tuner::Q_diag_initial;
+    populationWeights[0].R_diag = Config::Tuner::R_diag_initial;
 
 #pragma omp parallel for
-    for (size_t i = 1; i < populationSize; ++i) {
+    for (size_t i = 1; i < Config::Tuner::populationSize; ++i) {
         populationWeights[i] = populationWeights[0];
         populationWeights[i].mutate();
     }
 
-    for (size_t g = 0; g < numberOfGenerations; ++g) {
+    for (size_t g = 0; g < Config::Tuner::generations; ++g) {
 
 #pragma omp parallel for
-        for (size_t i = 0; i < populationSize; ++i) {
+        for (size_t i = 0; i < Config::Tuner::populationSize; ++i) {
             auto &w = populationWeights[i];
             try {
                 Drone::FixedClampAttitudeController ctrl =
@@ -155,11 +160,11 @@ int main(int argc, char const *argv[]) {
         static ColVector<Ny_att> ref =
             vcat(eul2quat({M_PI / 16, M_PI / 16, M_PI / 16}), zeros<3, 1>());
         static ConstantTimeFunctionT reff = ref;
-        static ColVector<10> x0 = {1};
+        static ColVector<10> x0           = {1};
 
         Drone::FixedClampAttitudeController ctrl =
             drone.getFixedClampAttitudeController(best.Q(), best.R());
-        auto result = model.simulate(ctrl, reff, x0, Config::odeopt);
+        auto result = model.simulate(ctrl, reff, x0, Config::Tuner::odeopt);
         result.resultCode.verbose();
 
         /* ------ Plot the simulation result -------------------------------- */
@@ -169,19 +174,19 @@ int main(int argc, char const *argv[]) {
 
         plt::figure();
         std::string gstr = std::to_string(g);
+
         plt::subplot(4, 1, 1);
-        plt::tight_layout();
-        plotDroneSignal(result.sampledTime, result.reference,
-                        &DroneOutput::getOrientationEuler, {"z", "y'", "x\""},
-                        {"b" DISCRETE_FMT, "g" DISCRETE_FMT, "r" DISCRETE_FMT},
-                        "Reference orientation");
+        plotDroneSignal(result.time, result.solution,
+                        &DroneAttitudeState::getOrientationEuler,
+                        {"z", "y'", "x\""}, {"b-", "g-", "r-"},
+                        "Orientation of drone (Generation #" + gstr + ")");
         plt::xlim(t_start, t_end * 1.1);
 
         plt::subplot(4, 1, 2);
         plotDroneSignal(result.time, result.solution,
-                        &DroneAttitudeState::getOrientationEuler,
-                        {"z", "y'", "x\""}, {"b-", "g-", "r-"},
-                        "Orientation of drone");
+                        &DroneAttitudeState::getAngularVelocity,
+                        {"x", "y", "z"}, {"r-", "g-", "b-"},
+                        "Angular velocity of drone");
         plt::xlim(t_start, t_end * 1.1);
 
         plt::subplot(4, 1, 3);
@@ -198,10 +203,13 @@ int main(int argc, char const *argv[]) {
                         "Torque motor control");
         plt::xlim(t_start, t_end * 1.1);
 
+        plt::tight_layout();
+
         std::stringstream filename;
         filename << "generation" << std::setw(3) << std::setfill('0') << g
                  << ".png";
-        plt::save(filename.str());
+        std::filesystem::path outputfile = outPath / filename.str();
+        plt::save(outputfile);
 
 #endif
 
@@ -209,10 +217,12 @@ int main(int argc, char const *argv[]) {
 
         // mutate
         std::default_random_engine generator;
-        std::uniform_int_distribution<size_t> distribution(0, survivors - 1);
+        std::uniform_int_distribution<size_t> distribution(
+            0, Config::Tuner::survivors - 1);
 
 #pragma omp parallel for
-        for (size_t i = survivors; i < populationSize; ++i) {
+        for (size_t i = Config::Tuner::survivors;
+             i < Config::Tuner::populationSize; ++i) {
             size_t idx1 = distribution(generator);
             size_t idx2 = distribution(generator);
             populationWeights[i].crossOver(populationWeights[idx1],

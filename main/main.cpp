@@ -1,6 +1,6 @@
 #include "Config.hpp"
 #include "InputSignals.hpp"
-#include "MotorControl.hpp"
+#include <Drone/MotorControl.hpp>
 #include "Plot.hpp"
 #include "PrintCSV.hpp"
 

@@ -17,7 +17,8 @@
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/main",
                 "${HOME}/lib/matplotlib-cpp",
-                "/usr/include/python2.7"
+                "/usr/include/python2.7",
+                "${workspaceFolder}/config"
             ]
         }
     ],

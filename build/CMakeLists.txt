@@ -46,7 +46,7 @@ enable_testing()
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
--O2 \
+-O4 \
 -Wall -Wextra \
 -Wsuggest-override \
 -Wno-register \
@@ -74,12 +74,17 @@ include_directories("../src")
 file(GLOB_RECURSE SOURCES "../src/*.cpp")
 add_library(source STATIC ${SOURCES})
 
+include_directories("../config")
+file(GLOB_RECURSE CONFIG "../config/*.cpp")
+add_library(config STATIC ${CONFIG})
+
 # Main source files
 include_directories("../main")
 file(GLOB_RECURSE MAIN "../main/*.cpp" "../main/*.c")
 add_executable(main ${MAIN})
 target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(main 
+                      config
                       source
                       ${PYTHON_LIBRARIES}
                       lapacke
@@ -97,7 +102,15 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 target_include_directories(tuner PRIVATE ${PYTHON_INCLUDE_DIRS})
-target_link_libraries(tuner source ${PYTHON_LIBRARIES} lapacke)
+target_link_libraries(tuner
+                      config
+                      source
+                      ${PYTHON_LIBRARIES}
+                      lapacke.a
+                      lapack
+                      -static-libgcc 
+                      -static-libstdc++
+                      stdc++fs)
 
 # Test executable compilation and linking
 file(GLOB_RECURSE TESTS "../test/*.cpp")
@@ -105,7 +118,8 @@ add_executable(tests ${TESTS})
 target_link_libraries(tests
                       gmock
                       source
-                      lapacke
+                      lapacke.a
+                      lapack
                       stdc++fs)
 
 # Add tests
