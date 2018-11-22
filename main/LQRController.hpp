@@ -31,7 +31,7 @@ Matrix<Nx + Nu, Ny> calculateG(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                                bool continuous = false) {
     Matrix<Nx, Nx> As = continuous ? A : A - eye<Nx>();
     /* W =  [ As B ]
-                [ C  D ] */
+            [ C  D ] */
     Matrix<Nx + Ny, Nx + Nu> W = vcat(  //
         hcat(As, B),                    //
         hcat(C, D)                      //
@@ -58,6 +58,21 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
   public:
     /** 
      * @brief   Construct a new instance of LQRController with the 
+     *          given equilibrium matrix G, and the given proportional 
+     *          controller K.
+     * 
+     * @param   G
+     *          Equilibrium matrix G.
+     * @param   K
+     *          Proportional controller matrix K.
+     * @param   Ts
+     *          The sample time of the discrete controller.
+     */
+    LQRController(const Matrix<Nx + Nu, Ny> &G, const Matrix<Nu, Nx - 1> &K,
+                  double Ts)
+        : DiscreteController<Nx, Nu, Ny>{Ts}, K(K), G(G) {}
+    /** 
+     * @brief   Construct a new instance of LQRController with the 
      *          given system matrices A, B, C, D, and the given proportional 
      *          controller K.
      * 
@@ -71,11 +86,15 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
      *          System matrix D.
      * @param   K
      *          Proportional controller matrix K.
+     * @param   Ts
+     *          The sample time of the discrete controller.
      */
     LQRController(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                   const Matrix<Ny, Nx> &C, const Matrix<Ny, Nu> &D,
                   const Matrix<Nu, Nx - 1> &K, double Ts)
-        : DiscreteController<Nx, Nu, Ny>{Ts}, K(K), G(calculateG(A, B, C, D)) {}
+        : DiscreteController<Nx, Nu, Ny>{Ts}, K(K), G(calculateG(A, B, C, D)) {
+        std::cout << "Attitude::LQRController::G = " << G;
+    }
 
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
         return getRawControllerOutput(x, r);
@@ -116,6 +135,22 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
   public:
     /** 
      * @brief   Construct a new instance of LQRController with the 
+     *          given equilibrium matrix G, and the given proportional 
+     *          controller K.
+     * 
+     * @param   G
+     *          Equilibrium matrix G.
+     * @param   K
+     *          Proportional controller matrix K.
+     * @param   Ts
+     *          The sample time of the discrete controller.
+     */
+    LQRController(const Matrix<Nx + Nu, Ny> &G, const Matrix<Nu, Nx> &K_p,
+                  const Matrix<Nu, Nx> &K_i, double Ts)
+        : DiscreteController<Nx, Nu, Ny>{Ts}, K_p(K_p), K_i(K_i), G(G) {}
+
+    /** 
+     * @brief   Construct a new instance of LQRController with the 
      *          given system matrices A, B, C, D, and the given proportional 
      *          controller K.
      * 
@@ -140,7 +175,7 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
                   double Ts)
         : DiscreteController<Nx, Nu, Ny>{Ts}, K_p(K_p), K_i(K_i),
           G(calculateG(A, B, C, D)) {
-        std::cout << "Altitude::LQRController::G = " << G << std::endl;
+        std::cout << "Altitude::LQRController::G = " << std::endl << G;
     }
 
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {

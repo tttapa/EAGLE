@@ -1,9 +1,11 @@
 #pragma once
 
 #include <Matrix/Matrix.hpp>
+#include <algorithm>
+#include <vector>
 
 namespace MotorControlTransformation {
-constexpr Matrix<4, 4> M     = {{
+constexpr Matrix<4, 4> M = {{
     // nx ny nz nt
     {1, 1, -1, 1},
     {1, -1, 1, 1},
@@ -17,6 +19,17 @@ constexpr Matrix<4, 4> M_inv = 0.25 * transpose(M);
 inline ColVector<4>
 convertControlSignalToMotorOutputs(const ColVector<4> &u_model) {
     ColVector<4> u_motors = MotorControlTransformation::M * u_model;
+    return u_motors;
+}
+
+inline std::vector<ColVector<4>>
+convertControlSignalToMotorOutputs(const std::vector<ColVector<4>> &u_model) {
+    std::vector<ColVector<4>> u_motors;
+    u_motors.resize(u_model.size());
+    std::transform(u_model.begin(), u_model.end(), u_motors.begin(),
+                   [](const ColVector<4> &u_model) {
+                       return convertControlSignalToMotorOutputs(u_model);
+                   });
     return u_motors;
 }
 

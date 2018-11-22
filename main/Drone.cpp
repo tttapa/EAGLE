@@ -16,6 +16,8 @@ void Drone::load(const std::filesystem::path &loadPath) {
     Cd_att = loadMatrix<Ny_att, Nx_att>(loadPath / "attitude" / "Cd");
     Dd_att = loadMatrix<Ny_att, Nu_att>(loadPath / "attitude" / "Dd");
 
+    G_att = calculateG(Ad_att, Bd_att, Cd_att, Dd_att);
+
     Ad_att_r = getBlock<1, Nx_att, 1, Nx_att>(Ad_att);
     Bd_att_r = getBlock<1, Nx_att, 0, Nu_att>(Bd_att);
     Cd_att_r = getBlock<1, Ny_att, 1, Nx_att>(Cd_att);
@@ -36,6 +38,8 @@ void Drone::load(const std::filesystem::path &loadPath) {
     Bd_alt = loadMatrix<Nx_alt, Nu_alt>(loadPath / "altitude" / "Bd");
     Cd_alt = loadMatrix<Ny_alt, Nx_alt>(loadPath / "altitude" / "Cd");
     Dd_alt = loadMatrix<Ny_alt, Nu_alt>(loadPath / "altitude" / "Dd");
+
+    G_alt = calculateG(Ad_alt, Bd_alt, Cd_alt, Dd_alt);
 
     Ts_alt = loadDouble(loadPath / "altitude" / "Ts");
 
@@ -72,8 +76,7 @@ void Drone::load(const std::filesystem::path &loadPath) {
     assert(isAlmostEqual(Id_inv, inv(Id), 1e-12));
 }
 
-Drone::VecX_t Drone::operator()(const Drone::VecX_t &x,
-                                const Drone::VecU_t &u) {
+Drone::VecX_t Drone::operator()(const VecX_t &x, const VecU_t &u) {
     DroneState xx   = {x};
     DroneControl uu = {u};
     DroneState x_dot;
@@ -108,7 +111,7 @@ Drone::VecX_t Drone::operator()(const Drone::VecX_t &x,
     return x_dot;
 }
 
-Drone::VecY_t Drone::getOutput(const Drone::VecX_t &x, const Drone::VecU_t &u) {
+Drone::VecY_t Drone::getOutput(const VecX_t &x, const VecU_t &u) {
     DroneState xx   = {x};
     DroneControl uu = {u};
     ColVector<Ny_att> y_att =
@@ -128,6 +131,39 @@ Drone::VecX_t Drone::getStableState() const {
     return xx;
 }
 
+Drone::AttitudeModel::AttitudeModel(const Drone &drone)
+    : gamma_n{drone.gamma_n}, gamma_u{drone.gamma_u}, Id{drone.Id},
+      Id_inv{drone.Id_inv}, k1{drone.k1}, k2{drone.k2}, uh{drone.uh},
+      Ca_att{drone.Ca_att}, Da_att{drone.Da_att} {}
+
+// TODO: dry?
+Drone::AttitudeModel::VecX_t Drone::AttitudeModel::operator()(const VecX_t &x,
+                                                              const VecU_t &u) {
+    DroneAttitudeState xx = {x};
+    DroneControl uu       = {u, {uh}};
+    DroneAttitudeState x_dot;
+
+    // Attitude
+    Quaternion q       = xx.getOrientation();
+    ColVector<3> omega = xx.getAngularVelocity();
+    ColVector<3> n     = xx.getMotorSpeed();
+    ColVector<3> u_att = uu.getAttitudeControl();
+
+    Quaternion q_omega = vcat(zeros<1, 1>(), omega);
+    x_dot.setOrientation(0.5 * quatmultiply(q, q_omega));
+    x_dot.setAngularVelocity(gamma_n * n + gamma_u * u_att -
+                             Id_inv * cross(omega, Id * omega));
+    x_dot.setMotorSpeed(k2 * (k1 * u_att - n));
+
+    return x_dot;
+}
+
+// TODO: dry?
+Drone::AttitudeModel::VecY_t Drone::AttitudeModel::getOutput(const VecX_t &x,
+                                                             const VecU_t &u) {
+    return Ca_att * x + Da_att * u;
+}
+
 #pragma region Controllers......................................................
 
 Drone::Controller::VecU_t Drone::Controller::
@@ -144,26 +180,35 @@ operator()(const Drone::Controller::VecX_t &x,
     --subsampleCounter;
 
     auto u_att = attCtrl(xx.getAttitude(), rr.getAttitude());
-    u_att      = clampAttitude(u_att);
+    u_att      = clampAttitude(u_att, u_alt);
     uu.setAttitudeControl(u_att);
     uu.setThrustControl(u_alt);
     checkControlSignal(uu);
     return uu;
 }
 
-ColVector<1> Drone::Controller::clampThrust(ColVector<1> u_thrust) const {
+ColVector<1> Drone::Controller::clampThrust(ColVector<1> u_thrust) {
     clamp(u_thrust, {-0.1}, {0.1});
     return u_thrust;
 }
 
-ColVector<3> Drone::Controller::clampAttitude(const ColVector<3> &u_raw) const {
+Attitude::LQRController::VecU_t
+Drone::Controller::clampAttitude(const Attitude::LQRController::VecU_t &u_raw,
+                                 const Altitude::LQRController::VecU_t &u_alt) {
     ColVector<3> u      = u_raw;
-    double other_max    = 1 - fabs(u_alt);
-    double other_actual = fabs(u_raw[0]) + fabs(u_raw[1]) + fabs(u_raw[2]);
+    double other_max    = 1 - abs(u_alt);
+    double other_actual = abs(u_raw[0]) + abs(u_raw[1]) + abs(u_raw[2]);
     if (other_actual > other_max) {
         u[0] = {other_max / other_actual * u_raw[0]};
         u[1] = {other_max / other_actual * u_raw[1]};
         u[2] = {other_max / other_actual * u_raw[2]};
+    }
+    other_actual = abs(u[0]) + abs(u[1]) + abs(u[2]);
+    double e     = std::numeric_limits<double>::epsilon() + 1.0;
+    if (other_actual > abs(u_alt)) {
+        u[0] = {double(u_alt) / other_actual * u[0] / e};
+        u[1] = {double(u_alt) / other_actual * u[1] / e};
+        u[2] = {double(u_alt) / other_actual * u[2] / e};
     }
     return u;
 }

@@ -60,7 +60,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      *      \frac{F_{z'}}{m} - 
      *      \begin{pmatrix} 0 \\ 0 \\ g \end{pmatrix}
      * \quad @f$  where @f$ \star @f$ is the quaternion rotation of a vector and 
-     *      @f$ F_{z'} = C_t \rho Dp^4 n_t^2 N_m @f$ is the thrust along the 
+     *      @f$ F_{z'} = C_t \rho D_p^4 n_t^2 N_m @f$ is the thrust along the 
      *      local z-axis
      * 
      * @f$
@@ -143,6 +143,25 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         return result;
     }
 
+    struct AttitudeModel : public ContinuousModel<Nx_att, Nu_att, Ny_att> {
+        AttitudeModel(const Drone &drone);
+
+        VecX_t operator()(const VecX_t &x, const VecU_t &u) override;
+        VecY_t getOutput(const VecX_t &x, const VecU_t &u) override;
+
+        const Matrix<3, 3> gamma_n;
+        const Matrix<3, 3> gamma_u;
+        const Matrix<3, 3> Id;
+        const Matrix<3, 3> Id_inv;
+        const double k1;
+        const double k2;
+        const ColVector<1> uh;
+        const Matrix<Ny_att, Nx_att> Ca_att;
+        const Matrix<Ny_att, Nu_att> Da_att;
+    };
+
+    AttitudeModel getAttitudeModel() const { return {*this}; }
+
 #pragma region Controllers......................................................
 
     /** 
@@ -161,12 +180,36 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     getAttitudeController(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                           const Matrix<Nu_att, Nu_att> &R) const {
         auto K_red = getAttitudeControllerMatrixK(Q, R);
-        return {Ad_att, Bd_att, Cd_att, Dd_att, K_red, Ts_att};
+        return {G_att, K_red, Ts_att};
+    }
+
+    /** 
+     * A stand-alone attitude controller that clamps the control output using
+     * the (fixed) hover thrust as the common thrust.
+     */
+    class FixedClampAttitudeController : public Attitude::LQRController {
+      public:
+        FixedClampAttitudeController(const Attitude::LQRController &ctrl,
+                                     double uh)
+            : Attitude::LQRController{ctrl}, uh{uh} {}
+        VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
+            return Drone::Controller::clampAttitude(
+                getRawControllerOutput(x, r), uh);
+        }
+
+      private:
+        const ColVector<1> uh;
+    };
+
+    FixedClampAttitudeController
+    getFixedClampAttitudeController(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
+                                    const Matrix<Nu_att, Nu_att> &R) const {
+        return {getAttitudeController(Q, R), uh};
     }
 
     Altitude::LQRController getAltitudeController(const Matrix<1, 3> &K_p,
                                                   const Matrix<1, 3> &K_i) {
-        return {Ad_alt, Bd_alt, Cd_alt, Dd_alt, K_p, K_i, Ts_alt};
+        return {G_alt, K_p, K_i, Ts_alt};
     }
 
     class Controller : public DiscreteController<Nx, Nu, Ny> {
@@ -181,11 +224,13 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
         VecU_t operator()(const VecX_t &x, const VecR_t &r) override;
 
-      protected:
         /** Clamp the marginal thrust between 0.1 and -0.1 */
-        ColVector<1> clampThrust(ColVector<1> u_thrust) const;
+        static Altitude::LQRController::VecU_t
+        clampThrust(Altitude::LQRController::VecU_t u_thrust);
         /** 2.2: Clamp [ux;uy;uz] such that all motor inputs ui <= 1. */
-        ColVector<3> clampAttitude(const ColVector<3> &u_raw) const;
+        static Attitude::LQRController::VecU_t
+        clampAttitude(const Attitude::LQRController::VecU_t &u_raw,
+                      const Altitude::LQRController::VecU_t &u_alt);
 
       private:
         Attitude::LQRController attCtrl;
@@ -193,7 +238,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         const size_t subsampleAlt;
         size_t subsampleCounter = 0;
         Altitude::LQRController::VecU_t u_alt;
-        const ColVector<1> uh;
+        const Altitude::LQRController::VecU_t uh;
     };
 
     Controller getController(const Matrix<Nx_att - 1, Nx_att - 1> &Q_att,
@@ -276,7 +321,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     }
 
 #pragma region System matrices Attitude.........................................
-
+  private:
     /** 
      * ```
      *  Aa_att =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]
@@ -366,6 +411,11 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      */
     Matrix<Ny_att, Nu_att> Dd_att = {};
 
+    /** 
+     * Equilibrium G
+     */
+    Matrix<Nx_att + Nu_att, Ny_att> G_att;
+
 #pragma region System matrices Altitude.........................................
 
     /** 
@@ -415,6 +465,11 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      * Discrete D
      */
     Matrix<Ny_alt, Nu_alt> Dd_alt = {};
+
+    /** 
+     * Equilibrium G
+     */
+    Matrix<Nx_alt + Nu_alt, Ny_alt> G_alt;
 
 #pragma region System parameters................................................
 

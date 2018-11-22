@@ -23,8 +23,8 @@ struct IndexRange {
 };
 
 template <size_t N>
-void plotResults(const std::vector<double> &t,
-                 const std::vector<TColVector<double, N>> &vectors,
+void plotVectors(const std::vector<double> &t,
+                 const std::vector<ColVector<N>> &vectors,
                  const IndexRange idx                    = {0, N},
                  const std::vector<std::string> &legends = {},
                  const std::vector<std::string> &formats = {},
