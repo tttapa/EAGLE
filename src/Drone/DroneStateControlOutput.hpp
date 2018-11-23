@@ -82,44 +82,87 @@ class DroneControl {
     ColVector<4> u = {};
 
   public:
-    DroneControl() = default;
-    DroneControl(const ColVector<4> &u) : u{u} {}
-    DroneControl(const ColVector<3> &u_att, const ColVector<1> &u_alt = {})
+    constexpr DroneControl() = default;
+    constexpr DroneControl(const ColVector<4> &u) : u{u} {}
+    constexpr DroneControl(const ColVector<3> &u_att,
+                           const ColVector<1> &u_alt = {})
         : u{vcat(u_att, u_alt)} {}
-    ColVector<3> getAttitudeControl() const { return getBlock<0, 3, 0, 1>(u); }
-    ColVector<1> getThrustControl() const { return {u[3]}; }
-    void setAttitudeControl(const ColVector<3> &u_att) {
+    constexpr ColVector<3> getAttitudeControl() const {
+        return getBlock<0, 3, 0, 1>(u);
+    }
+    constexpr ColVector<1> getThrustControl() const { return {u[3]}; }
+    constexpr void setAttitudeControl(const ColVector<3> &u_att) {
         assignBlock<0, 3, 0, 1>(u) = u_att;
     }
-    void setThrustControl(double u_thrust) { u[3] = {u_thrust}; }
-    operator ColVector<4>() const { return u; }
+    constexpr void setThrustControl(double u_thrust) { u[3] = {u_thrust}; }
+    constexpr operator ColVector<4>() const { return u; }
 };
 
 class DroneOutput {
     ColVector<10> y = {};
 
   public:
-    DroneOutput() = default;
-    DroneOutput(const ColVector<10> &y) : y{y} {}
-    DroneOutput(const ColVector<Ny_att> &y_att,
-                const ColVector<Ny_nav + Ny_alt> &y_pos = {})
+    constexpr DroneOutput() = default;
+    constexpr DroneOutput(const ColVector<10> &y) : y{y} {}
+    constexpr DroneOutput(const ColVector<Ny_att> &y_att,
+                          const ColVector<Ny_nav + Ny_alt> &y_pos = {})
         : y{vcat(y_att, y_pos)} {}
-    Quaternion getOrientation() const { return getBlock<0, 4, 0, 1>(y); }
-    EulerAngles getOrientationEuler() const {
+    constexpr Quaternion getOrientation() const {
+        return getBlock<0, 4, 0, 1>(y);
+    }
+    constexpr EulerAngles getOrientationEuler() const {
         return quat2eul(getOrientation());
     }
-    ColVector<3> getAngularVelocity() const { return getBlock<4, 7, 0, 1>(y); }
-    ColVector<7> getAttitude() const { return getBlock<0, 7, 0, 1>(y); }
-    ColVector<3> getPosition() const { return getBlock<7, 10, 0, 1>(y); }
-    ColVector<1> getAltitude() const { return getBlock<9, 10, 0, 1>(y); }
+    constexpr ColVector<3> getAngularVelocity() const {
+        return getBlock<4, 7, 0, 1>(y);
+    }
+    constexpr ColVector<7> getAttitude() const {
+        return getBlock<0, 7, 0, 1>(y);
+    }
+    constexpr ColVector<3> getPosition() const {
+        return getBlock<7, 10, 0, 1>(y);
+    }
+    constexpr ColVector<1> getAltitude() const {
+        return getBlock<9, 10, 0, 1>(y);
+    }
 
-    void setOrientation(const Quaternion &q) { assignBlock<0, 4, 0, 1>(y) = q; }
-    void setAngularVelocity(const ColVector<3> &w) {
+    constexpr void setOrientation(const Quaternion &q) {
+        assignBlock<0, 4, 0, 1>(y) = q;
+    }
+    constexpr void setAngularVelocity(const ColVector<3> &w) {
         assignBlock<4, 7, 0, 1>(y) = w;
     }
-    void setAttitudeOutput(const ColVector<7> &yy) {
+    constexpr void setAttitudeOutput(const ColVector<7> &yy) {
         assignBlock<0, 7, 0, 1>(y) = yy;
     }
-    void setPosition(const ColVector<3> &z) { assignBlock<7, 10, 0, 1>(y) = z; }
-    operator ColVector<10>() const { return y; }
+    constexpr void setPosition(const ColVector<3> &z) {
+        assignBlock<7, 10, 0, 1>(y) = z;
+    }
+    constexpr operator ColVector<10>() const { return y; }
+};
+
+class DroneAttitudeOutput {
+    ColVector<7> y = {};
+
+  public:
+    constexpr DroneAttitudeOutput() = default;
+    constexpr DroneAttitudeOutput(const ColVector<7> &y) : y{y} {}
+    constexpr Quaternion getOrientation() const {
+        return getBlock<0, 4, 0, 1>(y);
+    }
+    constexpr EulerAngles getOrientationEuler() const {
+        return quat2eul(getOrientation());
+    }
+    constexpr ColVector<3> getAngularVelocity() const {
+        return getBlock<4, 7, 0, 1>(y);
+    }
+
+    constexpr void setOrientation(const Quaternion &q) {
+        assignBlock<0, 4, 0, 1>(y) = q;
+    }
+    constexpr void setAngularVelocity(const ColVector<3> &w) {
+        assignBlock<4, 7, 0, 1>(y) = w;
+    }
+
+    constexpr operator ColVector<7>() const { return y; }
 };

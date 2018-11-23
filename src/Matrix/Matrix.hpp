@@ -287,7 +287,7 @@ void printMATLAB(std::ostream &os, const TMatrix<T, R, C> &matrix) {
             os << std::setw(MatrixPrinting::width) << matrix[r][c];
         }
     }
-    os << " ];" << std::endl;
+    os << " ]";
 }
 
 template <class T, size_t R, size_t C>

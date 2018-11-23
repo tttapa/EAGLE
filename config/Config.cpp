@@ -76,12 +76,22 @@ const std::filesystem::path loadPath = home / "Private" / "EAGLE-Params";
 
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
-    .t_end   = 1,
-    .epsilon = 1e-6,
-    .h_start = 1e-6,
-    .h_min   = 1e-10,
+    .t_end   = 0.5,
+    .epsilon = 1e-4,
+    .h_start = 1e-4,
+    .h_min   = 1e-6,
     .maxiter = (unsigned long) 1e5,
 };
+
+const AdaptiveODEOptions odeoptdisp = {
+    .t_start = 0,
+    .t_end   = 0.5 * (7 + 1),
+    .epsilon = 1e-4,
+    .h_start = 1e-4,
+    .h_min   = 1e-6,
+    .maxiter = (unsigned long) 1e5,
+};
+
 /* ------ LQR --------------------------------------------------------------- */
 constexpr RowVector<3> Qn_initial     = {1, 1, 1};
 constexpr RowVector<3> Qomega_initial = {1, 1, 1};
@@ -97,16 +107,21 @@ const ColVector<3> R_diag_initial = ones<3, 1>();
 const double varQ[9] = {1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
 const double varR[3] = {1e-2, 1e-2, 1e-2};
 
-const ColVector<9> Qmin = 1e-6 * ones<9, 1>();
-const ColVector<3> Rmin = 1e-6 * ones<3, 1>();
+const ColVector<9> Qmin = 1e-10 * ones<9, 1>();
+const ColVector<3> Rmin = 1e-10 * ones<3, 1>();
 
 const ColVector<9> Qmax = 1e6 * ones<9, 1>();
 const ColVector<3> Rmax = 1e6 * ones<3, 1>();
 
 /* ------ Genetic algorithm settings ---------------------------------------- */
-const size_t populationSize = 16 * 64 * 2;
-const size_t generations    = 50;
-const size_t survivors      = populationSize / 64;
+const size_t population  = 16 * 64;
+const size_t generations = 50;
+const size_t survivors   = 16;
+
+/* ------ Image export dimensions ------------------------------------------- */
+const size_t px_x = 1920;
+const size_t px_y = 1080;
+
 }  // namespace Tuner
 
 }  // namespace Config

@@ -28,7 +28,7 @@ inline Quaternion quatDifference(const Quaternion &p, const Quaternion &q) {
 
 using EulerAngles = ColVector<3>;
 
-inline Quaternion eul2quat(const EulerAngles &eulerAngles) {
+constexpr Quaternion eul2quat(const EulerAngles &eulerAngles) {
     double phi   = eulerAngles[2];
     double theta = eulerAngles[1];
     double psi   = eulerAngles[0];
@@ -45,7 +45,7 @@ inline Quaternion eul2quat(const EulerAngles &eulerAngles) {
     }};
 }
 
-inline EulerAngles quat2eul(const Quaternion &q) {
+constexpr EulerAngles quat2eul(const Quaternion &q) {
     const double &q0 = q[0];
     const double &q1 = q[1];
     const double &q2 = q[2];
@@ -60,10 +60,10 @@ inline EulerAngles quat2eul(const Quaternion &q) {
     return {psi, theta, phi};
 }
 
-static inline double sq(double r) { return r * r; }
+static constexpr double sq(double r) { return r * r; }
 
 template <size_t C>
-inline Matrix<3, C> quatrotate(const Quaternion &q, const Matrix<3, C> &v) {
+constexpr Matrix<3, C> quatrotate(const Quaternion &q, const Matrix<3, C> &v) {
     const double &q0 = q[0];
     const double &q1 = q[1];
     const double &q2 = q[2];

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cmath>
+#include <cstddef>
 
 constexpr inline size_t numberOfSamplesInTimeRange(double t_start, double Ts,
                                                    double t_end) {
-    return floor((t_end - t_start) / Ts) + 1;
+    return size_t((t_end - t_start) / Ts) + 1;
 }

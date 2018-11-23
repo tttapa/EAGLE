@@ -8,13 +8,8 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/tuner",
-            "args": [
-                "--load",
-                "$HOME/PO-EAGLE/Groups/ANC/MATLAB/Codegen",
-                "--out",
-                "/tmp"
-            ],
+            "program": "${workspaceFolder}/build/bin/tests",
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

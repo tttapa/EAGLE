@@ -111,7 +111,7 @@ struct Array {
      * @brief   Implicit conversion from Array<T, 1> to T&.
      */
     template <bool EnableBool = true>
-    operator typename std::add_lvalue_reference<
+    constexpr operator typename std::add_lvalue_reference<
         typename std::enable_if<N == 1 && EnableBool, T>::type>::type() {
         return data[0];
     }
@@ -120,6 +120,7 @@ struct Array {
      * @brief   Implicit conversion from const Array<T, 1> to const T&.
      */
     template <bool EnableBool = true>
+    constexpr
     operator typename std::add_lvalue_reference<typename std::add_const<
         typename std::enable_if<N == 1 && EnableBool, T>::type>::type>::type()
         const {

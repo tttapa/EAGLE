@@ -56,6 +56,7 @@ namespace Tuner {
 extern const std::filesystem::path loadPath;
 
 extern const AdaptiveODEOptions odeopt;
+extern const AdaptiveODEOptions odeoptdisp;
 
 /* ------ LQR --------------------------------------------------------------- */
 extern const ColVector<9> Q_diag_initial;
@@ -72,9 +73,13 @@ extern const ColVector<9> Qmax;
 extern const ColVector<3> Rmax;
 
 /* ------ Genetic algorithm settings ---------------------------------------- */
-extern const size_t populationSize;
+extern const size_t population;
 extern const size_t generations;
 extern const size_t survivors;
+
+/* ------ Image export dimensions ------------------------------------------- */
+extern const size_t px_x;
+extern const size_t px_y;
 
 }  // namespace Tuner
 

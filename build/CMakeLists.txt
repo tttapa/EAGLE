@@ -39,14 +39,14 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest/googletest-src
 SET (CMAKE_C_COMPILER "gcc-8")
 SET (CMAKE_CXX_COMPILER "g++-8")
 
-# set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
 
 include(GoogleTest)
 enable_testing()
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
--O4 \
+-g -Ofast \
 -Wall -Wextra \
 -Wsuggest-override \
 -Wno-register \
@@ -98,9 +98,9 @@ add_definitions(-DPLOT_OBSERVER)
 file(GLOB_RECURSE TUNER "../tuner/*.cpp" "../tuner/*.c")
 add_executable(tuner ${TUNER})
 find_package(OpenMP REQUIRED)
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 target_include_directories(tuner PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(tuner
                       config

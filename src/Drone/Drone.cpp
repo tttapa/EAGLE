@@ -1,7 +1,9 @@
 #include "Drone.hpp"
 #include "MotorControl.hpp"
 
-void Drone::load(const std::filesystem::path &loadPath) {
+using namespace std;
+
+void Drone::load(const filesystem::path &loadPath) {
     PerfTimer timer;
 
     /* Attitude */
@@ -54,9 +56,8 @@ void Drone::load(const std::filesystem::path &loadPath) {
     ct = loadDouble(loadPath / "ct");
     Dp = loadDouble(loadPath / "Dp");
 
-    auto duration = timer.getDuration<std::chrono::microseconds>();
-    std::cout << "Loaded Drone data in " << duration << " microseconds"
-              << std::endl;
+    auto duration = timer.getDuration<chrono::microseconds>();
+    cout << "Loaded Drone data files in " << duration << " µs." << endl;
 
     nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
     uh = nh / k1;
@@ -66,12 +67,12 @@ void Drone::load(const std::filesystem::path &loadPath) {
     double Fzh = ct * rho * pow(Dp, 4) * pow(nh, 2) * Nm;
     double Fg  = -g * m;
 
-    std::cout << "nh  = " << nh << std::endl;
-    std::cout << "uh  = " << uh << std::endl;
-    std::cout << "Fzh = " << Fzh << std::endl;
-    std::cout << "Fg  = " << Fg << std::endl;
+    cout << "nh  = " << nh << endl;
+    cout << "uh  = " << uh << endl;
+    cout << "Fzh = " << Fzh << endl;
+    cout << "Fg  = " << Fg << endl;
 
-    std::cout << "Ts_alt / Ts_att = " << (Ts_alt / Ts_att) << std::endl;
+    cout << "Ts_alt / Ts_att = " << (Ts_alt / Ts_att) << endl;
 
     assert(isAlmostEqual(Id_inv, inv(Id), 1e-12));
 }
@@ -204,7 +205,7 @@ Drone::Controller::clampAttitude(const Attitude::LQRController::VecU_t &u_raw,
         u[2] = {other_max / other_actual * u_raw[2]};
     }
     other_actual = abs(u[0]) + abs(u[1]) + abs(u[2]);
-    double e     = std::numeric_limits<double>::epsilon() + 1.0;
+    double e     = numeric_limits<double>::epsilon() + 1.0;
     if (other_actual > abs(u_alt)) {
         u[0] = {double(u_alt) / other_actual * u[0] / e};
         u[1] = {double(u_alt) / other_actual * u[1] / e};
