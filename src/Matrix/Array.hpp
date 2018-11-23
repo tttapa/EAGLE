@@ -148,6 +148,50 @@ struct Array {
         return data[0][0];
     }
 
+    /** 
+     * @brief   Comparison of arrays: less than
+     */
+    constexpr Array<decltype(data[0] < data[0]), N>
+    operator<(const Array<T, N> &rhs) {
+        Array<decltype(data[0] < data[0]), N> result = {};
+        for (size_t i = 0; i < N; ++i)
+            result[i] = this->data[i] < rhs.data[i];
+        return result;
+    }
+
+    /** 
+     * @brief   Comparison of arrays: less than or equal
+     */
+    constexpr Array<decltype(data[0] <= data[0]), N>
+    operator<=(const Array<T, N> &rhs) {
+        Array<decltype(data[0] <= data[0]), N> result = {};
+        for (size_t i = 0; i < N; ++i)
+            result[i] = this->data[i] <= rhs.data[i];
+        return result;
+    }
+
+    /** 
+     * @brief   Comparison of arrays: greater than
+     */
+    constexpr Array<decltype(data[0] > data[0]), N>
+    operator>(const Array<T, N> &rhs) {
+        Array<decltype(data[0] > data[0]), N> result = {};
+        for (size_t i = 0; i < N; ++i)
+            result[i] = this->data[i] > rhs.data[i];
+        return result;
+    }
+
+    /** 
+     * @brief   Comparison of arrays: greater than or equal
+     */
+    constexpr Array<decltype(data[0] >= data[0]), N>
+    operator>=(const Array<T, N> &rhs) {
+        Array<decltype(data[0] >= data[0]), N> result = {};
+        for (size_t i = 0; i < N; ++i)
+            result[i] = this->data[i] >= rhs.data[i];
+        return result;
+    }
+
     static constexpr size_t length = N;
     using type                     = T;
 };
