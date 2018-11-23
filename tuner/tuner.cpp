@@ -19,6 +19,8 @@ using namespace std;
 constexpr static size_t Nq = ::Attitude::Nx - 1;
 constexpr static size_t Nr = ::Attitude::Nu;
 
+constexpr double infinity = std::numeric_limits<double>::infinity();
+
 struct Weights {
     ColVector<Nq> Q_diag;
     ColVector<Nr> R_diag;
@@ -56,65 +58,150 @@ struct Weights {
 
 double getRiseTimeCost(Drone::FixedClampAttitudeController &ctrl,
                        ContinuousModel<Nx_att, Nu_att, Ny_att> &model,
-                       ColVector<Ny_att> xref, double xrefnormsqthres,
-                       ColVector<10> x0 = {1}) {
-    static size_t max_sim_steps = numberOfSamplesInTimeRange(
-        Config::Tuner::odeopt.t_start, ctrl.Ts, Config::Tuner::odeopt.t_end);
+                       Quaternion q_ref, double q_refNormSqThres,
+                       ColVector<Nx_att> x0 = {1}) {
+    DroneAttitudeOutput y_ref;
+    y_ref.setOrientation(q_ref);
+    AdaptiveODEOptions opt                           = Config::Tuner::odeopt;
+    ConstantTimeFunctionT<ColVector<Ny_att>> y_ref_f = {y_ref};
 
-    AdaptiveODEOptions opt   = Config::Tuner::odeopt;
-    auto x                   = x0;
-    ODEResultCode resultCode = {};
-    for (size_t i = 0; i < max_sim_steps; ++i) {
-        double t    = opt.t_start + ctrl.Ts * i;
-        opt.t_start = t;
-        opt.t_end   = t + ctrl.Ts;
-        auto curr_u = ctrl(x, xref);
-        vector<double> time;
-        vector<ColVector<10>> states;
-        resultCode |=
-            model.simulate(std::back_inserter(time), std::back_inserter(states),
-                           curr_u, x, opt);
-        if (resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED)
-            return std::numeric_limits<double>::infinity();
-        x = states.back();
-        if (normsq(getBlock<0, Ny_att, 0, 1>(x) - xref) < xrefnormsqthres)
-            return i;
-    }
-    return max_sim_steps + normsq(getBlock<0, Ny_att, 0, 1>(x) - xref);
+    class RealTimeCostCalculator {
+      public:
+        RealTimeCostCalculator(ContinuousModel<Nx_att, Nu_att, Ny_att> &model,
+                               const Quaternion &q_ref, double q_refNormSqThres,
+                               const Quaternion &q_0)
+            : model{model}, q_ref{q_ref},
+              q_refNormSqThres{q_refNormSqThres}, q_prev{q_0} {}
+
+        bool operator()(size_t k, const ColVector<Nx_att> &x,
+                        const ColVector<Nu_att> &u) {
+            using namespace std;
+            DroneAttitudeOutput yy = model.getOutput(x, u);
+            auto q                 = yy.getOrientation();
+
+            bool continueSimulation = true;
+
+            auto q_err_sq = normsq(q - q_ref);
+
+#ifdef DEBUG
+            q_v.push_back(q);
+            k_v.push_back(k);
+
+            cerr << "q     = " << transpose(q) << endl
+                 << "qref  = " << transpose(q_ref) << endl
+                 << "qerr  = " << transpose(q - q_ref) << endl
+                 << "qdiff = " << transpose(q - q_prev) << endl
+                 << "qdiffsq = " << normsq(q - q_prev) << endl
+                 << "qerrsq          = " << q_err_sq << endl
+                 << "q_refNormSqThres = " << q_refNormSqThres << endl
+                 << "k = " << k << endl
+                 << "riseTime = " << riseTime << endl
+                 << endl;
+#endif
+
+            if (riseTime == 0) {
+                if (q_err_sq <= q_refNormSqThres) {
+                    riseTime = k;
+                }
+            } else {
+                if (q_err_sq > q_refNormSqThres) {
+                    overshoot += 5e4 * q_err_sq;
+                } else if (normsq(q - q_prev) < 1e-3 * q_refNormSqThres &&
+                           settled == 0) {
+                    settled = k;
+#ifdef DEBUG
+                    cerr << "settled" << endl;
+#else
+                    continueSimulation = false;
+#endif
+                }
+            }
+            q_prev = q;
+            return continueSimulation;
+        }
+        double getCost() const {
+            double cost = riseTime;
+            if (settled == 0)
+                cost += 1e10 * normsq(q_prev - q_ref);
+            else
+                cost += overshoot + (settled - riseTime) * 10;
+            return cost;
+        }
+
+#ifdef DEBUG
+        void plot() const {
+            plotVectors(k_v, q_v, {1, 4}, {"q0", "q1", "q2", "q3"},
+                        {"r.-", "g.-", "b.-", "orange.-"});
+            plt::plot(vector<double>{k_v[0], k_v.back()},
+                      vector<double>{q_ref[1], q_ref[1]}, "k--");
+            plt::plot(vector<double>{k_v[0], k_v.back()},
+                      vector<double>{q_ref[2], q_ref[2]}, "k--");
+            plt::plot(vector<double>{k_v[0], k_v.back()},
+                      vector<double>{q_ref[3], q_ref[3]}, "k--");
+
+            cerr << ANSIColors::whiteb << "Settled   = " << settled << endl
+                 << "Rise time = " << riseTime << endl
+                 << "Overshoot = " << overshoot << ANSIColors::reset << endl;
+        }
+#endif
+
+      private:
+        ContinuousModel<Nx_att, Nu_att, Ny_att> &model;
+        const Quaternion q_ref;
+        const double q_refNormSqThres;
+        Quaternion q_prev;
+
+        double settled   = 0;
+        double riseTime  = 0;
+        double overshoot = 0;
+
+#ifdef DEBUG
+        vector<Quaternion> q_v = {};
+        vector<double> k_v     = {};
+#endif
+
+    } costcalc = {model, q_ref, q_refNormSqThres, {1} /* TODO */};
+
+    ODEResultCode resultCode =
+        model.simulateRealTime(ctrl, y_ref_f, x0, opt, costcalc);
+    if (resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED)
+        return infinity;
+
+#ifdef DEBUG
+    costcalc.plot();
+    plt::show();
+#endif
+
+    return costcalc.getCost();
 }
 
 double getCost(Drone::FixedClampAttitudeController &ctrl,
                ContinuousModel<Nx_att, Nu_att, Ny_att> &model) {
     double totalCost = 0;
     {
-        static ColVector<Ny_att> ref =
-            vcat(eul2quat({M_PI / 16, M_PI / 16, M_PI / 16}), zeros<3, 1>());
-        static double refnormsqthres = 0.001 * normsq(ref);
-        totalCost += getRiseTimeCost(ctrl, model, ref, refnormsqthres);
-    }
-    {
-        static ColVector<Ny_att> ref =
-            vcat(eul2quat({0, M_PI / 16, M_PI / 16}), zeros<3, 1>());
-        static double refnormsqthres = 0.001 * normsq(ref);
-        totalCost += getRiseTimeCost(ctrl, model, ref, refnormsqthres);
-    }
-    {
-        static ColVector<Ny_att> ref =
-            vcat(eul2quat({M_PI / 16, 0, 0}), zeros<3, 1>());
-        static double refnormsqthres = 0.001 * normsq(ref);
-        totalCost += getRiseTimeCost(ctrl, model, ref, refnormsqthres);
-    }
-    {
-        static ColVector<Ny_att> ref =
-            vcat(eul2quat({0, M_PI / 16, 0}), zeros<3, 1>());
-        static double refnormsqthres = 0.001 * normsq(ref);
+        static Quaternion ref = eul2quat({M_PI / 16, M_PI / 16, M_PI / 16});
+        static double refnormsqthres = 1e-4 * normsq(ref - eul2quat({}));
         // totalCost += getRiseTimeCost(ctrl, model, ref, refnormsqthres);
     }
     {
-        static ColVector<Ny_att> ref =
-            vcat(eul2quat({0, 0, M_PI / 16}), zeros<3, 1>());
-        static double refnormsqthres = 0.001 * normsq(ref);
+        static Quaternion ref        = eul2quat({0, M_PI / 16, M_PI / 16});
+        static double refnormsqthres = 1e-4 * normsq(ref - eul2quat({}));
         // totalCost += getRiseTimeCost(ctrl, model, ref, refnormsqthres);
+    }
+    {
+        static Quaternion ref        = eul2quat({M_PI / 16, 0, 0});
+        static double refnormsqthres = 1e-4 * normsq(ref - eul2quat({}));
+        totalCost += getRiseTimeCost(ctrl, model, ref, refnormsqthres);
+    }
+    {
+        static Quaternion ref        = eul2quat({0, M_PI / 16, 0});
+        static double refnormsqthres = 1e-4 * normsq(ref - eul2quat({}));
+        totalCost += getRiseTimeCost(ctrl, model, ref, refnormsqthres);
+    }
+    {
+        static Quaternion ref        = eul2quat({0, 0, M_PI / 16});
+        static double refnormsqthres = 1e-4 * normsq(ref - eul2quat({}));
+        totalCost += getRiseTimeCost(ctrl, model, ref, refnormsqthres);
     }
     return totalCost;
 }
@@ -164,7 +251,7 @@ int main(int argc, char const *argv[]) {
     cout << ANSIColors::reset << endl;
 
     assert(survivors > 0);
-    assert(population > survivors);
+    assert(population >= survivors);  // TODO!
 
     cout << "Loading Drone ..." << endl;
     Drone drone = loadPath;
@@ -217,6 +304,7 @@ int main(int argc, char const *argv[]) {
             try {
                 Drone::FixedClampAttitudeController ctrl =
                     drone.getFixedClampAttitudeController(w.Q(), w.R());
+                // cerr << "Q = " << w.Q() << endl << "R = " << w.R() << endl;
                 w.cost = getCost(ctrl, model);
             } catch (std::runtime_error &e) {
                 // LAPACK sometimes fails for certain Q and R
@@ -342,6 +430,7 @@ int main(int argc, char const *argv[]) {
 
 #endif
     }
-    cout << ANSIColors::greenb << endl << "Done. ✔" << endl;
+    cout << ANSIColors::greenb << endl
+         << "Done. ✔" << ANSIColors::reset << endl;
     return EXIT_SUCCESS;
 }

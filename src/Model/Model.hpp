@@ -20,6 +20,31 @@ class Model {
     typedef ColVector<Nu> VecU_t;
     typedef ColVector<Ny> VecY_t;
     typedef ColVector<Ny> VecR_t;
+
+    /**
+     * @brief   Get the state change of the model, given current state
+     *          @f$ x @f$ and input @f$ u @f$.
+     */
+    virtual VecX_t operator()(const VecX_t &x, const VecU_t &u) = 0;
+
+    /** 
+     * @brief   Get the output of the model, given the current state
+     *          @f$ x @f$ and input @f$ u @f$.
+     */
+    virtual VecY_t getOutput(const VecX_t &x, const VecU_t &u) = 0;
+};
+
+/** 
+ * @brief   An abstract class for Continuous-Time models.
+ */
+template <size_t Nx, size_t Nu, size_t Ny>
+class ContinuousModel : public Model<Nx, Nu, Ny> {
+  public:
+    using VecX_t = typename Model<Nx, Nu, Ny>::VecX_t;
+    using VecU_t = typename Model<Nx, Nu, Ny>::VecU_t;
+    using VecY_t = typename Model<Nx, Nu, Ny>::VecY_t;
+    using VecR_t = typename Model<Nx, Nu, Ny>::VecR_t;
+
     typedef TimeFunctionT<VecU_t> InputFunction;
     typedef TimeFunctionT<VecR_t> ReferenceFunction;
     typedef ODEResultX<VecX_t> SimulationResult;
@@ -38,155 +63,11 @@ class Model {
     };
 
     /**
-     * @brief   Get the state change of the model, given current state
-     *          @f$ x @f$ and input @f$ u @f$.
-     */
-    virtual VecX_t operator()(const VecX_t &x, const VecU_t &u) = 0;
-
-    /** 
-     * @brief   Get the output of the model, given the current state
-     *          @f$ x @f$ and input @f$ u @f$.
-     */
-    virtual VecY_t getOutput(const VecX_t &x, const VecU_t &u) = 0;
-
-    /** 
-     * @brief   Simulate the model.
-     * 
-     * @param   u 
-     *          The input function that can be evaluated at any time t.
-     * @param   x_start
-     *          The initial state of the model.
-     * @param   opt
-     *          Options for the ODE solver.
-     * 
-     * @return  A struct containing a vector of times and a vector of states 
-     *          for each point of the simulation. It also contains a result code
-     *          to check if the simulation was successfull.
-     * 
-     * @todo    Move this function to the Continuous case?
-     */
-    virtual SimulationResult simulate(InputFunction &u, VecX_t x_start,
-                                      const AdaptiveODEOptions &opt) = 0;
-
-    /** 
-     * @brief   Simulate the model.
-     * 
-     * @param   timeresult
-     *          A `back_insert_iterator` to store the time points of 
-     *          the simulation in.
-     * @param   xresult
-     *          A `back_insert_iterator` to store the states of the simulation
-     *          in.
-     * @param   u 
-     *          The input function that can be evaluated at any time t.
-     * @param   x_start
-     *          The initial state of the model.
-     * @param   opt
-     *          Options for the ODE solver.
-     * 
-     * @return  A result code to check if the simulation was successfull.
-     * 
-     * @todo    Move this function to the Continuous case?
-     */
-    virtual ODEResultCode
-    simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
-             typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
-             InputFunction &u, VecX_t x_start,
-             const AdaptiveODEOptions &opt) = 0;
-
-    /** 
-     * @brief   Simulate the model.
-     * 
-     * @param   u 
-     *          A constant input value that will be kept constant during the 
-     *          simulation.
-     * @param   x_start
-     *          The initial state of the model.
-     * @param   opt
-     *          Options for the ODE solver.
-     * 
-     * @return  A struct containing a vector of times and a vector of states 
-     *          for each point of the simulation. It also contains a result code
-     *          to check if the simulation was successfull.
-     * 
-     * @todo    Move this function to the Continuous case?
-     */
-    virtual SimulationResult simulate(VecU_t u, VecX_t x_start,
-                                      const AdaptiveODEOptions &opt) {
-        ConstantTimeFunctionT<VecU_t> fu = {u};
-        return simulate(fu, x_start, opt);
-    }
-
-    /** 
-     * @brief   Simulate the model.
-     * 
-     * @param   timeresult
-     *          A `back_insert_iterator` to store the time points of 
-     *          the simulation in.
-     * @param   xresult
-     *          A `back_insert_iterator` to store the states of the simulation
-     *          in.
-     * @param   u 
-     *          A constant input value that will be kept constant during the 
-     *          simulation.
-     * @param   x_start
-     *          The initial state of the model.
-     * @param   opt
-     *          Options for the ODE solver.
-     * 
-     * @return  A result code to check if the simulation was successfull.
-     * 
-     * @todo    Move this function to the Continuous case?
-     */
-    virtual ODEResultCode
-    simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
-             typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
-             VecU_t u, VecX_t x_start, const AdaptiveODEOptions &opt) {
-        ConstantTimeFunctionT<VecU_t> fu = {u};
-        return simulate(timeresult, xresult, fu, x_start, opt);
-    }
-
-    /** 
-     * @brief   Simulate the model with the given discrete controller.
-     */
-    virtual ControllerSimulationResult
-    simulate(DiscreteController<Nx, Nu, Ny> &controller, ReferenceFunction &r,
-             VecX_t x_start, const AdaptiveODEOptions &opt) = 0;
-
-    /** 
-     * @brief   Simulate the model with the given discrete controller and 
-     *          observer.
-     */
-    virtual ObserverControllerSimulationResult
-    simulate(DiscreteController<Nx, Nu, Ny> &controller,
-             DiscreteObserver<Nx, Nu, Ny> &observer,
-             NoiseGenerator<Nu> &randFnW, NoiseGenerator<Ny> &randFnV,
-             ReferenceFunction &r, VecX_t x_start,
-             const AdaptiveODEOptions &opt) = 0;
-};
-
-/** 
- * @brief   An abstract class for Continuous-Time models.
- */
-template <size_t Nx, size_t Nu, size_t Ny>
-class ContinuousModel : public Model<Nx, Nu, Ny> {
-  public:
-    using VecX_t            = typename Model<Nx, Nu, Ny>::VecX_t;
-    using VecU_t            = typename Model<Nx, Nu, Ny>::VecU_t;
-    using VecY_t            = typename Model<Nx, Nu, Ny>::VecY_t;
-    using VecR_t            = typename Model<Nx, Nu, Ny>::VecR_t;
-    using InputFunction     = typename Model<Nx, Nu, Ny>::InputFunction;
-    using ReferenceFunction = typename Model<Nx, Nu, Ny>::ReferenceFunction;
-    using SimulationResult  = typename Model<Nx, Nu, Ny>::SimulationResult;
-    using ControllerSimulationResult =
-        typename Model<Nx, Nu, Ny>::ControllerSimulationResult;
-    using ObserverControllerSimulationResult =
-        typename Model<Nx, Nu, Ny>::ObserverControllerSimulationResult;
-
-    /**
      * @brief   Simulate the continuous model starting from the given initial 
      *          state, evaluating the given input function, using the given
-     *          integration options.
+     *          integration options.  
+     *          This version returns all intermediate points calculated by the
+     *          ODE solver.
      * 
      * @param   u
      *          The input function that can be evaluated at any given time in 
@@ -204,7 +85,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
      *          integration was successful.
      */
     SimulationResult simulate(InputFunction &u, VecX_t x_start,
-                              const AdaptiveODEOptions &opt) override {
+                              const AdaptiveODEOptions &opt) {
         // A lambda function that evaluates the input function and the dynamics
         // of the model
         ContinuousModel &model = *this;
@@ -213,6 +94,40 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
         };
         // Use the ODE solver to simulate the system
         return dormandPrince(f, x_start, opt);
+    }
+
+    /**
+     * @brief   Simulate the continuous model starting from the given initial 
+     *          state, evaluating the given input function, using the given
+     *          integration options.  
+     *          This version only returns the final time and state of the 
+     *          simulation.
+     * 
+     * @param   u
+     *          The input function that can be evaluated at any given time in 
+     *          the integration interval.
+     * @param   x_start
+     *          The inital state, which is the initial condition for the ODE
+     *          solver.
+     * @param   opt
+     *          A struct of options for the ODE solver.
+     * 
+     * @return
+     *          A struct containing a vector of time points, and a vector of
+     *          states that have equal lenghts.  
+     *          A result code is given as well, to indicate whether the 
+     *          integration was successful.
+     */
+    SimulationResult simulateEndResult(InputFunction &u, VecX_t x_start,
+                                       const AdaptiveODEOptions &opt) {
+        // A lambda function that evaluates the input function and the dynamics
+        // of the model
+        ContinuousModel &model = *this;
+        auto f                 = [&model, &u](double t, const VecX_t &x) {
+            return model(x, u(t));
+        };
+        // Use the ODE solver to simulate the system
+        return dormandPrinceEndResult(f, x_start, opt);
     }
 
     /**
@@ -242,8 +157,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
     ODEResultCode
     simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
              typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
-             InputFunction &u, VecX_t x_start,
-             const AdaptiveODEOptions &opt) override {
+             InputFunction &u, VecX_t x_start, const AdaptiveODEOptions &opt) {
         ContinuousModel &model = *this;
         auto f                 = [&model, &u](double t, const VecX_t &x) {
             return model(x, u(t));
@@ -255,8 +169,8 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
      * @brief   Simulate the continuous model starting from the given initial 
      *          state, with a given constant input, using the given
      *          integration options.  
-     *          This version appends the results to existing time and states
-     *          vectors.
+     *          This version returns all intermediate points calculated by the
+     *          ODE solver.
      * 
      * @param   u
      *          The constant input.
@@ -273,12 +187,42 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
      *          integration was successful.
      */
     SimulationResult simulate(VecU_t u, VecX_t x_start,
-                              const AdaptiveODEOptions &opt) override {
+                              const AdaptiveODEOptions &opt) {
         ContinuousModel &model = *this;
-        auto f                 = [&model, &u](double /* t */, const VecX_t &x) {
+        auto f                 = [&model, u](double /* t */, const VecX_t &x) {
             return model(x, u);
         };
         return dormandPrince(f, x_start, opt);
+    }
+
+    /**
+     * @brief   Simulate the continuous model starting from the given initial 
+     *          state, with a given constant input, using the given
+     *          integration options.  
+     *          This version only returns the final time and state of the 
+     *          simulation.
+     * 
+     * @param   u
+     *          The constant input.
+     * @param   x_start
+     *          The inital state, which is the initial condition for the ODE
+     *          solver.
+     * @param   opt
+     *          A struct of options for the ODE solver.
+     * 
+     * @return
+     *          A struct containing a vector of time points, and a vector of
+     *          states that have equal lenghts.  
+     *          A result code is given as well, to indicate whether the 
+     *          integration was successful.
+     */
+    SimulationResult simulateEndResult(VecU_t u, VecX_t x_start,
+                                       const AdaptiveODEOptions &opt) {
+        ContinuousModel &model = *this;
+        auto f                 = [&model, u](double /* t */, const VecX_t &x) {
+            return model(x, u);
+        };
+        return dormandPrinceEndResult(f, x_start, opt);
     }
 
     /**
@@ -307,7 +251,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
     ODEResultCode
     simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
              typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
-             VecU_t u, VecX_t x_start, const AdaptiveODEOptions &opt) override {
+             VecU_t u, VecX_t x_start, const AdaptiveODEOptions &opt) {
         ContinuousModel &model = *this;
         auto f                 = [&model, &u](double /* t */, const VecX_t &x) {
             return model(x, u);
@@ -339,12 +283,12 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
      *          A result code is given as well, to indicate whether the 
      *          integration was successful.
      */
-    typename Model<Nx, Nu, Ny>::ControllerSimulationResult
+    ControllerSimulationResult
     simulate(DiscreteController<Nx, Nu, Ny> &controller, ReferenceFunction &r,
-             VecX_t x_start, const AdaptiveODEOptions &opt) override {
-        typename Model<Nx, Nu, Ny>::ControllerSimulationResult result = {};
-        double Ts = controller.Ts;
-        size_t N  = floor((opt.t_end - opt.t_start) / Ts) + 1;
+             VecX_t x_start, const AdaptiveODEOptions &opt) {
+        ControllerSimulationResult result = {};
+        double Ts                         = controller.Ts;
+        size_t N = floor((opt.t_end - opt.t_start) / Ts) + 1;
         result.sampledTime.reserve(N);
         result.control.reserve(N);
         result.reference.reserve(N);
@@ -368,6 +312,32 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             result.solution.pop_back();
         }
         return result;
+    }
+
+    template <class F>
+    ODEResultCode simulateRealTime(DiscreteController<Nx, Nu, Ny> &controller,
+                                   ReferenceFunction &r, VecX_t x_start,
+                                   const AdaptiveODEOptions &opt, F &callback) {
+        ODEResultCode resultCode;
+        double Ts     = controller.Ts;
+        size_t N      = numberOfSamplesInTimeRange(opt.t_start, Ts, opt.t_end);
+        VecX_t curr_x = x_start;
+        AdaptiveODEOptions curr_opt = opt;
+        for (size_t i = 0; i < N; ++i) {
+            double t         = opt.t_start + Ts * i;
+            curr_opt.t_start = t;
+            curr_opt.t_end   = t + Ts;
+            VecR_t curr_ref  = r(t);
+            VecU_t curr_u    = controller(curr_x, curr_ref);
+            if (!callback(i, curr_x, curr_u))
+                break;
+            auto result = this->simulateEndResult(curr_u, curr_x, curr_opt);
+            resultCode |= result.resultCode;
+            if (resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED)
+                break;
+            curr_x = result.solution[0];
+        }
+        return resultCode;
     }
 
     /**
@@ -409,7 +379,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
              DiscreteObserver<Nx, Nu, Ny> &observer,
              NoiseGenerator<Nu> &randFnW, NoiseGenerator<Ny> &randFnV,
              ReferenceFunction &r, VecX_t x_start,
-             const AdaptiveODEOptions &opt) override {
+             const AdaptiveODEOptions &opt) {
         assert(controller.Ts == observer.Ts);
         ObserverControllerSimulationResult result = {};
         double Ts                                 = controller.Ts;

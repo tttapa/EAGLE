@@ -93,19 +93,24 @@ const AdaptiveODEOptions odeoptdisp = {
 };
 
 /* ------ LQR --------------------------------------------------------------- */
-constexpr RowVector<3> Qn_initial     = {1, 1, 1};
-constexpr RowVector<3> Qomega_initial = {1, 1, 1};
-constexpr RowVector<3> Qq_initial     = {1, 1, 1};
+// const RowVector<3> Qq_initial     = Config::Attitude::Qq;
+// const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
+// const RowVector<3> Qn_initial     = Config::Attitude::Qn;
+
+const RowVector<3> Qq_initial     = {2553.41, 2540.9, 2389.77}; // TODO
+const RowVector<3> Qomega_initial = {0.645266, 1e-10, 1e-10};
+const RowVector<3> Qn_initial     = {1e-10, 1e-10, 1e-10};
 
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial =
     transpose(hcat(Qq_initial, Qomega_initial, Qn_initial));
 /** Weighting matrix for inputs in LQR design. */
-const ColVector<3> R_diag_initial = ones<3, 1>();
+// const ColVector<3> R_diag_initial = ones<3, 1>();
+const ColVector<3> R_diag_initial = {1.84366, 2.6622, 2.39352}; // TODO
 
 /* ------ Tuner mutation variance ------------------------------------------- */
-const double varQ[9] = {1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
-const double varR[3] = {1e-2, 1e-2, 1e-2};
+const double varQ[9] = {10, 10, 10, 5, 5, 5, 5, 5, 5};
+const double varR[3] = {1, 1, 1};
 
 const ColVector<9> Qmin = 1e-10 * ones<9, 1>();
 const ColVector<3> Rmin = 1e-10 * ones<3, 1>();

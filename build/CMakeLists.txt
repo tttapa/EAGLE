@@ -46,7 +46,7 @@ enable_testing()
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
--g -Ofast \
+-Ofast \
 -Wall -Wextra \
 -Wsuggest-override \
 -Wno-register \
@@ -93,6 +93,8 @@ target_link_libraries(main
 add_definitions(-DPLOT_CONTROLLER)
 add_definitions(-DPLOT_ACTUAL_VS_ESTIMATED_STATES)
 add_definitions(-DPLOT_OBSERVER)
+
+# add_definitions(-DDEBUG)
 
 # Tuner
 file(GLOB_RECURSE TUNER "../tuner/*.cpp" "../tuner/*.c")
