@@ -40,7 +40,7 @@ void plotVectors(const std::vector<double> &t,
             else
                 plt::plot(t, plotdata, fmt);
         }
-        if (!legends.empty() > 0)
+        if (!legends.empty())
             plt::legend();
         if (!title.empty())
             plt::title(title);

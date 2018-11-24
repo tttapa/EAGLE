@@ -93,13 +93,13 @@ const AdaptiveODEOptions odeoptdisp = {
 };
 
 /* ------ LQR --------------------------------------------------------------- */
-// const RowVector<3> Qq_initial     = Config::Attitude::Qq;
-// const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
-// const RowVector<3> Qn_initial     = Config::Attitude::Qn;
+const RowVector<3> Qq_initial     = Config::Attitude::Qq;
+const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
+const RowVector<3> Qn_initial     = Config::Attitude::Qn;
 
-const RowVector<3> Qq_initial     = {2553.41, 2540.9, 2389.77}; // TODO
-const RowVector<3> Qomega_initial = {0.645266, 1e-10, 1e-10};
-const RowVector<3> Qn_initial     = {1e-10, 1e-10, 1e-10};
+// const RowVector<3> Qq_initial     = {2553.41, 2540.9, 2389.77}; // TODO
+// const RowVector<3> Qomega_initial = {0.645266, 1e-10, 1e-10};
+// const RowVector<3> Qn_initial     = {1e-10, 1e-10, 1e-10};
 
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial =

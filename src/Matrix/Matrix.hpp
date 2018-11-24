@@ -254,7 +254,7 @@ constexpr double norm(const Array<T, N> &vector) {
 }
 
 namespace MatrixPrinting {
-constexpr size_t precision = 6;
+constexpr size_t precision = 17;
 constexpr size_t width     = precision + 6;
 }  // namespace MatrixPrinting
 
@@ -263,8 +263,8 @@ template <class T, size_t R, size_t C>
 std::ostream &operator<<(std::ostream &os, const TMatrix<T, R, C> &matrix) {
     auto colsep = ' ';
     auto rowsep = "\r\n";
-    os << '(' << R << " × " << C << ')' << rowsep
-       << std::setprecision(MatrixPrinting::precision);
+    // os << '(' << R << " × " << C << ')' << rowsep;
+    os << std::setprecision(MatrixPrinting::precision);
     for (const auto &row : matrix) {
         for (const auto &el : row)
             os << std::setw(MatrixPrinting::width) << el << colsep;

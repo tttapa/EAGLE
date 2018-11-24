@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <numeric>  // accumulate
 #include <type_traits>
 
 template <class T, size_t N>
@@ -19,11 +20,11 @@ struct getArrayType : getArrayTypeBase<T> {};
 
 template <class T>
 struct getArrayLengthBase {
-    static constexpr size_t length = 0;
+    static constexpr size_t value = 0;
 };
 template <class T, size_t N>
 struct getArrayLengthBase<Array<T, N>> {
-    static constexpr size_t length = N;
+    static constexpr size_t value = N;
 };
 template <typename T>
 struct getArrayLength : getArrayLengthBase<T> {};
@@ -108,6 +109,16 @@ struct Array {
     }
 
     /**
+     * @brief   Assignment operator for Array<T, 1>.
+     */
+    template <bool EnableBool = true>
+    constexpr typename std::enable_if<N == 1 && EnableBool, Array<T, 1> &>::type
+    operator=(const T &t) {
+        data[0] = t;
+        return *this;
+    }
+
+    /**
      * @brief   Implicit conversion from Array<T, 1> to T&.
      */
     template <bool EnableBool = true>
@@ -132,7 +143,7 @@ struct Array {
      */
     template <bool EnableBool = true>
     operator typename std::add_lvalue_reference<typename std::enable_if<
-        N == 1 && getArrayLength<T>::length == 1 && EnableBool,
+        N == 1 && getArrayLength<T>::value == 1 && EnableBool,
         typename getArrayType<T>::type>::type>::type() {
         return data[0][0];
     }
@@ -143,7 +154,7 @@ struct Array {
     template <bool EnableBool = true>
     operator typename std::add_lvalue_reference<
         typename std::add_const<typename std::enable_if<
-            N == 1 && getArrayLength<T>::length == 1 && EnableBool,
+            N == 1 && getArrayLength<T>::value == 1 && EnableBool,
             typename getArrayType<T>::type>::type>::type>::type() const {
         return data[0][0];
     }
@@ -206,4 +217,82 @@ constexpr Array<T, N> operator*(double lhs, const Array<T, N> &rhs) {
 template <class T>
 constexpr Array<T, 1> operator*(Array<T, 1> lhs, Array<T, 1> rhs) {
     return {T{lhs} * T{rhs}};
+}
+
+template <class T, size_t N>
+constexpr T sum(const Array<T, N> &a) {
+    return std::accumulate(a.begin(), a.end(), T{});
+}
+
+template <class T, class U>
+constexpr bool operator==(const U &u, const Array<T, 1> &a) {
+    return u == static_cast<T>(a);
+}
+
+template <class T, class U>
+constexpr bool operator==(const Array<T, 1> &a, const U &u) {
+    return static_cast<T>(a) == u;
+}
+
+template <class T, class U>
+constexpr bool operator!=(const U &u, const Array<T, 1> &a) {
+    return u != static_cast<T>(a);
+}
+
+template <class T, class U>
+constexpr bool operator!=(const Array<T, 1> &a, const U &u) {
+    return static_cast<T>(a) != u;
+}
+
+template <class T, class U>
+constexpr bool operator<(const U &u, const Array<T, 1> &a) {
+    return u < static_cast<T>(a);
+}
+
+template <class T, class U>
+constexpr bool operator<(const Array<T, 1> &a, const U &u) {
+    return static_cast<T>(a) < u;
+}
+
+template <class T, class U>
+constexpr bool operator<=(const U &u, const Array<T, 1> &a) {
+    return u <= static_cast<T>(a);
+}
+
+template <class T, class U>
+constexpr bool operator<=(const Array<T, 1> &a, const U &u) {
+    return static_cast<T>(a) <= u;
+}
+
+template <class T, class U>
+constexpr bool operator>(const U &u, const Array<T, 1> &a) {
+    return u > static_cast<T>(a);
+}
+
+template <class T, class U>
+constexpr bool operator>(const Array<T, 1> &a, const U &u) {
+    return static_cast<T>(a) > u;
+}
+
+template <class T, class U>
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator>=(const U &u, const Array<T, 1> &a) {
+    return u >= static_cast<T>(a);
+} // TODO: do this for all < <= > >= == !=
+
+template <class T, class U>
+constexpr bool operator>=(const Array<T, 1> &a, const U &u) {
+    return static_cast<T>(a) >= u;
+}
+
+//
+
+template <class T, class U>
+constexpr U &operator+=(U &u, const Array<T, 1> &a) {
+    return u += static_cast<T>(a);
+}
+
+template <class T, class U>
+constexpr Array<T, 1> &operator+=(Array<T, 1> &a, const U &u) {
+    return a += {u};
 }

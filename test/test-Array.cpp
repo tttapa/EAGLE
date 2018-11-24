@@ -46,6 +46,12 @@ TEST(Array, equality) {
     EXPECT_TRUE(a != c);
 }
 
+TEST(Array, equalityOne) {
+    Array<int, 1> a = {42};
+    EXPECT_TRUE(a == 42);
+    EXPECT_FALSE(a == 43);
+}
+
 TEST(Array, operatorT) {
     Array<int, 1> a = {42};
     int i = a;
@@ -82,6 +88,13 @@ TEST(Array, compareGe) {
     Array<bool, 3> result = a >= b;
     Array<bool, 3> expected = {true, false, true};
     EXPECT_EQ(result, expected);
+}
+
+TEST(Array, assignSingleElement) {
+    Array<int, 1> a;
+    a = 42;
+    Array<int, 1> b = {42};
+    EXPECT_EQ(a, b);
 }
 
 // -------------------------------------------------------------------------- //
