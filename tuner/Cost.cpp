@@ -56,20 +56,28 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
             }
         }
         if (riseTime[i] != -1.0) {
-            if (abs(q_err[i]) > abs(q_ref[i]) * factor && q_ref[i] != 0.0) {
-                overshoot[i] += 5e3 * (q_err[i] * q_err[i]);
-            } else if ((abs(q_dif[i]) <= abs(q_ref[i]) * factor / 238.0 ||
-                        q_ref[i] == 0.0) &&
-                       settled[i] == -1.0) {
+            if (                                                     //
+                (                                                    //
+                    abs(q_dif[i]) <= abs(q_ref[i]) * factor / 238.0  //
+                    ||                                               //
+                    q_ref[i] == 0.0                                  //
+                    )                                                //
+                &&                                                   //
+                abs(q_err[i]) <= abs(q_ref[i]) * factor              //
+                &&                                                   //
+                settled[i] == -1.0                                   //
+            ) {
                 settled[i] = k;
 #ifdef DEBUG
                 cerr << "settled " << i << endl;
 #else
                 continueSimulation = false;
                 for (size_t i = 0; i < 4; ++i)
-                    if (settled[i] == -1)
+                    if (settled[i] == -1.0)
                         continueSimulation = true;
 #endif
+            } else if (settled[i] == -1.0) {
+                overshoot[i] += 1e2 * (q_err[i] * q_err[i]);
             }
         }
     }
@@ -78,12 +86,16 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
 }
 
 double RealTimeCostCalculator::getCost() const {
-    double cost = sum(riseTime);
+    double cost = 0;
     for (size_t i = 0; i < 4; ++i) {
-        if (settled[i] == -1.0)
-            cost += 1e10 * abs(q_prev[i] - q_ref[i]);
+        if (riseTime[i] == -1.0)
+            cost += 1e20 * abs(q_prev[i] - q_ref[i]);
+        else if (settled[i] == -1.0)
+            cost += 1e10 * overshoot[i];
         else
-            cost += overshoot[i];
+            cost +=
+                riseTime[i] + overshoot[i] + 1e2 * (settled[i] - riseTime[i]);
+        assert(settled[i] >= riseTime[i] || settled[i] == -1.0);
     }
     return cost;
 }
@@ -93,22 +105,34 @@ void RealTimeCostCalculator::plot() const {
     using namespace std;
     plotVectors(k_v, q_v, {0, 4}, {"q0", "q1", "q2", "q3"},
                 {"c.-", "r.-", "g.-", "b.-"});
-    plt::plot(vector<double>{k_v[0], k_v.back()},
-              vector<double>{q_ref[0], q_ref[0]}, "c--");
-    plt::plot(vector<double>{k_v[0], k_v.back()},
-              vector<double>{q_ref[1], q_ref[1]}, "r--");
-    plt::plot(vector<double>{k_v[0], k_v.back()},
-              vector<double>{q_ref[2], q_ref[2]}, "g--");
-    plt::plot(vector<double>{k_v[0], k_v.back()},
-              vector<double>{q_ref[3], q_ref[3]}, "b--");
-    plt::axvline(riseTime[0], "--", "c");
-    plt::axvline(riseTime[1], "--", "r");
-    plt::axvline(riseTime[2], "--", "g");
-    plt::axvline(riseTime[3], "--", "b");
-    plt::axvline(settled[0], "--", "c");
-    plt::axvline(settled[1], "--", "r");
-    plt::axvline(settled[2], "--", "g");
-    plt::axvline(settled[3], "--", "b");
+    if (q_ref[0] != 0)
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[0], q_ref[0]}, "c--");
+    if (q_ref[1] != 0)
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[1], q_ref[1]}, "r--");
+    if (q_ref[2] != 0)
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[2], q_ref[2]}, "g--");
+    if (q_ref[3] != 0)
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[3], q_ref[3]}, "b--");
+    if (riseTime[0] > 0)
+        plt::axvline(riseTime[0], "--", "c");
+    if (riseTime[1] > 0)
+        plt::axvline(riseTime[1], "--", "r");
+    if (riseTime[2] > 0)
+        plt::axvline(riseTime[2], "--", "g");
+    if (riseTime[3] > 0)
+        plt::axvline(riseTime[3], "--", "b");
+    if (settled[0] > 0)
+        plt::axvline(settled[0], ":", "c");
+    if (settled[1] > 0)
+        plt::axvline(settled[1], ":", "r");
+    if (settled[2] > 0)
+        plt::axvline(settled[2], ":", "g");
+    if (settled[3] > 0)
+        plt::axvline(settled[3], ":", "b");
 
     cerr << ANSIColors::whiteb << "Settled   = " << transpose(settled)  //
          << "Rise time = " << transpose(riseTime)                       //

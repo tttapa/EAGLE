@@ -63,8 +63,8 @@ extern const ColVector<9> Q_diag_initial;
 extern const ColVector<3> R_diag_initial;
 
 /* ------ Tuner mutation variance ------------------------------------------- */
-extern const double varQ[9];
-extern const double varR[3];
+extern const ColVector<9> varQ;
+extern const ColVector<3> varR;
 
 extern const ColVector<9> Qmin;
 extern const ColVector<3> Rmin;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>  // copy
 #include <cstddef>
 #include <numeric>  // accumulate
 #include <type_traits>
@@ -203,6 +204,18 @@ struct Array {
         return result;
     }
 
+    constexpr static Array<T, N> fromCppArray(const T (&a)[N]) {
+        Array<T, N> result = {};
+        std::copy(a, a + N, result.begin());
+        return result;
+    }
+
+    constexpr static Array<T, N> fromCArray(const T *a) {
+        Array<T, N> result = {};
+        std::copy(a, a + N, result.begin());
+        return result;
+    }
+
     static constexpr size_t length = N;
     using type                     = T;
 };
@@ -278,7 +291,7 @@ template <class T, class U>
 constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
 operator>=(const U &u, const Array<T, 1> &a) {
     return u >= static_cast<T>(a);
-} // TODO: do this for all < <= > >= == !=
+}  // TODO: do this for all < <= > >= == !=
 
 template <class T, class U>
 constexpr bool operator>=(const Array<T, 1> &a, const U &u) {

@@ -4,7 +4,7 @@
 #include <random>
 
 template <size_t N>
-ColVector<N> randn(const double (&variance)[N]) {
+ColVector<N> randn(const Array<double, N> &variance) {
     ColVector<N> result = {};
     static std::default_random_engine rgen;
     for (size_t i = 0; i < N; ++i) {
@@ -12,4 +12,14 @@ ColVector<N> randn(const double (&variance)[N]) {
         result[i] = {distribution(rgen)};
     }
     return result;
+}
+
+template <size_t N>
+ColVector<N> randn(const ColVector<N> &variance) {
+    return randn(transpose(variance)[0]);
+}
+
+template <size_t N>
+RowVector<N> randn(const RowVector<N> &variance) {
+    return transpose(randn(variance[0]));
 }

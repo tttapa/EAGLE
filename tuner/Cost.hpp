@@ -3,6 +3,8 @@
 #include <Config.hpp>
 #include <Drone/Drone.hpp>
 
+// #define DEBUG
+
 class RealTimeCostCalculator {
   public:
     RealTimeCostCalculator(ContinuousModel<Nx_att, Nu_att, Ny_att> &model,

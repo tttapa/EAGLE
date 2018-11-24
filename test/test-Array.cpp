@@ -54,47 +54,61 @@ TEST(Array, equalityOne) {
 
 TEST(Array, operatorT) {
     Array<int, 1> a = {42};
-    int i = a;
+    int i           = a;
     EXPECT_EQ(i, 42);
 }
 
 TEST(Array, compareLt) {
-    Array<int, 3> a = {1, 2, 3};
-    Array<int, 3> b = {1, 3, 2};
-    Array<bool, 3> result = a < b;
+    Array<int, 3> a         = {1, 2, 3};
+    Array<int, 3> b         = {1, 3, 2};
+    Array<bool, 3> result   = a < b;
     Array<bool, 3> expected = {false, true, false};
     EXPECT_EQ(result, expected);
 }
 
 TEST(Array, compareLe) {
-    Array<int, 3> a = {1, 2, 3};
-    Array<int, 3> b = {1, 3, 2};
-    Array<bool, 3> result = a <= b;
+    Array<int, 3> a         = {1, 2, 3};
+    Array<int, 3> b         = {1, 3, 2};
+    Array<bool, 3> result   = a <= b;
     Array<bool, 3> expected = {true, true, false};
     EXPECT_EQ(result, expected);
 }
 
 TEST(Array, compareGt) {
-    Array<int, 3> a = {1, 2, 3};
-    Array<int, 3> b = {1, 3, 2};
-    Array<bool, 3> result = a > b;
+    Array<int, 3> a         = {1, 2, 3};
+    Array<int, 3> b         = {1, 3, 2};
+    Array<bool, 3> result   = a > b;
     Array<bool, 3> expected = {false, false, true};
     EXPECT_EQ(result, expected);
 }
 
 TEST(Array, compareGe) {
-    Array<int, 3> a = {1, 2, 3};
-    Array<int, 3> b = {1, 3, 2};
-    Array<bool, 3> result = a >= b;
+    Array<int, 3> a         = {1, 2, 3};
+    Array<int, 3> b         = {1, 3, 2};
+    Array<bool, 3> result   = a >= b;
     Array<bool, 3> expected = {true, false, true};
     EXPECT_EQ(result, expected);
 }
 
 TEST(Array, assignSingleElement) {
     Array<int, 1> a;
-    a = 42;
+    a               = 42;
     Array<int, 1> b = {42};
     EXPECT_EQ(a, b);
+}
+
+TEST(Array, fromCArray) {
+    const int array[3]     = {1, 2, 3};
+    Array<int, 3> result   = Array<int, 3>::fromCArray(array);
+    Array<int, 3> expected = {1, 2, 3};
+    EXPECT_EQ(result, expected);
+}
+
+TEST(Array, fromCppArray) {
+    const int array[3]     = {1, 2, 3};
+    Array<int, 3> result   = Array<int, 3>::fromCppArray(array);
+    Array<int, 3> expected = {1, 2, 3};
+    EXPECT_EQ(result, expected);
 }
 
 // -------------------------------------------------------------------------- //

@@ -23,14 +23,31 @@ const std::filesystem::path loadPath =
 /* ------ Attitude LQR & LQE ------------------------------------------------ */
 
 namespace Attitude {
-const RowVector<3> Qq     = {{510.2525, 510.2525, 477.639736}};
-const RowVector<3> Qomega = {{0.20163231, 0.20163231, 0.00032853691}};
-const RowVector<3> Qn = {{3.789056346e-06, 3.789056346e-06, 7.8752933747e-08}};
+const RowVector<3> Qq     = {{
+    111.30830664019889,
+    94.869754374249425,
+    94.869754374249425,
+}};
+const RowVector<3> Qomega = {{
+    0.030482436999920717,
+    0.030482436999920717,
+    9.0458799180992353e-06,
+}};
+const RowVector<3> Qn     = {{
+    1.5777927165600708e-05,
+    1.5777927165600708e-05,
+    1.2102708808326187e-06,
+}};
+const RowVector<3> Rr     = {{
+    1.3510899510186709,
+    1.3510899510186709,
+    1.1397506288103747,
+}};
 
 /** Weighting matrix for states in LQR design. */
 const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
 /** Weighting matrix for inputs in LQR design. */
-const Matrix<3, 3> R = eye<3>();
+const Matrix<3, 3> R = diag(Rr);
 
 /** @todo   Tune */
 const RowVector<3> varDynamics = {{
@@ -97,20 +114,15 @@ const RowVector<3> Qq_initial     = Config::Attitude::Qq;
 const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
 const RowVector<3> Qn_initial     = Config::Attitude::Qn;
 
-// const RowVector<3> Qq_initial     = {2553.41, 2540.9, 2389.77}; // TODO
-// const RowVector<3> Qomega_initial = {0.645266, 1e-10, 1e-10};
-// const RowVector<3> Qn_initial     = {1e-10, 1e-10, 1e-10};
-
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial =
     transpose(hcat(Qq_initial, Qomega_initial, Qn_initial));
 /** Weighting matrix for inputs in LQR design. */
-// const ColVector<3> R_diag_initial = ones<3, 1>();
-const ColVector<3> R_diag_initial = {1.84366, 2.6622, 2.39352}; // TODO
+const ColVector<3> R_diag_initial = transpose(Config::Attitude::Rr);
 
 /* ------ Tuner mutation variance ------------------------------------------- */
-const double varQ[9] = {10, 10, 10, 5, 5, 5, 5, 5, 5};
-const double varR[3] = {1, 1, 1};
+const ColVector<9> varQ = 0.01 * Q_diag_initial;
+const ColVector<3> varR = 0.01 * R_diag_initial;
 
 const ColVector<9> Qmin = 1e-10 * ones<9, 1>();
 const ColVector<3> Rmin = 1e-10 * ones<3, 1>();

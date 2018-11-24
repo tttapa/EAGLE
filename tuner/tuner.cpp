@@ -38,6 +38,7 @@ struct Weights {
         // TODO: symmetry
         Q_diag[2] = Q_diag[1];
         Q_diag[4] = Q_diag[3];
+        Q_diag[7] = Q_diag[6];
 
         R_diag[1] = R_diag[0];
     }
@@ -60,14 +61,32 @@ struct Weights {
     }
 };
 
+void printBest(std::ostream &os, size_t generation, const Weights &best) {
+    os << ANSIColors::cyanb << endl;
+    os << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+    os << ANSIColors::whiteb;
+    os << "Best of generation " << (generation + 1) << ':' << endl;
+    os << ANSIColors::cyanb;
+    os << "=====================================================" << endl;
+    os << ANSIColors::whiteb;
+    os << "\tQ = diag(";
+    printMATLAB(os, transpose(best.Q_diag));
+    os << ");" << endl;
+    os << "\tR = diag(";
+    printMATLAB(os, transpose(best.R_diag));
+    os << ");" << endl;
+    os << "\tCost = " << best.cost << endl;
+    os << ANSIColors::cyanb;
+    os << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+    os << ANSIColors::reset;
+}
+
 int main(int argc, char const *argv[]) {
     filesystem::path loadPath = Config::Tuner::loadPath;
     filesystem::path outPath  = "";
-
     size_t population  = Config::Tuner::population;
     size_t generations = Config::Tuner::generations;
     size_t survivors   = Config::Tuner::survivors;
-
     size_t px_x = Config::Tuner::px_x;
     size_t px_y = Config::Tuner::px_y;
 
@@ -100,7 +119,7 @@ int main(int argc, char const *argv[]) {
         px_y = strtoul(argv[1], nullptr, 10);
         cout << "Setting the image height to: " << px_y << endl;
     });
-    cout << ANSIColors::blueb;
+    cout << ANSIColors::blue;
     parser.parse(argc, argv);
     cout << ANSIColors::reset << endl;
 
@@ -177,23 +196,7 @@ int main(int argc, char const *argv[]) {
              << " µs." << endl;
 
         auto &best = populationWeights[0];
-        cout << ANSIColors::cyanb << endl;
-        cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-        cout << ANSIColors::whiteb;
-        cout << "Best of generation " << (g + 1) << ':' << endl;
-        cout << ANSIColors::cyanb;
-        cout << "=====================================================" << endl;
-        cout << ANSIColors::whiteb;
-        cout << "\tQ = diag(";
-        printMATLAB(cout, transpose(best.Q_diag));
-        cout << ");" << endl;
-        cout << "\tR = diag(";
-        printMATLAB(cout, transpose(best.R_diag));
-        cout << ");" << endl;
-        cout << "\tCost = " << best.cost << endl;
-        cout << ANSIColors::cyanb;
-        cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-        cout << ANSIColors::reset;
+        printBest(cout, g, best);
 
         //
 
@@ -223,9 +226,9 @@ int main(int argc, char const *argv[]) {
                 rr.setOrientation(q);
                 return rr;
             }
-            const Quaternion qz = eul2quat({M_PI / 16, 0, 0});
-            const Quaternion qy = eul2quat({0, M_PI / 16, 0});
-            const Quaternion qx = eul2quat({0, 0, M_PI / 16});
+            const Quaternion qz = eul2quat({M_PI / 8, 0, 0});
+            const Quaternion qy = eul2quat({0, M_PI / 8, 0});
+            const Quaternion qx = eul2quat({0, 0, M_PI / 8});
             const Quaternion qu = eul2quat({0, 0, 0});
             const double m      = 0.5;
         } reff;
@@ -280,11 +283,13 @@ int main(int argc, char const *argv[]) {
                  << ".png";
         std::filesystem::path outputfile = outPath / filename.str();
         plt::save(outputfile);
-        plt::clf();
+        if (g + 1 < generations)
+            plt::close();
 
 #endif
     }
     cout << ANSIColors::greenb << endl
          << "Done. ✔" << ANSIColors::reset << endl;
+    plt::show();
     return EXIT_SUCCESS;
 }
