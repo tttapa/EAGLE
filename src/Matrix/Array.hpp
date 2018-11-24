@@ -164,7 +164,7 @@ struct Array {
      * @brief   Comparison of arrays: less than
      */
     constexpr Array<decltype(data[0] < data[0]), N>
-    operator<(const Array<T, N> &rhs) {
+    operator<(const Array<T, N> &rhs) const {
         Array<decltype(data[0] < data[0]), N> result = {};
         for (size_t i = 0; i < N; ++i)
             result[i] = this->data[i] < rhs.data[i];
@@ -175,7 +175,7 @@ struct Array {
      * @brief   Comparison of arrays: less than or equal
      */
     constexpr Array<decltype(data[0] <= data[0]), N>
-    operator<=(const Array<T, N> &rhs) {
+    operator<=(const Array<T, N> &rhs) const {
         Array<decltype(data[0] <= data[0]), N> result = {};
         for (size_t i = 0; i < N; ++i)
             result[i] = this->data[i] <= rhs.data[i];
@@ -186,7 +186,7 @@ struct Array {
      * @brief   Comparison of arrays: greater than
      */
     constexpr Array<decltype(data[0] > data[0]), N>
-    operator>(const Array<T, N> &rhs) {
+    operator>(const Array<T, N> &rhs) const {
         Array<decltype(data[0] > data[0]), N> result = {};
         for (size_t i = 0; i < N; ++i)
             result[i] = this->data[i] > rhs.data[i];
@@ -197,7 +197,7 @@ struct Array {
      * @brief   Comparison of arrays: greater than or equal
      */
     constexpr Array<decltype(data[0] >= data[0]), N>
-    operator>=(const Array<T, N> &rhs) {
+    operator>=(const Array<T, N> &rhs) const {
         Array<decltype(data[0] >= data[0]), N> result = {};
         for (size_t i = 0; i < N; ++i)
             result[i] = this->data[i] >= rhs.data[i];
@@ -221,6 +221,15 @@ struct Array {
 };
 
 template <class T, size_t N>
+constexpr Array<T, N> abs(const Array<T, N> &a) {
+    using namespace std;
+    Array<T, N> result = a;
+    for (auto &e : result)
+        e = abs(e);
+    return result;
+}
+
+template <class T, size_t N>
 constexpr Array<T, N> operator*(double lhs, const Array<T, N> &rhs) {
     Array<T, N> result = rhs;
     result *= lhs;
@@ -232,58 +241,72 @@ constexpr Array<T, 1> operator*(Array<T, 1> lhs, Array<T, 1> rhs) {
     return {T{lhs} * T{rhs}};
 }
 
+template <class T, class U,
+          typename = std::enable_if<getArrayLength<U>::value == 0>>
+constexpr auto operator+(const Array<T, 1> &a, const U &u)
+    -> decltype(static_cast<T>(a) + u) {
+    return static_cast<T>(a) + u;
+}
+
+template <class T, class U,
+          typename = std::enable_if<getArrayLength<U>::value == 0>>
+constexpr auto operator+(const U &u, const Array<T, 1> &a)
+    -> decltype(u + static_cast<T>(a)) {
+    return u + static_cast<T>(a);
+}
+
+template <class T, class U,
+          typename = std::enable_if<getArrayLength<U>::value == 0>>
+constexpr auto operator-(const Array<T, 1> &a, const U &u)
+    -> decltype(static_cast<T>(a) - u) {
+    return static_cast<T>(a) - u;
+}
+
+template <class T, class U,
+          typename = std::enable_if<getArrayLength<U>::value == 0>>
+constexpr auto operator-(const U &u, const Array<T, 1> &a)
+    -> decltype(u - static_cast<T>(a)) {
+    return u - static_cast<T>(a);
+}
+
 template <class T, size_t N>
 constexpr T sum(const Array<T, N> &a) {
     return std::accumulate(a.begin(), a.end(), T{});
 }
 
 template <class T, class U>
-constexpr bool operator==(const U &u, const Array<T, 1> &a) {
-    return u == static_cast<T>(a);
-}
-
-template <class T, class U>
-constexpr bool operator==(const Array<T, 1> &a, const U &u) {
-    return static_cast<T>(a) == u;
-}
-
-template <class T, class U>
-constexpr bool operator!=(const U &u, const Array<T, 1> &a) {
-    return u != static_cast<T>(a);
-}
-
-template <class T, class U>
-constexpr bool operator!=(const Array<T, 1> &a, const U &u) {
-    return static_cast<T>(a) != u;
-}
-
-template <class T, class U>
-constexpr bool operator<(const U &u, const Array<T, 1> &a) {
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator<(const U &u, const Array<T, 1> &a) {
     return u < static_cast<T>(a);
 }
 
 template <class T, class U>
-constexpr bool operator<(const Array<T, 1> &a, const U &u) {
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator<(const Array<T, 1> &a, const U &u) {
     return static_cast<T>(a) < u;
 }
 
 template <class T, class U>
-constexpr bool operator<=(const U &u, const Array<T, 1> &a) {
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator<=(const U &u, const Array<T, 1> &a) {
     return u <= static_cast<T>(a);
 }
 
 template <class T, class U>
-constexpr bool operator<=(const Array<T, 1> &a, const U &u) {
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator<=(const Array<T, 1> &a, const U &u) {
     return static_cast<T>(a) <= u;
 }
 
 template <class T, class U>
-constexpr bool operator>(const U &u, const Array<T, 1> &a) {
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator>(const U &u, const Array<T, 1> &a) {
     return u > static_cast<T>(a);
 }
 
 template <class T, class U>
-constexpr bool operator>(const Array<T, 1> &a, const U &u) {
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator>(const Array<T, 1> &a, const U &u) {
     return static_cast<T>(a) > u;
 }
 
@@ -291,11 +314,36 @@ template <class T, class U>
 constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
 operator>=(const U &u, const Array<T, 1> &a) {
     return u >= static_cast<T>(a);
-}  // TODO: do this for all < <= > >= == !=
+}
 
 template <class T, class U>
-constexpr bool operator>=(const Array<T, 1> &a, const U &u) {
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator>=(const Array<T, 1> &a, const U &u) {
     return static_cast<T>(a) >= u;
+}
+
+template <class T, class U>
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator==(const U &u, const Array<T, 1> &a) {
+    return u == static_cast<T>(a);
+}
+
+template <class T, class U>
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator==(const Array<T, 1> &a, const U &u) {
+    return static_cast<T>(a) == u;
+}
+
+template <class T, class U>
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator!=(const U &u, const Array<T, 1> &a) {
+    return u != static_cast<T>(a);
+}
+
+template <class T, class U>
+constexpr typename std::enable_if<getArrayLength<U>::value == 0, bool>::type
+operator!=(const Array<T, 1> &a, const U &u) {
+    return static_cast<T>(a) != u;
 }
 
 //

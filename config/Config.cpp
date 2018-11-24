@@ -92,8 +92,8 @@ namespace Tuner {
 const std::filesystem::path loadPath = home / "Private" / "EAGLE-Params";
 
 const AdaptiveODEOptions odeopt = {
-    .t_start = 0,
-    .t_end   = 0.5,
+    .t_start = 0.0,
+    .t_end   = 1.1,
     .epsilon = 1e-4,
     .h_start = 1e-4,
     .h_min   = 1e-6,
@@ -101,7 +101,7 @@ const AdaptiveODEOptions odeopt = {
 };
 
 const AdaptiveODEOptions odeoptdisp = {
-    .t_start = 0,
+    .t_start = 0.0,
     .t_end   = 0.5 * (7 + 1),
     .epsilon = 1e-4,
     .h_start = 1e-4,

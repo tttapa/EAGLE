@@ -84,11 +84,11 @@ void printBest(std::ostream &os, size_t generation, const Weights &best) {
 int main(int argc, char const *argv[]) {
     filesystem::path loadPath = Config::Tuner::loadPath;
     filesystem::path outPath  = "";
-    size_t population  = Config::Tuner::population;
-    size_t generations = Config::Tuner::generations;
-    size_t survivors   = Config::Tuner::survivors;
-    size_t px_x = Config::Tuner::px_x;
-    size_t px_y = Config::Tuner::px_y;
+    size_t population         = Config::Tuner::population;
+    size_t generations        = Config::Tuner::generations;
+    size_t survivors          = Config::Tuner::survivors;
+    size_t px_x               = Config::Tuner::px_x;
+    size_t px_y               = Config::Tuner::px_y;
 
     ArgParser parser;
     parser.add("--out", "-o", [&outPath](const char *argv[]) {
@@ -125,6 +125,12 @@ int main(int argc, char const *argv[]) {
 
     assert(survivors > 0);
     assert(population >= survivors);  // TODO!
+    if (population == survivors)
+        cout << ANSIColors::yellow
+             << "Warning: the entire population are survivors, so no mutations "
+                "will take place."
+             << ANSIColors::reset << endl
+             << endl;
 
     cout << "Loading Drone ..." << endl;
     Drone drone = loadPath;

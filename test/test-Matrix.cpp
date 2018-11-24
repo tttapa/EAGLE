@@ -47,13 +47,13 @@ TEST(Matrix, notEquals) {
 
 TEST(Matrix, operatorTMatrix) {
     TMatrix<int, 1, 1> a = {42};
-    int i = a;
+    int i                = a;
     ASSERT_EQ(i, 42);
 }
 
 TEST(Matrix, operatorTMatrixConst) {
     const TMatrix<int, 1, 1> a = {42};
-    int i = a;  
+    int i                      = a;
     ASSERT_EQ(i, 42);
 }
 
@@ -83,7 +83,7 @@ TEST(Matrix, scalarMultiply) {
         {21, 22},
         {31, 32},
     }};
-    int s               = 2;
+    int s                = 2;
 
     TMatrix<int, 3, 2> result1  = s * m;
     TMatrix<int, 3, 2> result2  = m * s;
@@ -176,7 +176,7 @@ TEST(Matrix, assignBlock) {
         {31, 32, 33, 34, 35},
         {41, 42, 43, 44, 45},
     }};
-    assignBlock<1, 3, 2, 4>(m) = {{
+    assignBlock<1, 3, 2, 4>(m)  = {{
         {101, 102},
         {103, 104},
     }};
@@ -298,4 +298,16 @@ TEST(Matrix, vcathcat) {
         {21, 22, 23, 24, 25},
     }};
     ASSERT_EQ(result, expected);
+}
+
+TEST(Matrix, abs) {
+    Matrix<2, 3> m        = {{
+        {0.0, -1.1, 2.2},
+        {-2.3, 0.0, 1.2},
+    }};
+    Matrix<2, 3> expected = {{
+        {0.0, 1.1, 2.2},
+        {2.3, 0.0, 1.2},
+    }};
+    EXPECT_EQ(abs(m), expected);
 }

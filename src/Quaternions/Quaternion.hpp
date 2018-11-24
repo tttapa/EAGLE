@@ -4,7 +4,7 @@
 
 using Quaternion = ColVector<4>;
 
-inline Quaternion quatmultiply(const Quaternion &q, const Quaternion &r) {
+constexpr Quaternion quatmultiply(const Quaternion &q, const Quaternion &r) {
     return {{
         {r[0] * q[0] - r[1] * q[1] - r[2] * q[2] - r[3] * q[3]},
         {r[0] * q[1] + r[1] * q[0] - r[2] * q[3] + r[3] * q[2]},
@@ -13,7 +13,7 @@ inline Quaternion quatmultiply(const Quaternion &q, const Quaternion &r) {
     }};
 }
 
-inline Quaternion quatconjugate(const Quaternion &q) {
+constexpr Quaternion quatconjugate(const Quaternion &q) {
     return {{
         {q[0]},
         {-q[1]},
@@ -22,13 +22,15 @@ inline Quaternion quatconjugate(const Quaternion &q) {
     }};
 }
 
-inline Quaternion quatDifference(const Quaternion &p, const Quaternion &q) {
+constexpr Quaternion quatDifference(const Quaternion &p, const Quaternion &q) {
     return quatmultiply(p, quatconjugate(q));
 }
 
 using EulerAngles = ColVector<3>;
 
 constexpr Quaternion eul2quat(const EulerAngles &eulerAngles) {
+    using std::sin;
+    using std::cos;
     double phi   = eulerAngles[2];
     double theta = eulerAngles[1];
     double psi   = eulerAngles[0];

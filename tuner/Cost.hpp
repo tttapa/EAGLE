@@ -3,7 +3,8 @@
 #include <Config.hpp>
 #include <Drone/Drone.hpp>
 
-// #define DEBUG
+#define DEBUG
+#define PLOT_ALL_QUATERNION_STATES
 
 class RealTimeCostCalculator {
   public:
@@ -22,7 +23,7 @@ class RealTimeCostCalculator {
   private:
     ContinuousModel<Nx_att, Nu_att, Ny_att> &model;
     const Quaternion q_ref;
-    const double factor;
+    const Quaternion q_thr; // threshold
     Quaternion q_prev;
 
     const ColVector<4> dir;

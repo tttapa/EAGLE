@@ -111,6 +111,12 @@ TEST(Array, fromCppArray) {
     EXPECT_EQ(result, expected);
 }
 
+TEST(Array, abs) {
+    Array<double, 3> a        = {0.0, -1.1, 2.2};
+    Array<double, 3> expected = {0.0, 1.1, 2.2};
+    EXPECT_EQ(abs(a), expected);
+}
+
 // -------------------------------------------------------------------------- //
 
 TEST(generateArray, simple) {
