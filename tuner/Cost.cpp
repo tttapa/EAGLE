@@ -19,105 +19,146 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
     bool continueSimulation = true;
 
     auto q_err = q_ref - q;
-    auto q_dif = q - q_prev;
 
 #ifdef DEBUG
-    cerr << boolalpha << endl                             //
-         << "k = " << k << endl                           //
-         << "q_ref       = " << transpose(q_ref)          //
-         << "q_thr       = " << transpose(q_thr)          //
-         << "q_err       = " << transpose(q_err)          //
-         << "q_thres_dif = " << transpose(q_thr / 238.0)  //
-         << "q_dif       = " << transpose(q_dif)          //
-         << "riseTime    = " << transpose(riseTime)       //
-         << "settled     = " << transpose(settled)        //
-         << "dir         = " << transpose(dir)            //
-         << "crossed     = " << transpose(crossed)        //
-         << "maxerr      = " << transpose(maxerr);        //
+    // cerr << boolalpha << endl                             //
+    //      << "k = " << k << endl                           //
+    //      << "q_ref       = " << transpose(q_ref)          //
+    //      << "q_thr       = " << transpose(q_thr)          //
+    //      << "q_err       = " << transpose(q_err)          //
+    //      << "q_thres_dif = " << transpose(q_thr / 238.0)  //
+    //      << "riseTime    = " << transpose(riseTime)       //
+    //      << "settled     = " << transpose(settled)        //
+    //      << "dir         = " << transpose(dir)            //
+    //      << "crossed     = " << transpose(crossed)        //
+    //      << "maxerr      = " << transpose(maxerr);        //
 
     q_v.push_back(q);
     k_v.push_back(k);
 #endif
 
     for (size_t i = 0; i < 4; ++i) {
-        if (riseTime[i] == -1.0) {
-            if (dir[i] * q_err[i] <= q_thr[i]) {
-                riseTime[i]             = k;
-                lastthrescross[i]       = k;
-                nextthrescrossrising[i] = !(dir[i] > 0);
 
-#ifdef DEBUG
-                cerr << "risen " << i << endl;
-#endif
+        // if not risen yet
+        if (riseTime[i] == -1.0) {
+            // if we are crossing the threshold
+            // (sign of threshold depends on direction)
+            if (dir[i] * q_err[i] <= q_thr[i]) {
+                riseTime[i] = k;
+                // first crossing of the settling interval
+                lastthrescross[i] = k;
+                // if this was a rising crossing, the next crossing will be
+                // falling, and vice versa
+                bool rising             = dir[i] > 0;
+                nextthrescrossrising[i] = !rising;
             }
         }
-        if (dir[i] * q_err[i] <= 0 && !crossed[i]) {
+
+        // if we have not actually crossed the reference yet,
+        // and we are currently crossing it
+        // (i.e. error crosses 0 in the right direction)
+        if (!crossed[i] && dir[i] * q_err[i] <= 0) {
             crossed[i] = true;
-            rising[i]  = dir[i] > 0;
+            // remember whether we're rising or falling
+            rising[i] = dir[i] > 0;
         }
 
         // if we haven't crossed the reference yet after 2 times the rise time
+        // it probably means it has settled without overshoot
+        //   TODO: is this a reasonable assumption?
         if (!crossed[i] && k == 2 * riseTime[i] && settled[i] == -1.0) {
             settled[i] = riseTime[i];
-#ifdef DEBUG
-            cerr << "settled without overshoot " << i << endl;
-#else
+#ifndef DEBUG
             continueSimulation = false;
             for (size_t i = 0; i < 4; ++i)
                 if (settled[i] == -1.0)
                     continueSimulation = true;
 #endif
         }
+
+        // if we have crossed the reference, but haven't settled yet (overshoot)
         if (crossed[i] && settled[i] == -1.0) {
+            // find relative extrema of error
             double newmaxerr = maxerr[i];
-            if (rising[i]) {
-                if (q_err[i] <= q_thr[i] && nextthrescrossrising[i] == true) {
-                    lastthrescross[i]       = k;
-                    nextthrescrossrising[i] = false;
-                }
-                if (q[i] < q_prev[i]) { // was rising, is now falling again
+            if (rising[i]) {             // curve was previously rising
+                if (q[i] < q_prev[i]) {  // was rising, is now falling again
                     rising[i] = false;
                     // previous point was relative maximum
                     newmaxerr = q_prev[i] - q_ref[i];
                 }
-            } else {  // falling
-                if (-q_err[i] <= q_thr[i] && nextthrescrossrising[i] == false) {
-                    lastthrescross[i]       = k;
-                    nextthrescrossrising[i] = true;
-                }
-                if (q[i] > q_prev[i]) { // was falling, is now rising again
+            } else {                     // curve was previously falling
+                if (q[i] > q_prev[i]) {  // was falling, is now rising again
                     rising[i] = true;
                     // previous point was relative minimum
                     newmaxerr = q_ref[i] - q_prev[i];
                 }
             }
+
+            double newlastthrescross = lastthrescross[i];
+            // find crossings of settling interval
+            if (rising[i]) {  // curve is currently rising
+                // if we are looking for a rising crossing of the settling
+                // interval, and we are currently crossing the lower bound
+                // of the interval
+                if (nextthrescrossrising[i] == true && q_err[i] <= q_thr[i]) {
+                    // remember this crossing
+                    newlastthrescross = k;
+                    // next crossing will be falling
+                    nextthrescrossrising[i] = false;
+                }
+            } else {  // curve is currently falling
+                // if we are looking for a falling crossing of the settling
+                // interval, and we are currently crossing the upper bound
+                // of the interval
+                if (nextthrescrossrising[i] == false && -q_err[i] <= q_thr[i]) {
+                    // remember this crossing
+                    newlastthrescross = k;
+                    // next crossing will be rising
+                    nextthrescrossrising[i] = true;
+                }
+            }
+
+            // if extremum is greater than previous extremum,
+            // the oscillations are increasing in amplitude,
+            // so the system is unstable
             if (newmaxerr > maxerr[i]) {  // unstable
-#ifdef DEBUG
-                cerr << "Unstable! " << i << endl;
-#else
-                continueSimulaion  = false;
-#endif
                 overshoot[i] = infinity;
-            } else {
+                settled[i]   = infinity;
+#ifndef DEBUG
+                continueSimulaion = false;
+#endif
+            } else {  // stable
                 maxerr[i] = newmaxerr;
             }
+
+            // if the new extremum lies within the settling interval,
+            // the system has settled, and the settling time was the time
+            // of the previous crossing of the settling interval
             if (maxerr[i] <= q_thr[i] || q_thr[i] == 0.0) {
                 settled[i] = lastthrescross[i];
-#ifdef DEBUG
-                cerr << "settled " << i << endl;
-#else
+#ifndef DEBUG
                 continueSimulation = false;
                 for (size_t i = 0; i < 4; ++i)
                     if (settled[i] == -1.0)
                         continueSimulation = true;
 #endif
+            } else {
+                // only a real crossing if the extremum is outside of the 
+                // settling interval, otherwise, it doesn't really cross the 
+                // bounds of the interval, it just stays inside of it
+                lastthrescross[i] = newlastthrescross;
             }
+
+            // if the system is not settled yet,
+            // accumulate overshoot
             if (settled[i] == -1.0) {
-                overshoot[i] += 1e2 * (q_err[i] * q_err[i]);
+                overshoot[i] += q_err[i];
             }
         }
     }
+
     q_prev = q;
+
     return continueSimulation;
 }
 

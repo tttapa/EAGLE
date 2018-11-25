@@ -4,7 +4,7 @@
 #include <Drone/Drone.hpp>
 
 #define DEBUG
-#define PLOT_ALL_QUATERNION_STATES
+// #define PLOT_ALL_QUATERNION_STATES
 
 class RealTimeCostCalculator {
   public:
