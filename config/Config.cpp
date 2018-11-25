@@ -93,7 +93,7 @@ const std::filesystem::path loadPath = home / "Private" / "EAGLE-Params";
 
 const AdaptiveODEOptions odeopt = {
     .t_start = 0.0,
-    .t_end   = 45.0,
+    .t_end   = 1.1,
     .epsilon = 1e-4,
     .h_start = 1e-4,
     .h_min   = 1e-6,
