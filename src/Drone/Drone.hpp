@@ -177,6 +177,14 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      * @brief   TODO
      */
     Attitude::LQRController
+    getAttitudeController(const Matrix<Nu_att, Nx_att - 1> &K_red) const {
+        return {G_att, K_red, Ts_att};
+    }
+
+    /** 
+     * @brief   TODO
+     */
+    Attitude::LQRController
     getAttitudeController(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                           const Matrix<Nu_att, Nu_att> &R) const {
         auto K_red = getAttitudeControllerMatrixK(Q, R);
@@ -205,6 +213,11 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     getFixedClampAttitudeController(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                                     const Matrix<Nu_att, Nu_att> &R) const {
         return {getAttitudeController(Q, R), uh};
+    }
+
+    FixedClampAttitudeController getFixedClampAttitudeController(
+        const Matrix<Nu_att, Nx_att - 1> &K_red) const {
+        return {getAttitudeController(K_red), uh};
     }
 
     Altitude::LQRController getAltitudeController(const Matrix<1, 3> &K_p,

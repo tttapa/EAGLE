@@ -107,8 +107,11 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
 }
 
 double RealTimeCostCalculator::getCost() const {
+    auto settled = this->settled;
     double cost = 0;
     for (size_t i = 0; i < 4; ++i) {
+        if (!crossed[i])
+            settled[i] = riseTime[i];
         if (riseTime[i] == -1.0)
             cost += 1e20 * abs(q_prev[i] - q_ref[i]);
         else if (settled[i] == -1.0)

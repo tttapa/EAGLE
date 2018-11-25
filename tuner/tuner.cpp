@@ -181,9 +181,12 @@ int main(int argc, char const *argv[]) {
         for (size_t i = 0; i < population; ++i) {
             auto &w = populationWeights[i];
             try {
-                Drone::FixedClampAttitudeController ctrl =
-                    drone.getFixedClampAttitudeController(w.Q(), w.R());
+                // Drone::FixedClampAttitudeController ctrl =
+                //     drone.getFixedClampAttitudeController(w.Q(), w.R());
                 // cerr << "Q = " << w.Q() << endl << "R = " << w.R() << endl;
+                Drone::FixedClampAttitudeController ctrl =
+                    drone.getFixedClampAttitudeController(
+                        hcat(-0.1 * eye<3>(), -0.2 * eye<3>(), zeros<3, 3>())); // TODO!
                 w.cost = getCost(ctrl, model);
             } catch (std::runtime_error &e) {
                 // LAPACK sometimes fails for certain Q and R
