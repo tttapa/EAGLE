@@ -7,7 +7,8 @@ RealTimeCostCalculator::RealTimeCostCalculator(
     ContinuousModel<Nx_att, Nu_att, Ny_att> &model, const Quaternion &q_ref,
     double factor, const Quaternion &q_0)
     : model{model}, q_ref{q_ref}, q_thr{factor * abs(q_ref - q_0)}, q_prev{q_0},
-      dir{getDirection(q_ref, q_0)} {}
+      dir{getDirection(q_ref, q_0)}, maxerr{infinity, infinity, infinity,
+                                            infinity} {}
 
 bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
                                         const ColVector<Nu_att> &u) {
@@ -21,7 +22,7 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
     auto q_dif = q - q_prev;
 
 #ifdef DEBUG
-    cerr << endl                                          //
+    cerr << boolalpha << endl                             //
          << "k = " << k << endl                           //
          << "q_ref       = " << transpose(q_ref)          //
          << "q_thr       = " << transpose(q_thr)          //
@@ -30,7 +31,9 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
          << "q_dif       = " << transpose(q_dif)          //
          << "riseTime    = " << transpose(riseTime)       //
          << "settled     = " << transpose(settled)        //
-         << "dir         = " << transpose(dir);
+         << "dir         = " << transpose(dir)            //
+         << "crossed     = " << transpose(crossed)        //
+         << "maxerr      = " << transpose(maxerr);        //
 
     q_v.push_back(q);
     k_v.push_back(k);
@@ -45,18 +48,45 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
 #endif
             }
         }
-        if (riseTime[i] != -1.0) {
-            if (                                       //
-                (                                      //
-                    abs(q_dif[i]) <= q_thr[i] / 238.0  //
-                    ||                                 //
-                    q_ref[i] == 0.0                    //
-                    )                                  //
-                &&                                     //
-                abs(q_err[i]) <= q_thr[i]              //
-                &&                                     //
-                settled[i] == -1.0                     //
-            ) {
+        if (dir[i] * q_err[i] <= 0)
+            crossed[i] = true;
+
+        // if we haven't crossed the reference yet after 2 times the rise time
+        if (!crossed[i] && k == 2 * riseTime[i] && settled[i] == -1.0) {
+            settled[i] = riseTime[i];
+#ifdef DEBUG
+            cerr << "settled without overshoot " << i << endl;
+#else
+            continueSimulation = false;
+            for (size_t i = 0; i < 4; ++i)
+                if (settled[i] == -1.0)
+                    continueSimulation = true;
+#endif
+        }
+        if (crossed[i] && settled[i] == -1.0) {
+            double newmaxerr = maxerr[i];
+            if (rising[i]) {
+                if (q[i] < q_prev[i]) {
+                    rising[i] = false;
+                    newmaxerr = q_prev[i] - q_ref[i];
+                }
+            } else {
+                if (q[i] > q_prev[i]) {
+                    rising[i] = true;
+                    newmaxerr = q_ref[i] - q_prev[i];
+                }
+            }
+            if (newmaxerr > maxerr[i]) {  // unstable
+#ifdef DEBUG
+                cerr << "Unstable! " << i << endl;
+#else
+                continueSimulaion  = false;
+#endif
+                overshoot[i] = infinity;
+            } else {
+                maxerr[i] = newmaxerr;
+            }
+            if (maxerr[i] <= q_thr[i] || q_thr[i] == 0.0) {
                 settled[i] = k;
 #ifdef DEBUG
                 cerr << "settled " << i << endl;
@@ -66,7 +96,8 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
                     if (settled[i] == -1.0)
                         continueSimulation = true;
 #endif
-            } else if (settled[i] == -1.0) {
+            }
+            if (settled[i] == -1.0) {
                 overshoot[i] += 1e2 * (q_err[i] * q_err[i]);
             }
         }
@@ -103,19 +134,47 @@ void RealTimeCostCalculator::plot() const {
                 {"r.-", "g.-", "b.-"});
 #endif
 #ifdef PLOT_ALL_QUATERNION_STATES
-    if (q_ref[0] != 0)
+    if (q_ref[0] != 0) {
         plt::plot(vector<double>{k_v[0], k_v.back()},
                   vector<double>{q_ref[0], q_ref[0]}, "c--");
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[0] - q_thr[0], q_ref[0] - q_thr[0]},
+                  "c:");
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[0] + q_thr[0], q_ref[0] + q_thr[0]},
+                  "c:");
+    }
 #endif
-    if (q_ref[1] != 0)
+    if (q_ref[1] != 0) {
         plt::plot(vector<double>{k_v[0], k_v.back()},
                   vector<double>{q_ref[1], q_ref[1]}, "r--");
-    if (q_ref[2] != 0)
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[1] - q_thr[1], q_ref[1] - q_thr[1]},
+                  "r:");
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[1] + q_thr[1], q_ref[1] + q_thr[1]},
+                  "r:");
+    }
+    if (q_ref[2] != 0) {
         plt::plot(vector<double>{k_v[0], k_v.back()},
                   vector<double>{q_ref[2], q_ref[2]}, "g--");
-    if (q_ref[3] != 0)
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[2] - q_thr[2], q_ref[2] - q_thr[2]},
+                  "g:");
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[2] + q_thr[2], q_ref[2] + q_thr[2]},
+                  "g:");
+    }
+    if (q_ref[3] != 0) {
         plt::plot(vector<double>{k_v[0], k_v.back()},
                   vector<double>{q_ref[3], q_ref[3]}, "b--");
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[3] - q_thr[3], q_ref[3] - q_thr[3]},
+                  "b:");
+        plt::plot(vector<double>{k_v[0], k_v.back()},
+                  vector<double>{q_ref[3] + q_thr[3], q_ref[3] + q_thr[3]},
+                  "b:");
+    }
 #ifdef PLOT_ALL_QUATERNION_STATES
     if (riseTime[0] > 0)
         plt::axvline(riseTime[0], "--", "c");
@@ -173,7 +232,7 @@ double getRiseTimeCost(Drone::FixedClampAttitudeController &ctrl,
 double getCost(Drone::FixedClampAttitudeController &ctrl,
                ContinuousModel<Nx_att, Nu_att, Ny_att> &model) {
     constexpr double factor = 0.005;  // 0.5% criterium
-    constexpr Quaternion qx = eul2quat({0, 0, M_PI / 8}); 
+    constexpr Quaternion qx = eul2quat({0, 0, M_PI / 8});
     constexpr Quaternion qy = eul2quat({0, M_PI / 8, 0});
     constexpr Quaternion qz = eul2quat({M_PI / 8, 0, 0});
     double totalCost        = 0;
