@@ -26,16 +26,27 @@ class RealTimeCostCalculator {
     const Quaternion q_thr;  // threshold = factor * abs(q_ref - q_0)
     Quaternion q_prev;
 
+    // Contains +1.0 if the reference is greater than the initial value, 
+    // and -1.0 if the reference is less than the initial value
     const ColVector<4> dir;
 
+    // The time point where the curve last crossed the settling interval
     ColVector<4> lastthrescross = -ones<4, 1>();
+    // Whether the next crossing of the settling interval will be rising (true)
+    // or falling (false)
     TColVector<bool, 4> nextthrescrossrising;
-    TColVector<bool, 4> rising;  // TODO!!!
+    // Whether the curve is rising (true) or falling (false)
+    TColVector<bool, 4> rising; 
+    // The last relative maximum error (extrema of overshoot ringing)
     ColVector<4> maxerr;
+    // Whether the curve has crossed the reference or not
     TColVector<bool, 4> crossed = {};
 
+    // The time point where the curve settled to within the settling interval
     ColVector<4> settled   = -ones<4, 1>();
+    // The time point where the curve first entered the settling interval
     ColVector<4> riseTime  = -ones<4, 1>();
+    // The extremum of the error after crossing the reference
     ColVector<4> overshoot = zeros<4, 1>();
 
 #ifdef DEBUG

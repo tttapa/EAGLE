@@ -16,23 +16,13 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
     DroneAttitudeOutput yy = model.getOutput(x, u);
     auto q                 = yy.getOrientation();
 
+    // Should the simulation continue after this time step?
     bool continueSimulation = true;
 
+    // The error is the difference between the reference and the current value
     auto q_err = q_ref - q;
 
 #ifdef DEBUG
-    // cerr << boolalpha << endl                             //
-    //      << "k = " << k << endl                           //
-    //      << "q_ref       = " << transpose(q_ref)          //
-    //      << "q_thr       = " << transpose(q_thr)          //
-    //      << "q_err       = " << transpose(q_err)          //
-    //      << "q_thres_dif = " << transpose(q_thr / 238.0)  //
-    //      << "riseTime    = " << transpose(riseTime)       //
-    //      << "settled     = " << transpose(settled)        //
-    //      << "dir         = " << transpose(dir)            //
-    //      << "crossed     = " << transpose(crossed)        //
-    //      << "maxerr      = " << transpose(maxerr);        //
-
     q_v.push_back(q);
     k_v.push_back(k);
 #endif
@@ -128,6 +118,8 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
                 continueSimulaion = false;
 #endif
             } else {  // stable
+                if (maxerr[i] == infinity)
+                    overshoot[i] = dir[i] * newmaxerr;
                 maxerr[i] = newmaxerr;
             }
 
@@ -136,6 +128,8 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
             // of the previous crossing of the settling interval
             if (maxerr[i] <= q_thr[i] || q_thr[i] == 0.0) {
                 settled[i] = lastthrescross[i];
+                if (q_thr[i] == 0.0)
+                    overshoot[i] = 0.0;
 #ifndef DEBUG
                 continueSimulation = false;
                 for (size_t i = 0; i < 4; ++i)
@@ -143,16 +137,10 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
                         continueSimulation = true;
 #endif
             } else {
-                // only a real crossing if the extremum is outside of the 
-                // settling interval, otherwise, it doesn't really cross the 
+                // only a real crossing if the extremum is outside of the
+                // settling interval, otherwise, it doesn't really cross the
                 // bounds of the interval, it just stays inside of it
                 lastthrescross[i] = newlastthrescross;
-            }
-
-            // if the system is not settled yet,
-            // accumulate overshoot
-            if (settled[i] == -1.0) {
-                overshoot[i] += q_err[i];
             }
         }
     }
@@ -171,10 +159,11 @@ double RealTimeCostCalculator::getCost() const {
         if (riseTime[i] == -1.0)
             cost += 1e20 * abs(q_prev[i] - q_ref[i]);
         else if (settled[i] == -1.0)
-            cost += 1e10 * overshoot[i];
+            cost += 1e10 *
+                    abs(overshoot[i]);  // TODO: maybe overshoot is still zero
         else
-            cost +=
-                riseTime[i] + overshoot[i] + 1e2 * (settled[i] - riseTime[i]);
+            cost += riseTime[i] + abs(overshoot[i]) +
+                    1e2 * (settled[i] - riseTime[i]);
         assert(settled[i] >= riseTime[i] || settled[i] == -1.0);
     }
     return cost;
@@ -194,45 +183,29 @@ void RealTimeCostCalculator::plot() const {
 #endif
 #ifdef PLOT_ALL_QUATERNION_STATES
     if (q_ref[0] != 0) {
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[0], q_ref[0]}, "c--");
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[0] - q_thr[0], q_ref[0] - q_thr[0]},
-                  "c:");
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[0] + q_thr[0], q_ref[0] + q_thr[0]},
-                  "c:");
+        plt::axhline(q_ref[0], "--", "c");
+        plt::axhline(q_ref[0] - q_thr[0], "-.", "c");
+        plt::axhline(q_ref[0] + q_thr[0], "-.", "c");
+        plt::axhline(q_ref[0] + overshoot[0], ":", "c");
     }
 #endif
     if (q_ref[1] != 0) {
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[1], q_ref[1]}, "r--");
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[1] - q_thr[1], q_ref[1] - q_thr[1]},
-                  "r:");
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[1] + q_thr[1], q_ref[1] + q_thr[1]},
-                  "r:");
+        plt::axhline(q_ref[1], "--", "r");
+        plt::axhline(q_ref[1] - q_thr[1], "-.", "r");
+        plt::axhline(q_ref[1] + q_thr[1], "-.", "r");
+        plt::axhline(q_ref[1] + overshoot[1], ":", "r");
     }
     if (q_ref[2] != 0) {
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[2], q_ref[2]}, "g--");
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[2] - q_thr[2], q_ref[2] - q_thr[2]},
-                  "g:");
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[2] + q_thr[2], q_ref[2] + q_thr[2]},
-                  "g:");
+        plt::axhline(q_ref[2], "--", "g");
+        plt::axhline(q_ref[2] - q_thr[2], "-.", "g");
+        plt::axhline(q_ref[2] + q_thr[2], "-.", "g");
+        plt::axhline(q_ref[2] + overshoot[2], ":", "g");
     }
     if (q_ref[3] != 0) {
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[3], q_ref[3]}, "b--");
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[3] - q_thr[3], q_ref[3] - q_thr[3]},
-                  "b:");
-        plt::plot(vector<double>{k_v[0], k_v.back()},
-                  vector<double>{q_ref[3] + q_thr[3], q_ref[3] + q_thr[3]},
-                  "b:");
+        plt::axhline(q_ref[3], "--", "b");
+        plt::axhline(q_ref[3] - q_thr[3], "-.", "b");
+        plt::axhline(q_ref[3] + q_thr[3], "-.", "b");
+        plt::axhline(q_ref[3] + overshoot[3], ":", "b");
     }
 #ifdef PLOT_ALL_QUATERNION_STATES
     if (riseTime[0] > 0)
@@ -246,14 +219,14 @@ void RealTimeCostCalculator::plot() const {
         plt::axvline(riseTime[3], "--", "b");
 #ifdef PLOT_ALL_QUATERNION_STATES
     if (settled[0] > 0)
-        plt::axvline(settled[0], ":", "c");
+        plt::axvline(settled[0], "-.", "c");
 #endif
     if (settled[1] > 0)
-        plt::axvline(settled[1], ":", "r");
+        plt::axvline(settled[1], "-.", "r");
     if (settled[2] > 0)
-        plt::axvline(settled[2], ":", "g");
+        plt::axvline(settled[2], "-.", "g");
     if (settled[3] > 0)
-        plt::axvline(settled[3], ":", "b");
+        plt::axvline(settled[3], "-.", "b");
 
     plt::xlim(0.0, k_v.back());
 
