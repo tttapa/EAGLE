@@ -4,7 +4,7 @@
 #include <Drone/Drone.hpp>
 
 #define DEBUG
-// #define PLOT_ALL_QUATERNION_STATES
+#define PLOT_ALL_QUATERNION_STATES
 
 class RealTimeCostCalculator {
   public:
@@ -23,12 +23,14 @@ class RealTimeCostCalculator {
   private:
     ContinuousModel<Nx_att, Nu_att, Ny_att> &model;
     const Quaternion q_ref;
-    const Quaternion q_thr;  // threshold
+    const Quaternion q_thr;  // threshold = factor * abs(q_ref - q_0)
     Quaternion q_prev;
 
     const ColVector<4> dir;
 
-    TColVector<bool, 4> rising = {0, 1, 1, 1};  // TODO!!!
+    ColVector<4> lastthrescross = -ones<4, 1>();
+    TColVector<bool, 4> nextthrescrossrising;
+    TColVector<bool, 4> rising;  // TODO!!!
     ColVector<4> maxerr;
     TColVector<bool, 4> crossed = {};
 

@@ -42,14 +42,19 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
     for (size_t i = 0; i < 4; ++i) {
         if (riseTime[i] == -1.0) {
             if (dir[i] * q_err[i] <= q_thr[i]) {
-                riseTime[i] = k;
+                riseTime[i]             = k;
+                lastthrescross[i]       = k;
+                nextthrescrossrising[i] = !(dir[i] > 0);
+
 #ifdef DEBUG
                 cerr << "risen " << i << endl;
 #endif
             }
         }
-        if (dir[i] * q_err[i] <= 0)
+        if (dir[i] * q_err[i] <= 0 && !crossed[i]) {
             crossed[i] = true;
+            rising[i]  = dir[i] > 0;
+        }
 
         // if we haven't crossed the reference yet after 2 times the rise time
         if (!crossed[i] && k == 2 * riseTime[i] && settled[i] == -1.0) {
@@ -66,13 +71,23 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
         if (crossed[i] && settled[i] == -1.0) {
             double newmaxerr = maxerr[i];
             if (rising[i]) {
-                if (q[i] < q_prev[i]) {
+                if (q_err[i] <= q_thr[i] && nextthrescrossrising[i] == true) {
+                    lastthrescross[i]       = k;
+                    nextthrescrossrising[i] = false;
+                }
+                if (q[i] < q_prev[i]) { // was rising, is now falling again
                     rising[i] = false;
+                    // previous point was relative maximum
                     newmaxerr = q_prev[i] - q_ref[i];
                 }
-            } else {
-                if (q[i] > q_prev[i]) {
+            } else {  // falling
+                if (-q_err[i] <= q_thr[i] && nextthrescrossrising[i] == false) {
+                    lastthrescross[i]       = k;
+                    nextthrescrossrising[i] = true;
+                }
+                if (q[i] > q_prev[i]) { // was falling, is now rising again
                     rising[i] = true;
+                    // previous point was relative minimum
                     newmaxerr = q_ref[i] - q_prev[i];
                 }
             }
@@ -87,7 +102,7 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
                 maxerr[i] = newmaxerr;
             }
             if (maxerr[i] <= q_thr[i] || q_thr[i] == 0.0) {
-                settled[i] = k;
+                settled[i] = lastthrescross[i];
 #ifdef DEBUG
                 cerr << "settled " << i << endl;
 #else
@@ -108,7 +123,7 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
 
 double RealTimeCostCalculator::getCost() const {
     auto settled = this->settled;
-    double cost = 0;
+    double cost  = 0;
     for (size_t i = 0; i < 4; ++i) {
         if (!crossed[i])
             settled[i] = riseTime[i];
@@ -234,7 +249,7 @@ double getRiseTimeCost(Drone::FixedClampAttitudeController &ctrl,
 
 double getCost(Drone::FixedClampAttitudeController &ctrl,
                ContinuousModel<Nx_att, Nu_att, Ny_att> &model) {
-    constexpr double factor = 0.005;  // 0.5% criterium
+    constexpr double factor = 0.01;  // 1% criterium
     constexpr Quaternion qx = eul2quat({0, 0, M_PI / 8});
     constexpr Quaternion qy = eul2quat({0, M_PI / 8, 0});
     constexpr Quaternion qz = eul2quat({M_PI / 8, 0, 0});
