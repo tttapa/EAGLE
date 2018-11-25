@@ -441,14 +441,6 @@ Matrix<R, C> round(const Matrix<R, C> &m, size_t digits) {
     return result;
 }
 
-template <size_t R, size_t C>
-bool isfinite(const Matrix<R, C> &m) {
-    return std::all_of(m.begin(), m.end(), [](auto row) {
-        return std::all_of(row.begin(), row.end(),
-                           [](auto el) { return std::isfinite(el); });
-    });
-}
-
 // Clamping
 template <class T>
 static T clamp(T v, T lo, T hi) {

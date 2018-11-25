@@ -154,7 +154,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
      *          A result code that indicates whether the integration was
      *          successful.
      */
-    ODEResultCode
+    auto
     simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
              typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
              InputFunction &u, VecX_t x_start, const AdaptiveODEOptions &opt) {
@@ -248,7 +248,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
      *          A result code that indicates whether the integration was
      *          successful.
      */
-    ODEResultCode
+    auto
     simulate(typename std::back_insert_iterator<std::vector<double>> timeresult,
              typename std::back_insert_iterator<std::vector<VecX_t>> xresult,
              VecU_t u, VecX_t x_start, const AdaptiveODEOptions &opt) {
@@ -298,15 +298,17 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             double t         = opt.t_start + Ts * i;
             curr_opt.t_start = t;
             curr_opt.t_end   = t + Ts;
-            curr_opt.maxiter = opt.maxiter - result.time.size();
             VecR_t curr_ref  = r(t);
             VecU_t curr_u    = controller(curr_x, curr_ref);
+            curr_opt.maxiter = opt.maxiter - result.iterations;
             result.sampledTime.push_back(t);
             result.control.push_back(curr_u);
             result.reference.push_back(curr_ref);
-            result.resultCode |= this->simulate(
+            auto curr_result = this->simulate(
                 std::back_inserter(result.time),
                 std::back_inserter(result.solution), curr_u, curr_x, curr_opt);
+            result.resultCode |= curr_result.first;
+            result.iterations += curr_result.second;
             curr_x = result.solution.back();
             result.time.pop_back();
             result.solution.pop_back();
@@ -332,6 +334,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             if (!callback(i, curr_x, curr_u))
                 break;
             auto result = this->simulateEndResult(curr_u, curr_x, curr_opt);
+            curr_opt.maxiter -= result.iterations;
             resultCode |= result.resultCode;
             if (resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED)
                 break;
@@ -403,7 +406,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             double t         = opt.t_start + Ts * k;
             curr_opt.t_start = t;
             curr_opt.t_end   = t + Ts;
-            curr_opt.maxiter = opt.maxiter - result.time.size();
+            curr_opt.maxiter -= result.iterations;
             // reference signal
             VecR_t curr_ref = r(t);
             // calculate the control signal, based on current estimated state

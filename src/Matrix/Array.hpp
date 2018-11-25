@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>  // copy
+#include <cmath>      // isfinite
 #include <cstddef>
 #include <numeric>  // accumulate
 #include <type_traits>
@@ -227,6 +228,13 @@ constexpr Array<T, N> abs(const Array<T, N> &a) {
     for (auto &e : result)
         e = abs(e);
     return result;
+}
+
+template <class T, size_t N>
+bool isfinite(const Array<T, N> &a) {
+    using std::isfinite;
+    return std::all_of(a.begin(), a.end(),
+                       [](const T &e) { return isfinite(e); });
 }
 
 template <class T, size_t N>

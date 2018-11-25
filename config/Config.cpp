@@ -23,25 +23,46 @@ const std::filesystem::path loadPath =
 /* ------ Attitude LQR & LQE ------------------------------------------------ */
 
 namespace Attitude {
+// const RowVector<3> Qq     = {{
+//     103.23848252443499,
+//     106.42413118528627,
+//     106.42413118528627,
+// }};
+// const RowVector<3> Qomega = {{
+//     0.030929762777928395,
+//     0.030929762777928395,
+//     0.0043504717329451159,
+// }};
+// const RowVector<3> Qn     = {{
+//     1e-10,
+//     1e-10,
+//     1e-10,
+// }};
+// const RowVector<3> Rr     = {{
+//     1.7142847029476442,
+//     1.7142847029476442,
+//     0.43951272021883059,
+// }};
+
 const RowVector<3> Qq     = {{
-    111.30830664019889,
-    94.869754374249425,
-    94.869754374249425,
+    1.2578246839673057,
+    1.2664023040438583,
+    1.2664023040438583,
 }};
 const RowVector<3> Qomega = {{
-    0.030482436999920717,
-    0.030482436999920717,
-    9.0458799180992353e-06,
+    0.030276768974950123,
+    0.030276768974950123,
+    1e-10,
 }};
 const RowVector<3> Qn     = {{
-    1.5777927165600708e-05,
-    1.5777927165600708e-05,
-    1.2102708808326187e-06,
+    0.065644174665042174,
+    0.065644174665042174,
+    0.025955955595682777,
 }};
 const RowVector<3> Rr     = {{
-    1.3510899510186709,
-    1.3510899510186709,
-    1.1397506288103747,
+    1e-10,
+    1e-10,
+    1e-10,
 }};
 
 /** Weighting matrix for states in LQR design. */
@@ -93,7 +114,7 @@ const std::filesystem::path loadPath = home / "Private" / "EAGLE-Params";
 
 const AdaptiveODEOptions odeopt = {
     .t_start = 0.0,
-    .t_end   = 1.1,
+    .t_end   = 2.5,
     .epsilon = 1e-4,
     .h_start = 1e-4,
     .h_min   = 1e-6,
@@ -110,6 +131,10 @@ const AdaptiveODEOptions odeoptdisp = {
 };
 
 /* ------ LQR --------------------------------------------------------------- */
+// const RowVector<3> Qq_initial     = {1, 1, 1};
+// const RowVector<3> Qomega_initial = {1, 1, 1};
+// const RowVector<3> Qn_initial     = {1, 1, 1};
+
 const RowVector<3> Qq_initial     = Config::Attitude::Qq;
 const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
 const RowVector<3> Qn_initial     = Config::Attitude::Qn;

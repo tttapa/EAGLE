@@ -13,11 +13,11 @@ inline double norm(double x) { return fabs(x); }
 
 template <class IteratorTimeBegin, class IteratorXBegin, class F, class T,
           bool StoreIntermediate = true>
-ODEResultCode dormandPrince(IteratorTimeBegin timeresult,
-                            IteratorXBegin xresult,
-                            F f,        // function f(double t, T x)
-                            T x_start,  // initial value
-                            const AdaptiveODEOptions &opt  // options
+std::pair<ODEResultCode, size_t>
+dormandPrince(IteratorTimeBegin timeresult, IteratorXBegin xresult,
+              F f,                           // function f(double t, T x)
+              T x_start,                     // initial value
+              const AdaptiveODEOptions &opt  // options
 ) {
     using namespace DormandPrinceConstants;
     using std::isfinite;
@@ -33,10 +33,14 @@ ODEResultCode dormandPrince(IteratorTimeBegin timeresult,
     ODEResultCode resultCode = ODEResultCodes::SUCCESS;
 
     for (size_t i = 0; i < opt.maxiter; ++i) {
-        if (!isfinite(x))
+        if (!isfinite(x)) {
+            std::cerr << "Error: x is not finite" << std::endl;
             throw std::runtime_error{"Error: x is not finite"};
-        if (!isfinite(t))
+        }
+        if (!isfinite(t)) {
+            std::cerr << "Error: t is not finite" << std::endl;
             throw std::runtime_error{"Error: t is not finite"};
+        }
         // Calculate all seven slopes
         T K1 = f(t, x);
         T K2 = f(t + c2 * h, x + h * (a21 * K1));
@@ -87,7 +91,7 @@ ODEResultCode dormandPrince(IteratorTimeBegin timeresult,
                 *timeresult = {t_new};
                 *xresult    = {x_new};
             }
-            return resultCode;
+            return {resultCode, i};
         } else if (t_new + h_new > opt.t_end) {
             // finishes on next iteration, don't jump over t_end
             h_new = opt.t_end - t_new;
@@ -98,7 +102,7 @@ ODEResultCode dormandPrince(IteratorTimeBegin timeresult,
         x = x_new;
     }
     resultCode |= ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED;
-    return resultCode;
+    return {resultCode, opt.maxiter};
 }
 
 template <class F, class T>
@@ -108,9 +112,9 @@ ODEResultX<T> dormandPrince(F f,        // function f(double t, T x)
 ) {
     std::vector<double> t_v;
     std::vector<T> x_v;
-    ODEResultCode resultCode = dormandPrince(
-        std::back_inserter(t_v), std::back_inserter(x_v), f, x_start, opt);
-    return {t_v, x_v, resultCode};
+    auto result = dormandPrince(std::back_inserter(t_v),
+                                std::back_inserter(x_v), f, x_start, opt);
+    return {t_v, x_v, result.first, result.second};
 }
 
 template <class F, class T>
@@ -120,8 +124,8 @@ ODEResultX<T> dormandPrinceEndResult(F f,        // function f(double t, T x)
 ) {
     std::vector<double> t_v(1);
     std::vector<T> x_v(1);
-    ODEResultCode resultCode =
+    auto result =
         dormandPrince<decltype(t_v.begin()), decltype(x_v.begin()), F, T,
                       false>(t_v.begin(), x_v.begin(), f, x_start, opt);
-    return {t_v, x_v, resultCode};
+    return {t_v, x_v, result.first, result.second};
 }

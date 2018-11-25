@@ -6,13 +6,20 @@ constexpr double infinity = std::numeric_limits<double>::infinity();
 RealTimeCostCalculator::RealTimeCostCalculator(
     ContinuousModel<Nx_att, Nu_att, Ny_att> &model, const Quaternion &q_ref,
     double factor, const Quaternion &q_0)
-    : model{model}, q_ref{q_ref}, q_thr{factor * abs(q_ref - q_0)}, q_prev{q_0},
-      dir{getDirection(q_ref, q_0)}, maxerr{infinity, infinity, infinity,
-                                            infinity} {}
+    : model{model}, q_ref{q_ref}, q_dif{abs(q_ref - q_0)}, q_thr{factor *
+                                                                 q_dif},
+      q_prev{q_0}, dir{getDirection(q_ref, q_0)}, maxerr{infinity, infinity,
+                                                         infinity, infinity} {}
 
 bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
                                         const ColVector<Nu_att> &u) {
     using namespace std;
+
+    if (!isfinite(x) || !isfinite(u)) {
+        std::fill(overshoot.begin(), overshoot.end(), infinity);
+        return false;
+    }
+
     DroneAttitudeOutput yy = model.getOutput(x, u);
     auto q                 = yy.getOrientation();
 
@@ -115,7 +122,7 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
                 overshoot[i] = infinity;
                 settled[i]   = infinity;
 #ifndef DEBUG
-                continueSimulaion = false;
+                continueSimulation = false;
 #endif
             } else {  // stable
                 if (maxerr[i] == infinity)
@@ -150,20 +157,27 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
     return continueSimulation;
 }
 
-double RealTimeCostCalculator::getCost() const {
+double RealTimeCostCalculator::getCost(double notRisenCost,
+                                       double notSettledCost,
+                                       double overshootCost,
+                                       double settleTimeCost) const {
     auto settled = this->settled;
     double cost  = 0;
     for (size_t i = 0; i < 4; ++i) {
+        if (q_dif[i] == 0.0)
+            continue;
         if (!crossed[i])
             settled[i] = riseTime[i];
         if (riseTime[i] == -1.0)
-            cost += 1e20 * abs(q_prev[i] - q_ref[i]);
+            cost += notRisenCost * abs(q_ref[i] - q_prev[i]);
         else if (settled[i] == -1.0)
-            cost += 1e10 *
-                    abs(overshoot[i]);  // TODO: maybe overshoot is still zero
+            cost += notSettledCost *
+                    (abs(overshoot[i]) +  // TODO: maybe overshoot is still zero
+                     abs(q_ref[i] - q_prev[i]));
         else
-            cost += riseTime[i] + abs(overshoot[i]) +
-                    1e2 * (settled[i] - riseTime[i]);
+            cost += riseTime[i]                                     //
+                    + overshootCost * abs(overshoot[i] / q_dif[i])  //
+                    + settleTimeCost * (settled[i] - riseTime[i]);
         assert(settled[i] >= riseTime[i] || settled[i] == -1.0);
     }
     return cost;
@@ -172,6 +186,15 @@ double RealTimeCostCalculator::getCost() const {
 #ifdef DEBUG
 void RealTimeCostCalculator::plot() const {
     using namespace std;
+
+    cerr << ANSIColors::whiteb << "Settled   = " << transpose(settled)  //
+         << "Rise time = " << transpose(riseTime)                       //
+         << "Overshoot = " << transpose(overshoot)                      //
+         << "q         = " << transpose(q_prev)                         //
+         << ANSIColors::reset << endl;
+
+    if (k_v.empty() || q_v.empty())
+        return;
 
     plt::figure_size(1280, 720);
 #ifdef PLOT_ALL_QUATERNION_STATES
@@ -229,11 +252,6 @@ void RealTimeCostCalculator::plot() const {
         plt::axvline(settled[3], "-.", "b");
 
     plt::xlim(0.0, k_v.back());
-
-    cerr << ANSIColors::whiteb << "Settled   = " << transpose(settled)  //
-         << "Rise time = " << transpose(riseTime)                       //
-         << "Overshoot = " << transpose(overshoot)                      //
-         << ANSIColors::reset << endl;
 }
 #endif
 
@@ -249,14 +267,15 @@ double getRiseTimeCost(Drone::FixedClampAttitudeController &ctrl,
 
     ODEResultCode resultCode =
         model.simulateRealTime(ctrl, y_ref_f, x0, opt, costcalc);
-    if (resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED)
-        return infinity;
 
 #ifdef DEBUG
     costcalc.plot();
     plt::tight_layout();
     plt::show();
 #endif
+
+    if (resultCode & ODEResultCodes::MAXIMUM_ITERATIONS_EXCEEDED)
+        return infinity;
 
     return costcalc.getCost();
 }

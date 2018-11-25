@@ -157,13 +157,17 @@ int main(int argc, char const *argv[]) {
 
         PerfTimer mutateTimer;
         if (g == 0)
+#ifndef DEBUG
 #pragma omp parallel for
+#endif
             for (size_t i = 1; i < population; ++i) {
                 populationWeights[i] = populationWeights[0];
                 populationWeights[i].mutate();
             }
         else
+#ifndef DEBUG
 #pragma omp parallel for
+#endif
             for (size_t i = survivors; i < population; ++i) {
                 size_t idx1 = distribution(generator);
                 size_t idx2 = distribution(generator);
@@ -177,7 +181,9 @@ int main(int argc, char const *argv[]) {
              << " µs." << endl;
 
         PerfTimer simTimer;
+#ifndef DEBUG
 #pragma omp parallel for
+#endif
         for (size_t i = 0; i < population; ++i) {
             auto &w = populationWeights[i];
             try {
@@ -188,6 +194,8 @@ int main(int argc, char const *argv[]) {
             } catch (std::runtime_error &e) {
                 // LAPACK sometimes fails for certain Q and R
                 w.cost = std::numeric_limits<double>::infinity();
+                cerr << ANSIColors::redb << e.what() << ANSIColors::reset
+                     << endl;
             }
         }
         auto simTime = simTimer.getDuration<chrono::milliseconds>();
@@ -195,8 +203,12 @@ int main(int argc, char const *argv[]) {
              << " ms." << endl;
 
         PerfTimer sortTimer;
+#ifndef DEBUG
         __gnu_parallel::sort(populationWeights.begin(),
                              populationWeights.end());
+#else
+        sort(populationWeights.begin(), populationWeights.end());
+#endif
         auto sortTime = sortTimer.getDuration<chrono::microseconds>();
         cout << "Sorted " << population << " controllers in " << sortTime
              << " µs." << endl;
@@ -254,11 +266,13 @@ int main(int argc, char const *argv[]) {
         std::string gstr = std::to_string(g + 1);
         plt::figure_size(px_x, px_y);
 
+        plt::suptitle("Generation #" + gstr);
+
         plt::subplot(4, 1, 1);
         plotDroneSignal(result.time, result.solution,
                         &DroneAttitudeState::getOrientationEuler,
                         {"z", "y'", "x\""}, {"b-", "g-", "r-"},
-                        "Orientation of drone (Generation #" + gstr + ")");
+                        "Orientation of drone");
         plt::xlim(t_start, t_end * 1.1);
 
         plt::subplot(4, 1, 2);
@@ -281,8 +295,6 @@ int main(int argc, char const *argv[]) {
                         {"r" DISCRETE_FMT, "g" DISCRETE_FMT, "b" DISCRETE_FMT},
                         "Torque motor control");
         plt::xlim(t_start, t_end * 1.1);
-
-        plt::tight_layout();
 
         std::stringstream filename;
         filename << "generation" << std::setw(4) << std::setfill('0') << (g + 1)

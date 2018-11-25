@@ -14,7 +14,9 @@ class RealTimeCostCalculator {
 
     bool operator()(size_t k, const ColVector<Nx_att> &x,
                     const ColVector<Nu_att> &u);
-    double getCost() const;
+    double getCost(double notRisenCost = 1e20, double notSettledCost = 1e10,
+                   double overshootCost  = 1e0,
+                   double settleTimeCost = 5e-1) const;
 
 #ifdef DEBUG
     void plot() const;
@@ -23,12 +25,13 @@ class RealTimeCostCalculator {
   private:
     ContinuousModel<Nx_att, Nu_att, Ny_att> &model;
     const Quaternion q_ref;
-    const Quaternion q_thr;  // threshold = factor * abs(q_ref - q_0)
+    const Quaternion q_dif;  // dif = abs(q_ref - q_0)
+    const Quaternion q_thr;  // threshold = factor * q_dif
     Quaternion q_prev;
 
-    // Contains +1.0 if the reference is greater than the initial value, 
+    // Contains +1.0 if the reference is greater than the initial value,
     // and -1.0 if the reference is less than the initial value
-    const ColVector<4> dir;
+    const ColVector<4> dir;  // dir = sign(q_ref - q0)
 
     // The time point where the curve last crossed the settling interval
     ColVector<4> lastthrescross = -ones<4, 1>();
@@ -36,16 +39,16 @@ class RealTimeCostCalculator {
     // or falling (false)
     TColVector<bool, 4> nextthrescrossrising;
     // Whether the curve is rising (true) or falling (false)
-    TColVector<bool, 4> rising; 
+    TColVector<bool, 4> rising;
     // The last relative maximum error (extrema of overshoot ringing)
     ColVector<4> maxerr;
     // Whether the curve has crossed the reference or not
     TColVector<bool, 4> crossed = {};
 
     // The time point where the curve settled to within the settling interval
-    ColVector<4> settled   = -ones<4, 1>();
+    ColVector<4> settled = -ones<4, 1>();
     // The time point where the curve first entered the settling interval
-    ColVector<4> riseTime  = -ones<4, 1>();
+    ColVector<4> riseTime = -ones<4, 1>();
     // The extremum of the error after crossing the reference
     ColVector<4> overshoot = zeros<4, 1>();
 

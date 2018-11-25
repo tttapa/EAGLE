@@ -74,4 +74,5 @@ struct ODEResultX {
     std::vector<double> time;
     std::vector<V> solution;
     ODEResultCode resultCode = {};
+    size_t iterations;
 };

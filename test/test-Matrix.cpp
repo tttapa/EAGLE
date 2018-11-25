@@ -311,3 +311,19 @@ TEST(Matrix, abs) {
     }};
     EXPECT_EQ(abs(m), expected);
 }
+
+TEST(Matrix, isfinite) {
+    Matrix<2, 3> m        = {{
+        {0.0, -1.1, 2.2},
+        {-2.3, 0.0, 1.2},
+    }};
+    ASSERT_TRUE(isfinite(m));
+    m[1][2] = std::numeric_limits<double>::infinity();
+    ASSERT_FALSE(isfinite(m));
+    m[1][2] = std::numeric_limits<double>::quiet_NaN();
+    ASSERT_FALSE(isfinite(m));
+    m[1][2] = std::numeric_limits<double>::signaling_NaN();
+    ASSERT_FALSE(isfinite(m));
+    m[1][2] = 1.0 / 0.0;
+    ASSERT_FALSE(isfinite(m));
+}
