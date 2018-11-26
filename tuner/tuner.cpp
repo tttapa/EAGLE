@@ -194,8 +194,10 @@ int main(int argc, char const *argv[]) {
             } catch (std::runtime_error &e) {
                 // LAPACK sometimes fails for certain Q and R
                 w.cost = std::numeric_limits<double>::infinity();
+#ifdef DEBUG
                 cerr << ANSIColors::redb << e.what() << ANSIColors::reset
                      << endl;
+#endif
             }
         }
         auto simTime = simTimer.getDuration<chrono::milliseconds>();

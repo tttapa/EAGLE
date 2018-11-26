@@ -16,7 +16,7 @@ bool RealTimeCostCalculator::operator()(size_t k, const ColVector<Nx_att> &x,
     using namespace std;
 
     if (!isfinite(x) || !isfinite(u)) {
-        std::fill(overshoot.begin(), overshoot.end(), infinity);
+        fill(overshoot.begin(), overshoot.end(), infinity);
         return false;
     }
 
@@ -164,6 +164,8 @@ double RealTimeCostCalculator::getCost(double notRisenCost,
     auto settled = this->settled;
     double cost  = 0;
     for (size_t i = 0; i < 4; ++i) {
+        if (overshoot[i] == infinity)
+            return infinity;
         if (q_dif[i] == 0.0)
             continue;
         if (!crossed[i])
@@ -252,6 +254,7 @@ void RealTimeCostCalculator::plot() const {
         plt::axvline(settled[3], "-.", "b");
 
     plt::xlim(0.0, k_v.back());
+    plt::tight_layout();
 }
 #endif
 
@@ -270,7 +273,6 @@ double getRiseTimeCost(Drone::FixedClampAttitudeController &ctrl,
 
 #ifdef DEBUG
     costcalc.plot();
-    plt::tight_layout();
     plt::show();
 #endif
 

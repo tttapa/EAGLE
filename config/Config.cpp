@@ -23,46 +23,25 @@ const std::filesystem::path loadPath =
 /* ------ Attitude LQR & LQE ------------------------------------------------ */
 
 namespace Attitude {
-// const RowVector<3> Qq     = {{
-//     103.23848252443499,
-//     106.42413118528627,
-//     106.42413118528627,
-// }};
-// const RowVector<3> Qomega = {{
-//     0.030929762777928395,
-//     0.030929762777928395,
-//     0.0043504717329451159,
-// }};
-// const RowVector<3> Qn     = {{
-//     1e-10,
-//     1e-10,
-//     1e-10,
-// }};
-// const RowVector<3> Rr     = {{
-//     1.7142847029476442,
-//     1.7142847029476442,
-//     0.43951272021883059,
-// }};
-
 const RowVector<3> Qq     = {{
-    1.2578246839673057,
-    1.2664023040438583,
-    1.2664023040438583,
+    103.23848252443499,
+    106.42413118528627,
+    106.42413118528627,
 }};
 const RowVector<3> Qomega = {{
-    0.030276768974950123,
-    0.030276768974950123,
-    1e-10,
+    0.030929762777928395,
+    0.030929762777928395,
+    0.0043504717329451159,
 }};
 const RowVector<3> Qn     = {{
-    0.065644174665042174,
-    0.065644174665042174,
-    0.025955955595682777,
+    1e-10,
+    1e-10,
+    1e-10,
 }};
 const RowVector<3> Rr     = {{
-    1e-10,
-    1e-10,
-    1e-10,
+    1.7142847029476442,
+    1.7142847029476442,
+    0.43951272021883059,
 }};
 
 /** Weighting matrix for states in LQR design. */
@@ -114,7 +93,7 @@ const std::filesystem::path loadPath = home / "Private" / "EAGLE-Params";
 
 const AdaptiveODEOptions odeopt = {
     .t_start = 0.0,
-    .t_end   = 2.5,
+    .t_end   = 2.0,
     .epsilon = 1e-4,
     .h_start = 1e-4,
     .h_min   = 1e-6,
@@ -131,13 +110,13 @@ const AdaptiveODEOptions odeoptdisp = {
 };
 
 /* ------ LQR --------------------------------------------------------------- */
-// const RowVector<3> Qq_initial     = {1, 1, 1};
-// const RowVector<3> Qomega_initial = {1, 1, 1};
-// const RowVector<3> Qn_initial     = {1, 1, 1};
+const RowVector<3> Qq_initial     = {1, 1, 1};
+const RowVector<3> Qomega_initial = {1, 1, 1};
+const RowVector<3> Qn_initial     = {1, 1, 1};
 
-const RowVector<3> Qq_initial     = Config::Attitude::Qq;
-const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
-const RowVector<3> Qn_initial     = Config::Attitude::Qn;
+// const RowVector<3> Qq_initial     = Config::Attitude::Qq;
+// const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
+// const RowVector<3> Qn_initial     = Config::Attitude::Qn;
 
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial =
@@ -150,10 +129,10 @@ const ColVector<9> varQ = 0.01 * Q_diag_initial;
 const ColVector<3> varR = 0.01 * R_diag_initial;
 
 const ColVector<9> Qmin = 1e-10 * ones<9, 1>();
-const ColVector<3> Rmin = 1e-10 * ones<3, 1>();
+const ColVector<3> Rmin = 1e-2 * ones<3, 1>();
 
 const ColVector<9> Qmax = 1e6 * ones<9, 1>();
-const ColVector<3> Rmax = 1e6 * ones<3, 1>();
+const ColVector<3> Rmax = 1e2 * ones<3, 1>();
 
 /* ------ Genetic algorithm settings ---------------------------------------- */
 const size_t population  = 16 * 64;

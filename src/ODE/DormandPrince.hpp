@@ -57,6 +57,11 @@ dormandPrince(IteratorTimeBegin timeresult, IteratorXBegin xresult,
             norm((b1 - b1p) * K1 + (b3 - b3p) * K3 + (b4 - b4p) * K4 +
                  (b5 - b5p) * K5 + (b6 - b6p) * K6 + (b7 - b7p) * K7);
 
+        if (!isfinite(K1)) {
+            std::cerr << "Error: K1 is not finite" << std::endl;
+            throw std::runtime_error{"Error: K1 is not finite"};
+        }
+
         double s = pow(h * opt.epsilon / 2.0 / error, 1.0 / 5.0);
 
         double h_new = h;

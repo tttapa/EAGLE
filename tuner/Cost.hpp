@@ -3,7 +3,7 @@
 #include <Config.hpp>
 #include <Drone/Drone.hpp>
 
-#define DEBUG
+// #define DEBUG
 // #define PLOT_ALL_QUATERNION_STATES
 
 class RealTimeCostCalculator {
@@ -15,7 +15,7 @@ class RealTimeCostCalculator {
     bool operator()(size_t k, const ColVector<Nx_att> &x,
                     const ColVector<Nu_att> &u);
     double getCost(double notRisenCost = 1e20, double notSettledCost = 1e10,
-                   double overshootCost  = 1e0,
+                   double overshootCost  = 5e0,
                    double settleTimeCost = 5e-1) const;
 
 #ifdef DEBUG
