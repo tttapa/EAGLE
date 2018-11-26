@@ -12,9 +12,9 @@ public class FloatReceiver extends Thread {
 
   private DatagramSocket socket;
   private boolean running;
-  private ByteBuffer buf = ByteBuffer.allocate(256);
+  private ByteBuffer buf = ByteBuffer.allocate(1024);
 
-  private Queue<Float> fbuf = new ArrayBlockingQueue<Float>(32);
+  private Queue<Float> floatqueue = new ArrayBlockingQueue<Float>(256);
 
   public FloatReceiver() throws SocketException {
     buf.order(ByteOrder.LITTLE_ENDIAN);
@@ -30,6 +30,8 @@ public class FloatReceiver extends Thread {
         DatagramPacket packet 
           = new DatagramPacket(buf.array(), buf.capacity());
         socket.receive(packet);
+        
+        buf.limit(packet.getLength());
 
         InetAddress address = packet.getAddress();
         int port = packet.getPort();
@@ -38,7 +40,8 @@ public class FloatReceiver extends Thread {
 
         System.out.println("Received UDP packet from " + address.toString() + ":" + port);
         
-        for (int i = 0; i < packet.getLength(); i += 4) {
+        // for (int i = 0; i < packet.getLength(); i += 4) {
+        while (floatbuf.hasRemaining()) {
           float f = floatbuf.get();
           addToQueue(f);
           System.out.println(f);
@@ -52,24 +55,24 @@ public class FloatReceiver extends Thread {
   }
 
   public synchronized void addToQueue(float f) {
-    fbuf.add(f);
+    floatqueue.add(f);
   }
 
   public synchronized float getFromQueue() {
     if (getQueueSize() > 0)
-      return fbuf.remove();
+      return floatqueue.remove();
     else 
     return Float.NaN;
   }
 
-  public synchronized int getQueueSize() {
-    return fbuf.size();
+  private synchronized int getQueueSize() {
+    return floatqueue.size();
   }
 };
 
 
 // A PShape object
-PShape path;
+PShape plot;
 
 float[] buffer;
 int index = 0;
@@ -95,46 +98,37 @@ void setup() {
   }
 }
 
-boolean started = false;
-int prebuffer = 0;
-
 void draw() {
-  if (!started)
-    if (floatreceiver.getQueueSize() > prebuffer)
-      started = true;
-    else
-      return;
-
-  // println(frameRate);
+  // clear the display
   background(bg);
     
+  // add a new value to the buffer
   buffer[index] = floatreceiver.getFromQueue();
 
-  // Create the shape
-  path = createShape();
-  path.beginShape();
-  // Set fill and stroke
-  path.noFill();
-  path.stroke(255, 0, 0);
-  path.strokeWeight(1);
+  plot = createShape();
+  plot.beginShape();
+  plot.noFill();
+  plot.stroke(255, 0, 0);
+  plot.strokeWeight(1);
 
   int i = index;
+  float lastfinitevalue = 0;
   for (int ctr = viewportwidth; ctr--> 0; ) {
     if (Float.isNaN(buffer[i])) {
-      path.stroke(bg);
-      path.vertex(ctr, 0);
-      path.stroke(255, 0, 0);
+      plot.stroke(bg);
+      plot.vertex(ctr, lastfinitevalue);
+      plot.stroke(255, 0, 0);
     } else {
-      path.vertex(ctr, buffer[i]);
+      plot.vertex(ctr, buffer[i]);
+      lastfinitevalue = buffer[i];
     }
     if (i == 0)
       i = buffer.length;
     --i;
   }
-  // The path is complete
-  path.endShape();  
+  plot.endShape();  
 
-  shape(path);
+  shape(plot);
 
   index++;
   if (index == buffer.length)
