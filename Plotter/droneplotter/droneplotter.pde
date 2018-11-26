@@ -30,16 +30,16 @@ public class FloatReceiver extends Thread {
         DatagramPacket packet 
           = new DatagramPacket(buf.array(), buf.capacity());
         socket.receive(packet);
-        
+
         buf.limit(packet.getLength());
 
         InetAddress address = packet.getAddress();
         int port = packet.getPort();
-        
+
         FloatBuffer floatbuf = buf.asFloatBuffer();
 
         System.out.println("Received UDP packet from " + address.toString() + ":" + port);
-        
+
         // for (int i = 0; i < packet.getLength(); i += 4) {
         while (floatbuf.hasRemaining()) {
           float f = floatbuf.get();
@@ -61,8 +61,7 @@ public class FloatReceiver extends Thread {
   public synchronized float getFromQueue() {
     if (getQueueSize() > 0)
       return floatqueue.remove();
-    else 
-    return Float.NaN;
+    return Float.NaN;  
   }
 
   private synchronized int getQueueSize() {
@@ -101,7 +100,7 @@ void setup() {
 void draw() {
   // clear the display
   background(bg);
-    
+
   // add a new value to the buffer
   buffer[index] = floatreceiver.getFromQueue();
 
