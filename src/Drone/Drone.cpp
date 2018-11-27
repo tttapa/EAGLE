@@ -121,7 +121,7 @@ Drone::VecY_t Drone::getOutput(const VecX_t &x, const VecU_t &u) {
     return DroneOutput{y_att, y_nav};
 }
 
-Drone::VecX_t Drone::getStableState() const {
+DroneState Drone::getStableState() const {
     DroneState xx = {};
     xx.setOrientation(eul2quat({0, 0, 0}));
     xx.setAngularVelocity({0, 0, 0});

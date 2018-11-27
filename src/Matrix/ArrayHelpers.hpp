@@ -1,27 +1,14 @@
 #pragma once
 
 #include "Array.hpp"
-
-#if __cplusplus >= 201400L
-#define USE_CONSTEXPR_ARRAY_HELPERS constexpr
-#else
-#define USE_CONSTEXPR_ARRAY_HELPERS
-#endif
-
-// https://en.cppreference.com/w/cpp/algorithm/generate
-template <class ForwardIt, class Generator>
-USE_CONSTEXPR_ARRAY_HELPERS void generate(ForwardIt first, ForwardIt last,
-                                          Generator g) {
-    while (first != last)
-        *first++ = g();
-}
+#include <algorithm>
 
 template <class T>
 class Incrementor {
   public:
-    USE_CONSTEXPR_ARRAY_HELPERS Incrementor(T start = 0, T increment = 1)
+    constexpr Incrementor(T start = 0, T increment = 1)
         : value(start), increment(increment) {}
-    USE_CONSTEXPR_ARRAY_HELPERS T operator()() {
+    constexpr T operator()() {
         T temp = value;
         value += increment;
         return temp;
@@ -61,10 +48,16 @@ class Incrementor {
  * @return  The generated array.
  */
 template <class T, size_t N, class U>
-USE_CONSTEXPR_ARRAY_HELPERS Array<T, N>
-generateArray(U start = 0, U increment = 1) {
+constexpr Array<T, N> generatedArray(U start = 0, U increment = 1) {
     Array<T, N> array = {};
     Incrementor<U> g(start, increment);
-    generate(array.begin(), array.end(), g);
+    std::generate(array.begin(), array.end(), g);
+    return array;
+}
+
+template <class T, size_t N>
+constexpr Array<T, N> filledArray(const T &value) {
+    Array<T, N> array = {};
+    std::fill(array.begin(), array.end(), value);
     return array;
 }

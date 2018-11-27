@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Array.hpp"
-#include <cmath>  // sqrt, isfinite
+#include <algorithm>  // all_of
+#include <cmath>      // sqrt, isfinite
 #include <iomanip>
 #include <ostream>
-#include <algorithm> // all_of
-
 
 template <class T, size_t R, size_t C>
 using TMatrix = Array<Array<T, C>, R>;
@@ -343,6 +342,46 @@ void printCpp(std::ostream &os, const TMatrix<T, R, C> &matrix,
               const std::string &name) {
     os << "const Matrix<" << R << ", " << C << "> " << name << " = ";
     printCpp(os, matrix);
+}
+
+struct Printable {
+    virtual void print(std::ostream &os) const = 0;
+};
+
+inline std::ostream &operator<<(std::ostream &os, const Printable &p) {
+    p.print(os);
+    return os;
+}
+
+template <size_t N>
+class PrintAsRowVector_t : public Printable {
+  public:
+    PrintAsRowVector_t(const ColVector<N> &v, const char *sep, size_t precision)
+        : v{v}, sep{sep}, precision{precision} {}
+
+    void print(std::ostream &os) const override {
+        os << std::setprecision(precision) << std::setw(precision + 6)
+           << double(v[0]);
+        for (size_t i = 1; i < N; ++i)
+            os << sep << std::setw(precision + 6) << double(v[i]);
+    }
+
+  private:
+    const ColVector<N> v;
+    const char *const sep;
+    const size_t precision;
+};
+
+template <size_t N>
+PrintAsRowVector_t<N> asrowvector(const ColVector<N> &v, const char *sep = " ",
+                                  size_t precision = 2) {
+    return {v, sep, precision};
+}
+
+template <size_t N>
+PrintAsRowVector_t<N> asrowvector(const RowVector<N> &v, const char *sep = " ",
+                                  size_t precision = 2) {
+    return {transpose(v), sep, precision};
 }
 
 // -----------------------------------------------------------------------------

@@ -88,7 +88,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      * @brief   Get the initial state of the drone. (Upright orientation and 
      *          hovering thrust.)
      */
-    VecX_t getStableState() const;
+    DroneState getStableState() const;
 
     /** 
      * @brief   Get the rotation in Euler angles, given a state vector x.

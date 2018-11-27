@@ -365,3 +365,18 @@ template <class T, class U>
 constexpr Array<T, 1> &operator+=(Array<T, 1> &a, const U &u) {
     return a += {u};
 }
+
+//
+
+template <class T, class F>
+constexpr auto map(const T &t, F &&f) {
+    return f(t);
+}
+
+template <class T, size_t N, class F>
+constexpr auto map(const Array<T, N> &a, F &&f) {
+    Array<decltype(map(a[0], f)), N> result = {};
+    for (size_t i = 0; i < N; ++i)
+        result[i] = map(a[i], f);
+    return result;
+}

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Drone/Drone.hpp>
 #include <Util/ANSIColors.hpp>
 #include <matplotlibcpp.h>

@@ -331,7 +331,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             curr_opt.t_end   = t + Ts;
             VecR_t curr_ref  = r(t);
             VecU_t curr_u    = controller(curr_x, curr_ref);
-            if (!callback(i, curr_x, curr_u))
+            if (!callback(t, curr_x, curr_u))
                 break;
             auto result = this->simulateEndResult(curr_u, curr_x, curr_opt);
             curr_opt.maxiter -= result.iterations;

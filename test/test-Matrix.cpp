@@ -327,3 +327,17 @@ TEST(Matrix, isfinite) {
     m[1][2] = 1.0 / 0.0;
     ASSERT_FALSE(isfinite(m));
 }
+
+TEST(Matrix, map) {
+    Matrix<2, 3> m        = {{
+        {0.0, -1.1, 2.2},
+        {-2.3, 0.0, 1.2},
+    }};
+    auto f                = [](double d) { return d >= 0 ? 1.0 : -1.0; };
+    Matrix<2, 3> result   = map(m, f);
+    Matrix<2, 3> expected = {{
+        {1, -1, 1},
+        {-1, 1, 1},
+    }};
+    ASSERT_EQ(result, expected);
+}

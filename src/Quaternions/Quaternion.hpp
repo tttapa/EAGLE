@@ -4,6 +4,8 @@
 
 using Quaternion = ColVector<4>;
 
+constexpr Quaternion unitQuaternion = {1};
+
 constexpr Quaternion quatmultiply(const Quaternion &q, const Quaternion &r) {
     return {{
         {r[0] * q[0] - r[1] * q[1] - r[2] * q[2] - r[3] * q[3]},

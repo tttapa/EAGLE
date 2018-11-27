@@ -130,10 +130,23 @@ TEST(Array, isfinite) {
     ASSERT_FALSE(isfinite(m));
 }
 
+TEST(Array, map) {
+    Array<double, 4> a      = {-1, 2.2, 3, 4};
+    Array<double, 4> result = map(a, [](double d) { return d + 5; });
+    Array<double, 4> expected = {4, 7.2, 8, 9};
+    ASSERT_EQ(result, expected);
+}
+
 // -------------------------------------------------------------------------- //
 
 TEST(generateArray, simple) {
-    auto x                   = generateArray<unsigned int, 4>(2, 3);
+    auto x                   = generatedArray<unsigned int, 4>(2, 3);
     Array<unsigned int, 4> y = {2, 5, 8, 11};
+    EXPECT_EQ(x, y);
+}
+
+TEST(fillArray, simple) {
+    auto x                   = filledArray<unsigned int, 4>(42);
+    Array<unsigned int, 4> y = {42, 42, 42, 42};
     EXPECT_EQ(x, y);
 }
