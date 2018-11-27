@@ -61,24 +61,50 @@ struct Weights {
     }
 };
 
+/*
+┏━━━━━━━━━━━━━━━━━┓
+┃ Generation #    ┃
+┡━━━━━━━━━━━━━━━━━┩
+│                 │
+└─────────────────┘
+*/
+
 void printBest(std::ostream &os, size_t generation, const Weights &best) {
-    os << ANSIColors::cyanb << endl;
-    os << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-    os << ANSIColors::whiteb;
-    os << "Best of generation " << (generation + 1) << ':' << endl;
-    os << ANSIColors::cyanb;
-    os << "=====================================================" << endl;
-    os << ANSIColors::whiteb;
-    os << "\tQ = diag(";
-    printMATLAB(os, transpose(best.Q_diag));
-    os << ");" << endl;
-    os << "\tR = diag(";
-    printMATLAB(os, transpose(best.R_diag));
-    os << ");" << endl;
-    os << "\tCost = " << best.cost << endl;
-    os << ANSIColors::cyanb;
-    os << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-    os << ANSIColors::reset;
+    os << ANSIColors::cyanb << endl
+       << "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\r\n"
+       << "┃ " << ANSIColors::whiteb << "Best of Generation #" << setw(4)
+       << setfill(' ') << (generation + 1) << "  " << ANSIColors::cyanb
+       << "┃\r\n"
+          "┡━━━━━━━━━━━━━━━━━━━━━━━━━━━┩\r\n";
+    os << "│ " << ANSIColors::whiteb << "Qq = {{" << ANSIColors::cyanb
+       << "                   │\r\n";
+    for (double q : getBlock<0, 3, 0, 1>(best.Q_diag))
+        os << "│   " << ANSIColors::whiteb << setprecision(16) << setw(16 + 6)
+           << setfill(' ') << q << "," << ANSIColors::cyanb << " │\r\n";
+    os << "│ " << ANSIColors::whiteb << "}};" << ANSIColors::cyanb
+       << "                       │\r\n";
+    os << "│ " << ANSIColors::whiteb << "Qomega = {{" << ANSIColors::cyanb
+       << "               │\r\n";
+    for (double w : getBlock<3, 6, 0, 1>(best.Q_diag))
+        os << "│   " << ANSIColors::whiteb << setprecision(16) << setw(16 + 6)
+           << setfill(' ') << w << "," << ANSIColors::cyanb << " │\r\n";
+    os << "│ " << ANSIColors::whiteb << "}};" << ANSIColors::cyanb
+       << "                       │\r\n";
+    os << "│ " << ANSIColors::whiteb << "Qn = {{" << ANSIColors::cyanb
+       << "                   │\r\n";
+    for (double n : getBlock<6, 9, 0, 1>(best.Q_diag))
+        os << "│   " << ANSIColors::whiteb << setprecision(16) << setw(16 + 6)
+           << setfill(' ') << n << "," << ANSIColors::cyanb << " │\r\n";
+    os << "│ " << ANSIColors::whiteb << "}};" << ANSIColors::cyanb
+       << "                       │\r\n";
+    os << "│ " << ANSIColors::whiteb << "Ru = {{" << ANSIColors::cyanb
+       << "                   │\r\n";
+    for (double r : best.R_diag)
+        os << "│   " << ANSIColors::whiteb << setprecision(16) << setw(16 + 6)
+           << setfill(' ') << r << "," << ANSIColors::cyanb << " │\r\n";
+    os << "│ " << ANSIColors::whiteb << "}};" << ANSIColors::cyanb
+       << "                       │\r\n";
+    os << "└───────────────────────────┘\r\n" << ANSIColors::reset;
 }
 
 int main(int argc, char const *argv[]) {
