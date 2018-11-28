@@ -17,8 +17,6 @@ void plotDrone(const Drone::ControllerSimulationResult &result) {
     const double t_start = result.time[0];
     const double t_end   = result.time.back();
 
-    plt::figure();
-
     // Plot all results
     plt::subplot(r, c, 1);
     plt::tight_layout();

@@ -20,18 +20,29 @@ const double CSV_Ts = 1.0 / CSV_fs;
 const std::filesystem::path loadPath =
     home / "PO-EAGLE/Groups/ANC/MATLAB/Codegen";
 
+/* ------ Image export dimensions ------------------------------------------- */
+const size_t px_x = 1920;
+const size_t px_y = 1080;
+
+/* ------ Plot settings ----------------------------------------------------- */
+const bool plotSimulationResult = true;
+const bool plotMotorControls    = false;
+const bool plotStepResponse     = true;
+
+const bool plotAllAtOnce = true;
+
 /* ------ Attitude LQR & LQE ------------------------------------------------ */
 
 namespace Attitude {
 const RowVector<3> Qq     = {{
-    103.23848252443499,
-    106.42413118528627,
-    106.42413118528627,
+    1.9276029314833232,
+    1.946962135553113,
+    1.946962135553113,
 }};
 const RowVector<3> Qomega = {{
-    0.030929762777928395,
-    0.030929762777928395,
-    0.0043504717329451159,
+    0.00063270151110671018,
+    0.00063270151110671018,
+    1e-10,
 }};
 const RowVector<3> Qn     = {{
     1e-10,
@@ -39,9 +50,9 @@ const RowVector<3> Qn     = {{
     1e-10,
 }};
 const RowVector<3> Rr     = {{
-    1.7142847029476442,
-    1.7142847029476442,
-    0.43951272021883059,
+    0.057239039674772528,
+    0.057239039674772528,
+    0.01,
 }};
 
 /** Weighting matrix for states in LQR design. */
@@ -110,19 +121,23 @@ const AdaptiveODEOptions odeoptdisp = {
 };
 
 /* ------ LQR --------------------------------------------------------------- */
+#if 0
 const RowVector<3> Qq_initial     = {1, 1, 1};
 const RowVector<3> Qomega_initial = {1, 1, 1};
 const RowVector<3> Qn_initial     = {1, 1, 1};
-
-// const RowVector<3> Qq_initial     = Config::Attitude::Qq;
-// const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
-// const RowVector<3> Qn_initial     = Config::Attitude::Qn;
+const RowVector<3> Rr_initial     = {1, 1, 1};
+#else
+const RowVector<3> Qq_initial     = Config::Attitude::Qq;
+const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
+const RowVector<3> Qn_initial     = Config::Attitude::Qn;
+const RowVector<3> Rr_initial     = Config::Attitude::Rr;
+#endif
 
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial =
     transpose(hcat(Qq_initial, Qomega_initial, Qn_initial));
 /** Weighting matrix for inputs in LQR design. */
-const ColVector<3> R_diag_initial = transpose(Config::Attitude::Rr);
+const ColVector<3> R_diag_initial = transpose(Rr_initial);
 
 /* ------ Tuner mutation variance ------------------------------------------- */
 const ColVector<9> varQ = 0.01 * Q_diag_initial;
@@ -139,9 +154,22 @@ const size_t population  = 16 * 64;
 const size_t generations = 50;
 const size_t survivors   = 16;
 
-/* ------ Image export dimensions ------------------------------------------- */
-const size_t px_x = 1920;
-const size_t px_y = 1080;
+/* ------ Cost function parameters ------------------------------------------ */
+const CostWeights stepcostweights = {
+    .notRisen   = 1e20,
+    .notSettled = 1e10,
+    .overshoot  = 5e0,
+    .settleTime = 5e-1,
+};
+
+/* ------ Time step error factor (for rise and settling time) --------------- */
+const double steperrorfactor = 0.01;  // 1% of step size
+
+/* ------ Plot settings ----------------------------------------------------- */
+const bool plotSimulationResult = true;
+const bool plotStepResponse     = true;
+
+const bool plotAllAtOnce = true;
 
 }  // namespace Tuner
 

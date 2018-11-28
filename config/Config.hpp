@@ -1,5 +1,6 @@
 #pragma once
 
+#include <CostWeights.hpp>
 #include <Matrix/Matrix.hpp>
 #include <ODE/ODEOptions.hpp>
 #include <filesystem>
@@ -22,6 +23,17 @@ extern const double CSV_Ts;
 
 /* ------ Matrix & Parameter data loading ----------------------------------- */
 extern const std::filesystem::path loadPath;
+
+/* ------ Image export dimensions ------------------------------------------- */
+extern const size_t px_x;
+extern const size_t px_y;
+
+/* ------ Plot settings ----------------------------------------------------- */
+extern const bool plotSimulationResult;
+extern const bool plotMotorControls;
+extern const bool plotStepResponse;
+
+extern const bool plotAllAtOnce;
 
 /* ------ Attitude LQR & LQE ------------------------------------------------ */
 
@@ -77,9 +89,17 @@ extern const size_t population;
 extern const size_t generations;
 extern const size_t survivors;
 
-/* ------ Image export dimensions ------------------------------------------- */
-extern const size_t px_x;
-extern const size_t px_y;
+/* ------ Cost function parameters ------------------------------------------ */
+extern const CostWeights stepcostweights;
+
+/* ------ Time step error factor (for rise and settling time) --------------- */
+extern const double steperrorfactor;
+
+/* ------ Plot settings ----------------------------------------------------- */
+extern const bool plotSimulationResult;
+extern const bool plotStepResponse;
+
+extern const bool plotAllAtOnce;
 
 }  // namespace Tuner
 

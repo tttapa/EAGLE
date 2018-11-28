@@ -82,3 +82,35 @@ void plotDroneSignal(const std::vector<double> &t,
 #define DISCRETE_FMT "-"
 
 void plotDrone(const Drone::ControllerSimulationResult &result);
+
+inline void plotAttitudeTunerResult(
+    Drone::AttitudeModel::ControllerSimulationResult &result) {
+    const double t_start = result.time[0];
+    const double t_end   = result.time.back();
+
+    plt::subplot(4, 1, 1);
+    plotDroneSignal(
+        result.time, result.solution, &DroneAttitudeState::getOrientationEuler,
+        {"z", "y'", "x\""}, {"b-", "g-", "r-"}, "Orientation of drone");
+    plt::xlim(t_start, t_end * 1.1);
+
+    plt::subplot(4, 1, 2);
+    plotDroneSignal(result.time, result.solution,
+                    &DroneAttitudeState::getAngularVelocity, {"x", "y", "z"},
+                    {"r-", "g-", "b-"}, "Angular velocity of drone");
+    plt::xlim(t_start, t_end * 1.1);
+
+    plt::subplot(4, 1, 3);
+    plotDroneSignal(result.time, result.solution,
+                    &DroneAttitudeState::getMotorSpeed, {"x", "y", "z"},
+                    {"r-", "g-", "b-"}, "Angular velocity of torque motors");
+    plt::xlim(t_start, t_end * 1.1);
+
+    plt::subplot(4, 1, 4);
+    plotDroneSignal(result.sampledTime, result.control,
+                    &DroneControl::getAttitudeControl, {"x", "y", "z"},
+                    {"r" DISCRETE_FMT, "g" DISCRETE_FMT, "b" DISCRETE_FMT},
+                    "Torque motor control");
+    plt::xlim(t_start, t_end * 1.1);
+    plt::xlabel("time [s]");
+}

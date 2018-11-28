@@ -14,7 +14,7 @@ public class FloatReceiver extends Thread {
   private boolean running;
   private ByteBuffer buf = ByteBuffer.allocate(1024);
 
-  private Queue<Float> floatqueue = new ArrayBlockingQueue<Float>(256);
+  private float q0 = 1;
 
   public FloatReceiver() throws SocketException {
     buf.order(ByteOrder.LITTLE_ENDIAN);

@@ -249,6 +249,11 @@ constexpr Array<T, 1> operator*(Array<T, 1> lhs, Array<T, 1> rhs) {
     return {T{lhs} * T{rhs}};
 }
 
+template <class T>
+constexpr Array<T, 1> operator/(Array<T, 1> lhs, Array<T, 1> rhs) {
+    return {T{lhs} / T{rhs}};
+}
+
 template <class T, class U,
           typename = std::enable_if<getArrayLength<U>::value == 0>>
 constexpr auto operator+(const Array<T, 1> &a, const U &u)
@@ -275,6 +280,13 @@ template <class T, class U,
 constexpr auto operator-(const U &u, const Array<T, 1> &a)
     -> decltype(u - static_cast<T>(a)) {
     return u - static_cast<T>(a);
+}
+
+template <class T, class U,
+          typename = std::enable_if<getArrayLength<U>::value == 0>>
+constexpr auto operator/(const U &u, const Array<T, 1> &a)
+    -> decltype(u / static_cast<T>(a)) {
+    return u / static_cast<T>(a);
 }
 
 template <class T, size_t N>

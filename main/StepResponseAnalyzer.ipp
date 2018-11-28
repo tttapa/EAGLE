@@ -5,11 +5,6 @@ template <size_t N>
 bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
     using namespace std;
 
-    auto &x_prev     = result.last;
-    auto &overshoot  = result.overshoot;
-    auto &risetime   = result.risetime;
-    auto &settletime = result.settletime;
-
     if (!isfinite(x) || !isfinite(t)) {
         fill(overshoot.begin(), overshoot.end(), infinity);
         return false;
@@ -24,7 +19,7 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
     for (size_t i = 0; i < N; ++i) {
 
         // if not risen yet
-        if (risetime[i] == -1.0) {
+        if (risetime[i] < 0.0) {
             // if we are crossing the threshold
             // (sign of threshold depends on direction)
             if (dir[i] * x_err[i] <= x_thr[i]) {
@@ -47,21 +42,21 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
             rising[i] = dir[i] > 0;
         }
 
-        // if we haven't crossed the reference yet after 2 times the rise time
+        // if we haven't crossed the reference yet after 5 times the rise time
         // it probably means it has settled without overshoot
         //   TODO: is this a reasonable assumption?
-        if (!crossed[i] && t >= 2 * risetime[i] && settletime[i] == -1.0) {
+        if (!crossed[i] && t >= 5 * risetime[i] && settletime[i] < 0.0) {
             settletime[i] = risetime[i];
 #ifndef DEBUG
             continueSimulation = false;
             for (size_t i = 0; i < 4; ++i)
-                if (settletime[i] == -1.0)
+                if (settletime[i] < 0.0)
                     continueSimulation = true;
 #endif
         }
 
         // if we have crossed the reference, but haven't settled yet (overshoot)
-        if (crossed[i] && settletime[i] == -1.0) {
+        if (crossed[i] && settletime[i] < 0.0) {
             // find relative extrema of error
             double newmaxerr = maxerr[i];
             if (rising[i]) {             // curve was previously rising
@@ -110,8 +105,9 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
                 settletime[i] = infinity;
 #ifndef DEBUG
                 continueSimulation = false;
-#endif
+#else
                 cerr << "Unstable: " << t << endl;
+#endif
             } else {  // stable
                 if (maxerr[i] == infinity)
                     overshoot[i] = dir[i] * newmaxerr;
@@ -128,7 +124,7 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
 #ifndef DEBUG
                 continueSimulation = false;
                 for (size_t i = 0; i < 4; ++i)
-                    if (settletime[i] == -1.0)
+                    if (settletime[i] < 0.0)
                         continueSimulation = true;
 #endif
             } else {
@@ -160,9 +156,9 @@ double RealTimeCostCalculator<N>::getCost(double notRisenCost,
             continue;
         if (!crossed[i])
             settled[i] = risetime[i];
-        if (risetime[i] == -1.0)
+        if (risetime[i]< 0.0)
             cost += notRisenCost * abs(x_ref[i] - x_prev[i]);
-        else if (settled[i] == -1.0)
+        else if (settled[i]< 0.0)
             cost += notSettledCost *
                     (abs(overshoot[i]) +  // TODO: maybe overshoot is still zero
                      abs(x_ref[i] - x_prev[i]));
@@ -170,7 +166,7 @@ double RealTimeCostCalculator<N>::getCost(double notRisenCost,
             cost += risetime[i]                                     //
                     + overshootCost * abs(overshoot[i] / x_dif[i])  //
                     + settleTimeCost * (settled[i] - risetime[i]);
-        assert(settled[i] >= risetime[i] || settled[i] == -1.0);
+        assert(settled[i] >= risetime[i] || settled[i]< 0.0);
     }
     return cost;
 }
@@ -184,9 +180,10 @@ void StepResponseAnalyzerPlotter<N>::plot(
     if (t_v.empty() || x_v.empty())
         return;
 
-    const auto &overshoot  = this->result.overshoot;
-    const auto &risetime   = this->result.risetime;
-    const auto &settletime = this->result.settletime;
+    const auto result      = this->getResult();
+    const auto &overshoot  = result.overshoot;
+    const auto &risetime   = result.risetime;
+    const auto &settletime = result.settletime;
     const auto &x_ref      = this->x_ref;
     const auto &x_thr      = this->x_thr;
 

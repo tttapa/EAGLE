@@ -11,11 +11,11 @@ class StepResponseAnalyzer {
     StepResponseAnalyzer() = delete;
     constexpr StepResponseAnalyzer(const ColVector<N> &x_ref, double factor,
                                    const ColVector<N> &x_0)
-        : x_ref{x_ref},              //
-          x_adif{abs(x_ref - x_0)},  //
-          x_thr{factor * x_adif},    //
-          result{x_0},               //
-          dir{getDirection(x_ref, x_0)} {}
+        : x_ref{x_ref},                   //
+          x_adif{abs(x_ref - x_0)},       //
+          x_thr{factor * x_adif},         //
+          dir{getDirection(x_ref, x_0)},  //
+          x_prev{x_0} {}
 
     virtual bool operator()(double t, const ColVector<N> &x) {
         return calculate(t, x);
@@ -25,22 +25,43 @@ class StepResponseAnalyzer {
         /**
          * The last value that was fed to the analyzer
          */
-        ColVector<N> last;
+        ColVector<N> finalvalue;
+        /** 
+         * The last error value
+         */
+        ColVector<N> finalerror;
+        /** 
+         * The size of the step: `abs(x_ref - x_0)`
+         */
+        ColVector<N> absdelta;
         /** 
          * The time point where the curve first entered the settling interval
          */
-        ColVector<N> risetime = -ones<N, 1>();
+        ColVector<N> risetime;
         /** 
          * The extremum of the error after crossing the reference
          */
-        ColVector<N> overshoot = zeros<N, 1>();
+        ColVector<N> overshoot;
         /** 
          * The time point where the curve settled within the settling interval
          */
-        ColVector<N> settletime = -ones<N, 1>();
+        ColVector<N> settletime;
     };
 
-    const Result &getResult() const { return result; }
+    Result getResult() const {
+        Result result = {
+            .finalvalue = x_prev,
+            .finalerror = x_ref - x_prev,
+            .absdelta   = x_adif,
+            .risetime   = risetime,
+            .overshoot  = overshoot,
+            .settletime = settletime,
+        };
+        for (size_t i = 0; i < N; ++i)
+            if (!crossed[i])
+                result.settletime[i] = result.risetime[i];
+        return result;
+    }
 
   protected:
     const ColVector<N> x_ref;
@@ -51,7 +72,10 @@ class StepResponseAnalyzer {
     // value, and -1.0 if the reference is less than the initial value
     const ColVector<4> dir;
 
-    Result result;
+    ColVector<N> x_prev;
+    ColVector<N> risetime   = -ones<N, 1>();
+    ColVector<N> overshoot  = zeros<N, 1>();
+    ColVector<N> settletime = -ones<N, 1>();
 
     // The time point where the curve last crossed the settling interval
     ColVector<4> lastthrescross = -ones<4, 1>();
@@ -75,8 +99,8 @@ class StepResponseAnalyzer {
 };
 
 #include <Plot.hpp>
-#include <vector>
 #include <string>
+#include <vector>
 
 template <size_t N>
 class StepResponseAnalyzerPlotter : public StepResponseAnalyzer<N> {
