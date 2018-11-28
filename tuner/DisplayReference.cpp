@@ -2,9 +2,9 @@
 #include <Util/Degrees.hpp>
 
 DisplayReference::DisplayReference()
-    : qz{eul2quat({30_deg, 0, 0})},  //
-      qy{eul2quat({0, 30_deg, 0})},  //
-      qx{eul2quat({0, 0, 30_deg})} {}
+    : qz{eul2quat({10_deg, 0, 0})},  //
+      qy{eul2quat({0, 10_deg, 0})},  //
+      qx{eul2quat({0, 0, 10_deg})} {}
 
 DisplayReference::VecR_t DisplayReference::operator()(double t) {
     Quaternion q = qu;

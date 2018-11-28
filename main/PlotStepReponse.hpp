@@ -7,6 +7,7 @@
 void plotStepResponseAttitude(const Drone &drone,
                               const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                               const Matrix<Nu_att, Nu_att> &R,
+                              double steperrorfactor,
                               const Quaternion &q_ref,
                               const AdaptiveODEOptions &opt) {
     using std::cout;
@@ -24,9 +25,8 @@ void plotStepResponseAttitude(const Drone &drone,
     const DroneAttitudeOutput atty0 = attmodel.getOutput(attx0, {0});
     const Quaternion q0             = atty0.getOrientation();
 
-    constexpr double factor = 0.01;  // 1% criterium
-
-    StepResponseAnalyzerPlotter<4> stepAnalyzerPlt = {q_ref, factor, q0, false};
+    StepResponseAnalyzerPlotter<4> stepAnalyzerPlt = {q_ref, steperrorfactor,
+                                                      q0, false};
     auto f = [&](double t, const ColVector<Nx_att> &x,
                  const ColVector<Nu_att> &u) {
         DroneAttitudeOutput y = attmodel.getOutput(x, u);

@@ -204,11 +204,18 @@ int main(int argc, char const *argv[]) {
         plt::show();
 
     if (Config::plotStepResponse) {
+        auto &best = populationWeights[0];
+        size_t i   = 0;
         for (const Quaternion &ref : CostReferences::references) {
             plt::figure_size(px_x, px_y);
-            plotStepResponseAttitude(drone, Config::Attitude::Q,
-                                     Config::Attitude::R, ref, Config::odeopt);
+            plotStepResponseAttitude(drone, best.Q(), best.R(), steperrorfactor,
+                                     ref, Config::Tuner::odeopt);
+            std::stringstream filename;
+            filename << "stepresponse" << std::setw(4) << std::setfill('0')
+                     << (++i) << ".png";
+            std::filesystem::path outputfile = outPath / filename.str();
             plt::tight_layout();
+            plt::save(outputfile);
             if (!Config::plotAllAtOnce)
                 plt::show();
         }

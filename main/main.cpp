@@ -14,6 +14,7 @@ using namespace std;
 int main(int argc, char const *argv[]) {
     filesystem::path loadPath = Config::loadPath;
     filesystem::path outPath  = "";
+    double steperrorfactor    = Config::steperrorfactor;
     size_t px_x               = Config::px_x;
     size_t px_y               = Config::px_y;
 
@@ -81,7 +82,8 @@ int main(int argc, char const *argv[]) {
         plt::figure_size(px_x, px_y);
         Quaternion q_ref = eul2quat({0, 30_deg, 30_deg});
         plotStepResponseAttitude(drone, Config::Attitude::Q,
-                                 Config::Attitude::R, q_ref, Config::odeopt);
+                                 Config::Attitude::R, steperrorfactor, q_ref,
+                                 Config::odeopt);
         plt::tight_layout();
         if (!Config::plotAllAtOnce)
             plt::show();

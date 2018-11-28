@@ -3,11 +3,12 @@
 #include <CostWeights.hpp>
 #include <Drone/Drone.hpp>
 #include <StepResponseAnalyzer.hpp>
+#include <Util/Degrees.hpp>
 
 namespace CostReferences {
-constexpr Quaternion qx                   = eul2quat({0, 0, M_PI / 8});
-constexpr Quaternion qy                   = eul2quat({0, M_PI / 8, 0});
-constexpr Quaternion qz                   = eul2quat({M_PI / 8, 0, 0});
+constexpr Quaternion qz                   = eul2quat({10_deg, 0, 0});
+constexpr Quaternion qy                   = eul2quat({0, 10_deg, 0});
+constexpr Quaternion qx                   = eul2quat({0, 0, 10_deg});
 constexpr Array<Quaternion, 5> references = {{
     quatmultiply(qx, quatmultiply(qy, qz)),
     quatmultiply(qx, qy),

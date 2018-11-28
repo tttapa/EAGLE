@@ -35,6 +35,9 @@ extern const bool plotStepResponse;
 
 extern const bool plotAllAtOnce;
 
+/* ------ Time step error factor (for rise and settling time) --------------- */
+extern const double steperrorfactor;
+
 /* ------ Attitude LQR & LQE ------------------------------------------------ */
 
 namespace Attitude {

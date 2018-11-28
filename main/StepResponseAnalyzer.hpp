@@ -70,7 +70,7 @@ class StepResponseAnalyzer {
 
     // Contains +1.0 if the reference is greater than or equal to the initial
     // value, and -1.0 if the reference is less than the initial value
-    const ColVector<4> dir;
+    const ColVector<N> dir;
 
     ColVector<N> x_prev;
     ColVector<N> risetime   = -ones<N, 1>();
@@ -78,16 +78,17 @@ class StepResponseAnalyzer {
     ColVector<N> settletime = -ones<N, 1>();
 
     // The time point where the curve last crossed the settling interval
-    ColVector<4> lastthrescross = -ones<4, 1>();
+    ColVector<N> lastthrescross = -ones<N, 1>();
     // Whether the next crossing of the settling interval will be rising (true)
     // or falling (false)
-    TColVector<bool, 4> nextthrescrossrising = {};
+    TColVector<bool, N> nextthrescrossrising = {};
     // Whether the curve is rising (true) or falling (false)
-    TColVector<bool, 4> rising = {};
+    TColVector<bool, N> rising = {};
     // The last relative maximum error (extrema of overshoot ringing)
-    ColVector<4> maxerr = filledMatrix<N, 1>(infinity);
+    ColVector<N> maxerr = filledMatrix<N, 1>(infinity);
     // Whether the curve has crossed the reference or not
-    TColVector<bool, 4> crossed = {};
+    TColVector<bool, N> crossed            = {};
+    TColVector<bool, N> firstextremum = filledTMatrix<bool, N, 1>(false);
 
     static constexpr ColVector<N> getDirection(const ColVector<N> &x_ref,
                                                const ColVector<N> &x_0) {

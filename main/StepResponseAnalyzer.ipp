@@ -97,20 +97,29 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
                 }
             }
 
+            bool validnewextremum = false;
+
             // if extremum is greater than previous extremum,
             // the oscillations are increasing in amplitude,
             // so the system is unstable
-            if (newmaxerr > 1.1 * maxerr[i]) {  // unstable (TODO)
+            if (newmaxerr > maxerr[i] && !firstextremum[i]) {  // unstable
                 overshoot[i]  = infinity;
                 settletime[i] = infinity;
 #ifndef DEBUG
                 continueSimulation = false;
 #else
-                cerr << "Unstable: " << t << endl;
+                cerr << "Unstable " << i << " t = " << t << endl;
 #endif
-            } else {  // stable
-                if (maxerr[i] == infinity)
-                    overshoot[i] = dir[i] * newmaxerr;
+            } else if (newmaxerr == maxerr[i]) {  // no new extremum
+                ;
+            } else {                          // stable, new extremum
+                if (maxerr[i] == infinity) {  // this extremum is the first
+                    overshoot[i]     = dir[i] * newmaxerr;
+                    firstextremum[i] = true;
+                } else {  // first extremum doesn't count for settling
+                    firstextremum[i] = false;
+                    validnewextremum = true;
+                }
                 maxerr[i] = newmaxerr;
             }
 
@@ -118,15 +127,17 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
             // the system has settled, and the settling time was the time
             // of the previous crossing of the settling interval
             if (maxerr[i] <= x_thr[i] || x_thr[i] == 0.0) {
-                settletime[i] = lastthrescross[i];
-                if (x_thr[i] == 0.0)
-                    overshoot[i] = 0.0;
+                if (validnewextremum || x_thr[i] == 0.0) {
+                    settletime[i] = lastthrescross[i];
+                    if (x_thr[i] == 0.0)
+                        overshoot[i] = 0.0;
 #ifndef DEBUG
-                continueSimulation = false;
-                for (size_t i = 0; i < 4; ++i)
-                    if (settletime[i] < 0.0)
-                        continueSimulation = true;
+                    continueSimulation = false;
+                    for (size_t i = 0; i < 4; ++i)
+                        if (settletime[i] < 0.0)
+                            continueSimulation = true;
 #endif
+                }
             } else {
                 // only a real crossing if the extremum is outside of the
                 // settling interval, otherwise, it doesn't really cross the
