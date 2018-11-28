@@ -38,24 +38,24 @@ const double steperrorfactor = 0.01;  // 1% of step size
 
 namespace Attitude {
 const RowVector<3> Qq     = {{
-    1.9276029314833232,
-    1.946962135553113,
-    1.946962135553113,
+    248.2566541613234,
+    285.3564859658812,
+    285.3564859658812,
 }};
 const RowVector<3> Qomega = {{
-    0.00063270151110671018,
-    0.00063270151110671018,
-    1e-10,
+    0.06913895186952017,
+    0.06913895186952017,
+    0.01378019322006485,
 }};
 const RowVector<3> Qn     = {{
-    1e-10,
-    1e-10,
-    1e-10,
+    1.39385333888989e-05,
+    1.39385333888989e-05,
+    1.256521771966514e-10,
 }};
 const RowVector<3> Rr     = {{
-    0.057239039674772528,
-    0.057239039674772528,
-    0.01,
+    1,
+    1,
+    0.1822721786710156,
 }};
 
 /** Weighting matrix for states in LQR design. */
@@ -124,7 +124,7 @@ const AdaptiveODEOptions odeoptdisp = {
 };
 
 /* ------ LQR --------------------------------------------------------------- */
-#if 1
+#if 0
 const RowVector<3> Qq_initial     = {1, 1, 1};
 const RowVector<3> Qomega_initial = {1, 1, 1};
 const RowVector<3> Qn_initial     = {1, 1, 1};

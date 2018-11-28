@@ -137,12 +137,24 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
                         if (settletime[i] < 0.0)
                             continueSimulation = true;
 #endif
+                } else {  // first extremum, but still no new extremum
+                    // probably stable
+                    if (t - lastthrescross[i] >= 5 * risetime[i]) {
+                        settletime[i] = lastthrescross[i];
+#ifndef DEBUG
+                        continueSimulation = false;
+                        for (size_t i = 0; i < 4; ++i)
+                            if (settletime[i] < 0.0)
+                                continueSimulation = true;
+#endif
+                    }
                 }
             } else {
                 // only a real crossing if the extremum is outside of the
                 // settling interval, otherwise, it doesn't really cross the
                 // bounds of the interval, it just stays inside of it
                 lastthrescross[i] = newlastthrescross;
+                // TODO: ignores first extremum
             }
         }
     }
