@@ -38,24 +38,24 @@ const double steperrorfactor = 0.01;  // 1% of step size
 
 namespace Attitude {
 const RowVector<3> Qq     = {{
-    248.2566541613234,
-    285.3564859658812,
-    285.3564859658812,
+    214.2209067087807,
+    224.5285346829013,
+    224.5285346829013,
 }};
 const RowVector<3> Qomega = {{
-    0.06913895186952017,
-    0.06913895186952017,
-    0.01378019322006485,
+    0.06257390500603584,
+    0.06257390500603584,
+    0.01499104669068503,
 }};
 const RowVector<3> Qn     = {{
-    1.39385333888989e-05,
-    1.39385333888989e-05,
-    1.256521771966514e-10,
+    8.858579563938991e-11,
+    8.858579563938991e-11,
+    5.452271679780374e-06,
 }};
 const RowVector<3> Rr     = {{
     1,
     1,
-    0.1822721786710156,
+    0.1475251170483027,
 }};
 
 /** Weighting matrix for states in LQR design. */
@@ -93,9 +93,9 @@ const RowVector<1> varSensors  = {0.02};  // 2 cm
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
     .t_end   = 16,
-    .epsilon = 1e-6,
+    .epsilon = 1e-5,
     .h_start = 1e-6,
-    .h_min   = 1e-10,
+    .h_min   = 1e-6,
     .maxiter = (unsigned long) 1e6,
 };
 
@@ -136,15 +136,30 @@ const RowVector<3> Qn_initial     = Config::Attitude::Qn;
 const RowVector<3> Rr_initial     = Config::Attitude::Rr;
 #endif
 
+#if 0
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial =
     transpose(hcat(Qq_initial, Qomega_initial, Qn_initial));
 /** Weighting matrix for inputs in LQR design. */
 const ColVector<3> R_diag_initial = transpose(Rr_initial);
+#else
+/** Weighting matrix for states in LQR design. */
+const ColVector<9> Q_diag_initial = {
+    38.38112325382031,     38.38112325382031,     29.8187807864482,
+    0.04596074995792578,   0.04596074995792578,   0.0008638386385394193,
+    0.0003525398949497121, 0.0003525398949497121, 3.127251479849193e-10,
+};
+/** Weighting matrix for inputs in LQR design. */
+const ColVector<3> R_diag_initial = {
+    1,
+    1,
+    0.5749465237617963,
+};
+#endif
 
 /* ------ Tuner mutation variance ------------------------------------------- */
-const ColVector<9> varQ = 0.025 * Q_diag_initial;
-const ColVector<3> varR = 0.025 * R_diag_initial;
+const ColVector<9> varQ = 0.05 * Q_diag_initial;
+const ColVector<3> varR = 0.05 * R_diag_initial;
 
 const ColVector<9> Qmin = 1e-10 * ones<9, 1>();
 const ColVector<3> Rmin = 1e-2 * ones<3, 1>();
@@ -161,7 +176,7 @@ const size_t survivors   = 16;
 const CostWeights stepcostweights = {
     .notRisen   = 1e20,
     .notSettled = 1e10,
-    .overshoot  = 5e0,
+    .overshoot  = 3e0,
     .settleTime = 5e-1,
 };
 

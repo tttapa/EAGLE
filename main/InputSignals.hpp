@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Drone/Drone.hpp>
+#include <Util/Degrees.hpp>
 
 /** 
  * @brief   Reference function for controller simulations.
@@ -39,9 +40,9 @@ struct TestReferenceFunction : public TimeFunctionT<ColVector<Ny>> {
         rr.setPosition({0, 0, 1.0 * (t >= m * 24)});
         return rr;
     }
-    const Quaternion qz = eul2quat({M_PI / 4, 0, 0});
-    const Quaternion qy = eul2quat({0, M_PI / 32, 0});
-    const Quaternion qx = eul2quat({0, 0, M_PI / 32});
+    const Quaternion qz = eul2quat({10_deg, 0, 0});
+    const Quaternion qy = eul2quat({0, 10_deg, 0});
+    const Quaternion qx = eul2quat({0, 0, 10_deg});
     const Quaternion qu = eul2quat({0, 0, 0});
 };
 

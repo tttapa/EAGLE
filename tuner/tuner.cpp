@@ -32,6 +32,7 @@ int main(int argc, char const *argv[]) {
     size_t survivors          = Config::Tuner::survivors;
     size_t px_x               = Config::px_x;
     size_t px_y               = Config::px_y;
+    bool show                 = true;
 
     double steperrorfactor      = Config::Tuner::steperrorfactor;
     CostWeights stepcostweights = Config::Tuner::stepcostweights;
@@ -65,6 +66,10 @@ int main(int argc, char const *argv[]) {
     parser.add("--height", "-h", [&](const char *argv[]) {
         px_y = strtoul(argv[1], nullptr, 10);
         cout << "Setting the image height to: " << px_y << endl;
+    });
+    parser.add<0>("--no-show", [&](const char * /* argv */ []) {
+        show = false;
+        cout << "Not showing the resulting plots" << endl;
     });
     cout << ANSIColors::blue;
     parser.parse(argc, argv);
@@ -170,6 +175,7 @@ int main(int argc, char const *argv[]) {
 
         auto &best = populationWeights[0];
         printBest(cout, g, best);
+        appendBestToFile(outPath / "tuner.output", g, best);
 
         //
 
@@ -194,16 +200,17 @@ int main(int argc, char const *argv[]) {
         plt::suptitle("Generation #" + gstr);
 
         plt::save(outputfile);
-        if (g + 1 < generations && Config::plotSimulationResult)
+        if (g + 1 < generations || !show)
             plt::close();
     }
     cout << ANSIColors::greenb << endl
          << "Done. ✔" << ANSIColors::reset << endl;
 
-    if (!Config::plotAllAtOnce)
+    if (show && !Config::Tuner::plotAllAtOnce &&
+        Config::Tuner::plotSimulationResult)
         plt::show();
 
-    if (Config::plotStepResponse) {
+    if (Config::Tuner::plotStepResponse) {
         auto &best = populationWeights[0];
         size_t i   = 0;
         for (const Quaternion &ref : CostReferences::references) {
@@ -216,12 +223,16 @@ int main(int argc, char const *argv[]) {
             std::filesystem::path outputfile = outPath / filename.str();
             plt::tight_layout();
             plt::save(outputfile);
-            if (!Config::plotAllAtOnce)
+            if (!Config::Tuner::plotAllAtOnce && show)
                 plt::show();
+            else if (!show)
+                plt::close();
         }
     }
 
-    if (Config::plotAllAtOnce)
+    if (show && Config::Tuner::plotAllAtOnce &&
+        (Config::Tuner::plotStepResponse ||
+         Config::Tuner::plotSimulationResult))
         plt::show();
 
     return EXIT_SUCCESS;

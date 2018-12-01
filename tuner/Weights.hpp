@@ -24,7 +24,7 @@ struct Weights {
         clamp(R_diag, Config::Tuner::Rmin, Config::Tuner::Rmax);
 
         // TODO: symmetry
-        Q_diag[2] = Q_diag[1];
+        Q_diag[1] = Q_diag[0];
         Q_diag[4] = Q_diag[3];
         Q_diag[7] = Q_diag[6];
 

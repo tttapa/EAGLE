@@ -10,9 +10,9 @@ void printBest(std::ostream &os, size_t generation, const Weights &best) {
        << setfill(' ') << (generation + 1) << "  " << ANSIColors::cyanb
        << "┃\r\n"
           "┡━━━━━━━━━━━━━━━━━━━━━━━━━━━┩\r\n";
-    os << "| " << ANSIColors::whiteb << "Cost = " << scientific
+    os << "│ " << ANSIColors::whiteb << "Cost = " << scientific
        << setprecision(2) << setw(2 + 7) << best.cost << ANSIColors::cyanb
-       << "          |\r\n";
+       << "          │\r\n";
     os.unsetf(ios_base::floatfield);
     os << "│ " << ANSIColors::whiteb << "Qq = {{" << ANSIColors::cyanb
        << "                   │\r\n";
@@ -43,4 +43,21 @@ void printBest(std::ostream &os, size_t generation, const Weights &best) {
     os << "│ " << ANSIColors::whiteb << "}};" << ANSIColors::cyanb
        << "                       │\r\n";
     os << "└───────────────────────────┘\r\n" << ANSIColors::reset;
+}
+
+#include <fstream>
+#include <iostream>
+
+void appendBestToFile(const std::filesystem::path &filename, size_t generation,
+                      const Weights &best) {
+    std::ofstream ofile;
+    ofile.open(filename, std::ios_base::app);
+    if (!ofile)
+        std::cerr << ANSIColors::red << "Error opening file: `" << filename
+                  << "`" << ANSIColors::reset << std::endl;
+    else
+        ofile << (generation == 0 ? "\r\n---\r\n\r\n" : "") << (generation + 1)
+              << ':' << asrowvector(best.Q_diag, ",", 16) << '\t'
+              << asrowvector(best.R_diag, ",", 16) << std::endl;
+    ofile.close();
 }

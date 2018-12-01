@@ -6,9 +6,9 @@
 #include <Util/Degrees.hpp>
 
 namespace CostReferences {
-constexpr Quaternion qz                   = eul2quat({10_deg, 0, 0});
-constexpr Quaternion qy                   = eul2quat({0, 10_deg, 0});
-constexpr Quaternion qx                   = eul2quat({0, 0, 10_deg});
+constexpr Quaternion qz                   = eul2quat({22.5_deg, 0, 0});
+constexpr Quaternion qy                   = eul2quat({0, 22.5_deg, 0});
+constexpr Quaternion qx                   = eul2quat({0, 0, 22.5_deg});
 constexpr Array<Quaternion, 5> references = {{
     quatmultiply(qx, quatmultiply(qy, qz)),
     quatmultiply(qx, qy),

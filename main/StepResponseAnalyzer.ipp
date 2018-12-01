@@ -42,10 +42,10 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
             rising[i] = dir[i] > 0;
         }
 
-        // if we haven't crossed the reference yet after 5 times the rise time
+        // if we haven't crossed the reference yet after 4 times the rise time
         // it probably means it has settled without overshoot
         //   TODO: is this a reasonable assumption?
-        if (!crossed[i] && t >= 5 * risetime[i] && settletime[i] < 0.0) {
+        if (!crossed[i] && t >= 4 * risetime[i] && settletime[i] < 0.0) {
             settletime[i] = risetime[i];
 #ifndef DEBUG
             continueSimulation = false;
@@ -139,7 +139,7 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
 #endif
                 } else {  // first extremum, but still no new extremum
                     // probably stable
-                    if (t - lastthrescross[i] >= 5 * risetime[i]) {
+                    if (t - lastthrescross[i] >= 4 * risetime[i]) {
                         settletime[i] = lastthrescross[i];
 #ifndef DEBUG
                         continueSimulation = false;
