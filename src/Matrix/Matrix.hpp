@@ -353,6 +353,38 @@ inline std::ostream &operator<<(std::ostream &os, const Printable &p) {
     return os;
 }
 
+template <size_t R, size_t C>
+class PrintAsTeX_t : public Printable {
+  public:
+    PrintAsTeX_t(const Matrix<R, C> &m, size_t precision)
+        : m{m}, precision{precision} {}
+
+    void print(std::ostream &os) const override {
+        auto colsep = " & ";
+        auto rowsep = "\\\\ \r\n";
+        os << "\\begin{pmatrix}\r\n  " << std::setprecision(precision);
+        for (size_t r = 0; r < R; ++r) {
+            if (r)
+                os << rowsep << "  ";
+            for (size_t c = 0; c < C; ++c) {
+                if (c)
+                    os << colsep;
+                os << std::setw(precision + 6) << m[r][c];
+            }
+        }
+        os << "\r\n\\end{pmatrix}";
+    }
+
+  private:
+    const Matrix<R, C> m;
+    const size_t precision;
+};
+
+template <size_t R, size_t C>
+PrintAsTeX_t<R, C> asTeX(const Matrix<R, C> &m, size_t precision = 2) {
+    return {m, precision};
+}
+
 template <size_t N>
 class PrintAsRowVector_t : public Printable {
   public:

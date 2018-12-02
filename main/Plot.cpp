@@ -75,10 +75,12 @@ void plotDrone(const Drone::ControllerSimulationResult &result, int colorset) {
         result.sampledTime, result.control, &DroneControl::getAttitudeControl,
         {"x" + istr, "y" + istr, "z" + istr}, c, "Torque motor control");
     plt::xlim(t_start, t_end * 1.1);
+    plt::xlabel("time [s]");
 
     plt::subplot(row, col, 10);
     plotDroneSignal(result.sampledTime, result.control,
                     &DroneControl::getThrustControl, {"t" + istr}, c,
                     "Thrust motor control");
     plt::xlim(t_start, t_end * 1.1);
+    plt::xlabel("time [s]");
 }

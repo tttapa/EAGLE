@@ -25,9 +25,9 @@ const size_t px_x = 1920;
 const size_t px_y = 1080;
 
 /* ------ Plot settings ----------------------------------------------------- */
-const bool plotSimulationResult = false;
+const bool plotSimulationResult = true;
 const bool plotMotorControls    = false;
-const bool plotStepResponse     = false;
+const bool plotStepResponse     = true;
 
 const bool plotAllAtOnce = true;
 
@@ -37,43 +37,7 @@ const double steperrorfactor = 0.01;  // 1% of step size
 /* ------ Attitude LQR & LQE ------------------------------------------------ */
 
 namespace Attitude {
-const RowVector<3> Qq     = {{
-    510.25,
-    510.25,
-    477.64,
-}};
-const RowVector<3> Qomega = {{
-    0.202,
-    0.202,
-    0.000329,
-}};
-const RowVector<3> Qn     = {{
-    3.78906e-06,
-    3.789057e-06,
-    7.8753e-08,
-}};
-const RowVector<3> Rr     = {{
-    9.1215,
-    9.1215,
-    9.1215,
-}};
-
-/** Weighting matrix for states in LQR design. */
-const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
-/** Weighting matrix for inputs in LQR design. */
-const Matrix<3, 3> R = diag(Rr);
-
-/* ------ Compare two controllers ------------------------------------------- */
-namespace Compare {
-const RowVector<3> Qq1     = Config::Attitude::Qq;
-const RowVector<3> Qomega1 = Config::Attitude::Qomega;
-const RowVector<3> Qn1     = Config::Attitude::Qn;
-const RowVector<3> Rr1     = Config::Attitude::Rr;
-
-const Matrix<9, 9> Q1 = diag(hcat(Qq1, Qomega1, Qn1));
-const Matrix<3, 3> R1 = diag(Rr1);
-
-const RowVector<9> Qdiag2 = {{
+const RowVector<9> Qdiag = {{
     139.6245112700232,
     139.6245112700232,
     240.2811761590895,
@@ -84,16 +48,46 @@ const RowVector<9> Qdiag2 = {{
     9.976475759487083e-11,
     9.976475759487083e-11,
 }};
-const RowVector<3> Rdiag2 = {{
+const RowVector<3> Rdiag = {{
     1,
     1,
     1.001966068300933,
 }};
 
+/** Weighting matrix for states in LQR design. */
+const Matrix<9, 9> Q = diag(Qdiag);
+/** Weighting matrix for inputs in LQR design. */
+const Matrix<3, 3> R = diag(Rdiag);
+
+/* ------ Compare two controllers ------------------------------------------- */
+namespace Compare {
+const RowVector<9> Qdiag1 = Config::Attitude::Qdiag;
+const RowVector<3> Rdiag1 = Config::Attitude::Rdiag;
+
+const Matrix<9, 9> Q1 = diag(Qdiag1);
+const Matrix<3, 3> R1 = diag(Rdiag1);
+
+const RowVector<9> Qdiag2 = {{
+    510.25,
+    510.25,
+    477.64,
+    0.202,
+    0.202,
+    0.000329,
+    3.78906e-06,
+    3.789057e-06,
+    7.8753e-08,
+}};
+const RowVector<3> Rdiag2 = {{
+    9.1215,
+    9.1215,
+    9.1215,
+}};
+
 const Matrix<9, 9> Q2 = diag(Qdiag2);
 const Matrix<3, 3> R2 = diag(Rdiag2);
 
-const bool compare = true;
+const bool compare = false;
 }  // namespace Compare
 
 /** @todo   Tune */
@@ -167,24 +161,6 @@ const AdaptiveODEOptions odeoptdisp = {
 
 /* ------ LQR --------------------------------------------------------------- */
 #if 0
-const RowVector<3> Qq_initial     = {1, 1, 1};
-const RowVector<3> Qomega_initial = {1, 1, 1};
-const RowVector<3> Qn_initial     = {1, 1, 1};
-const RowVector<3> Rr_initial     = {1, 1, 1};
-#else
-const RowVector<3> Qq_initial     = Config::Attitude::Qq;
-const RowVector<3> Qomega_initial = Config::Attitude::Qomega;
-const RowVector<3> Qn_initial     = Config::Attitude::Qn;
-const RowVector<3> Rr_initial     = Config::Attitude::Rr;
-#endif
-
-#if 0
-/** Weighting matrix for states in LQR design. */
-const ColVector<9> Q_diag_initial =
-    transpose(hcat(Qq_initial, Qomega_initial, Qn_initial));
-/** Weighting matrix for inputs in LQR design. */
-const ColVector<3> R_diag_initial = transpose(Rr_initial);
-#else
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial = {
     1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -195,6 +171,9 @@ const ColVector<3> R_diag_initial = {
     1,
     1,
 };
+#else
+const ColVector<9> Q_diag_initial = transpose(Config::Attitude::Qdiag);
+const ColVector<3> R_diag_initial = transpose(Config::Attitude::Rdiag);
 #endif
 
 /* ------ Tuner mutation variance ------------------------------------------- */

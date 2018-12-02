@@ -80,10 +80,19 @@ int main(int argc, char const *argv[]) {
     /* ------ Plot the step response ---------------------------------------- */
     if (Config::plotStepResponse) {
         plt::figure_size(px_x, px_y);
-        Quaternion q_ref = eul2quat({20_deg, 20_deg, 20_deg});
-        plotStepResponseAttitude(drone, Config::Attitude::Q,
-                                 Config::Attitude::R, steperrorfactor, q_ref,
-                                 Config::odeopt);
+        Quaternion q_ref = eul2quat({0, 0, 10_deg});
+        plotStepResponseAttitude(
+            drone, Config::Attitude::Q, Config::Attitude::R, steperrorfactor,
+            q_ref, Config::odeopt, "$(0\\degree, 0\\degree, 10\\degree)$");
+        plt::tight_layout();
+        if (!Config::plotAllAtOnce)
+            plt::show();
+
+        plt::figure_size(px_x, px_y);
+        q_ref = eul2quat({0, 10_deg, 10_deg});
+        plotStepResponseAttitude(
+            drone, Config::Attitude::Q, Config::Attitude::R, steperrorfactor,
+            q_ref, Config::odeopt, "$(0\\degree, 10\\degree, 10\\degree)$");
         plt::tight_layout();
         if (!Config::plotAllAtOnce)
             plt::show();
@@ -111,10 +120,12 @@ int main(int argc, char const *argv[]) {
         Quaternion q_ref = eul2quat({0, 30_deg, 30_deg});
         plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
                                  Config::Attitude::Compare::R1, steperrorfactor,
-                                 q_ref, Config::odeopt, 0);
+                                 q_ref, Config::odeopt,
+                                 "$(0\\degree, 30\\degree, 30\\degree)$", 0);
         plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
                                  Config::Attitude::Compare::R2, steperrorfactor,
-                                 q_ref, Config::odeopt, 1);
+                                 q_ref, Config::odeopt,
+                                 "$(0\\degree, 30\\degree, 30\\degree)$", 1);
         plt::tight_layout();
         if (!Config::plotAllAtOnce)
             plt::show();
@@ -123,10 +134,12 @@ int main(int argc, char const *argv[]) {
         q_ref = eul2quat({0, 0, 10_deg});
         plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
                                  Config::Attitude::Compare::R1, steperrorfactor,
-                                 q_ref, Config::odeopt, 0);
+                                 q_ref, Config::odeopt,
+                                 "$(0\\degree, 0\\degree, 10\\degree)$", 0);
         plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
                                  Config::Attitude::Compare::R2, steperrorfactor,
-                                 q_ref, Config::odeopt, 1);
+                                 q_ref, Config::odeopt,
+                                 "$(0\\degree, 0\\degree, 10\\degree)$", 1);
         plt::tight_layout();
         if (!Config::plotAllAtOnce)
             plt::show();
@@ -153,7 +166,8 @@ int main(int argc, char const *argv[]) {
         printCSV(Config::locationCSVFile, 0.0, Config::CSV_Ts, sampledLocation);
     }
 
-    cout << MotorControlTransformation::M_inv << endl;
+    cout << "$$ Q = " << asTeX(Config::Attitude::Q) << " $$" << endl;
+    cout << "$$ R = " << asTeX(Config::Attitude::R) << " $$" << endl;
 
     return EXIT_SUCCESS;
 }

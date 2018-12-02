@@ -41,10 +41,6 @@ extern const double steperrorfactor;
 /* ------ Attitude LQR & LQE ------------------------------------------------ */
 
 namespace Attitude {
-extern const RowVector<3> Qq;
-extern const RowVector<3> Qomega;
-extern const RowVector<3> Qn;
-
 extern const Matrix<9, 9> Q;
 extern const Matrix<3, 3> R;
 
