@@ -25,9 +25,9 @@ const size_t px_x = 1920;
 const size_t px_y = 1080;
 
 /* ------ Plot settings ----------------------------------------------------- */
-const bool plotSimulationResult = true;
+const bool plotSimulationResult = false;
 const bool plotMotorControls    = false;
-const bool plotStepResponse     = true;
+const bool plotStepResponse     = false;
 
 const bool plotAllAtOnce = true;
 
@@ -38,24 +38,24 @@ const double steperrorfactor = 0.01;  // 1% of step size
 
 namespace Attitude {
 const RowVector<3> Qq     = {{
-    214.2209067087807,
-    224.5285346829013,
-    224.5285346829013,
+    510.25,
+    510.25,
+    477.64,
 }};
 const RowVector<3> Qomega = {{
-    0.06257390500603584,
-    0.06257390500603584,
-    0.01499104669068503,
+    0.202,
+    0.202,
+    0.000329,
 }};
 const RowVector<3> Qn     = {{
-    8.858579563938991e-11,
-    8.858579563938991e-11,
-    5.452271679780374e-06,
+    3.78906e-06,
+    3.789057e-06,
+    7.8753e-08,
 }};
 const RowVector<3> Rr     = {{
-    1,
-    1,
-    0.1475251170483027,
+    9.1215,
+    9.1215,
+    9.1215,
 }};
 
 /** Weighting matrix for states in LQR design. */
@@ -74,20 +74,20 @@ const Matrix<9, 9> Q1 = diag(hcat(Qq1, Qomega1, Qn1));
 const Matrix<3, 3> R1 = diag(Rr1);
 
 const RowVector<9> Qdiag2 = {{
-    200,
-    200,
-    100,
-    0.202,
-    0.202,
-    0.000329,
-    3.78906e-06,
-    3.789057e-06,
-    7.8753e-08,
+    139.6245112700232,
+    139.6245112700232,
+    240.2811761590895,
+    0.1505204155597211,
+    0.1505204155597211,
+    0.0409919487616804,
+    9.976475759487083e-11,
+    9.976475759487083e-11,
+    9.976475759487083e-11,
 }};
 const RowVector<3> Rdiag2 = {{
-    9.1215,
-    9.1215,
-    9.1215,
+    1,
+    1,
+    1.001966068300933,
 }};
 
 const Matrix<9, 9> Q2 = diag(Qdiag2);
@@ -187,15 +187,13 @@ const ColVector<3> R_diag_initial = transpose(Rr_initial);
 #else
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial = {
-    38.38112325382031,     38.38112325382031,     29.8187807864482,
-    0.04596074995792578,   0.04596074995792578,   0.0008638386385394193,
-    0.0003525398949497121, 0.0003525398949497121, 3.127251479849193e-10,
+    1, 1, 1, 1, 1, 1, 1, 1, 1,
 };
 /** Weighting matrix for inputs in LQR design. */
 const ColVector<3> R_diag_initial = {
     1,
     1,
-    0.5749465237617963,
+    1,
 };
 #endif
 
@@ -218,7 +216,8 @@ const size_t survivors   = 16;
 const CostWeights stepcostweights = {
     .notRisen   = 1e20,
     .notSettled = 1e10,
-    .overshoot  = 3e0,
+    .risetime   = 1e1,
+    .overshoot  = 5e2,
     .settleTime = 5e-1,
 };
 

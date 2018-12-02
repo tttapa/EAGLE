@@ -108,7 +108,7 @@ int main(int argc, char const *argv[]) {
             plt::show();
 
         plt::figure_size(px_x, px_y);
-        Quaternion q_ref = eul2quat({30_deg, 30_deg, 30_deg});
+        Quaternion q_ref = eul2quat({0, 30_deg, 30_deg});
         plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
                                  Config::Attitude::Compare::R1, steperrorfactor,
                                  q_ref, Config::odeopt, 0);
@@ -120,7 +120,7 @@ int main(int argc, char const *argv[]) {
             plt::show();
 
         plt::figure_size(px_x, px_y);
-        q_ref = eul2quat({0, 10_deg, 10_deg});
+        q_ref = eul2quat({0, 0, 10_deg});
         plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
                                  Config::Attitude::Compare::R1, steperrorfactor,
                                  q_ref, Config::odeopt, 0);
@@ -152,6 +152,8 @@ int main(int argc, char const *argv[]) {
                  sampledOrientation);
         printCSV(Config::locationCSVFile, 0.0, Config::CSV_Ts, sampledLocation);
     }
+
+    cout << MotorControlTransformation::M_inv << endl;
 
     return EXIT_SUCCESS;
 }

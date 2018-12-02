@@ -66,25 +66,27 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
         //   TODO: is this a reasonable assumption?
         if (t - lastenter[i] >= 3 * risetime[i] && inside[i]) {
             settletime[i] = risetime[i];
-            cerr << "settled (×3): i = " << i << ", t = " << t
-                 << ", lastenter = " << lastenter[i] << endl;
 #ifndef DEBUG
             continueSimulation = false;
             for (size_t i = 0; i < N; ++i)
                 if (settletime[i] < 0.0)
                     continueSimulation = true;
+#else
+            cerr << "settled (×3): i = " << i << ", t = " << t
+                 << ", lastenter = " << lastenter[i] << endl;
 #endif
         }
 
         if (lastextremum[i] <= x_thr[i] && extremumcount[i] > 1UL) {
             settletime[i] = lastenter[i];
-            cerr << "settled: i = " << i << ", t = " << t
-                 << ", lastenter = " << lastenter[i] << endl;
 #ifndef DEBUG
             continueSimulation = false;
             for (size_t i = 0; i < N; ++i)
                 if (settletime[i] < 0.0)
                     continueSimulation = true;
+#else
+            cerr << "settled: i = " << i << ", t = " << t
+                 << ", lastenter = " << lastenter[i] << endl;
 #endif
         }
     }

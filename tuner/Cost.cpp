@@ -5,7 +5,8 @@ constexpr double infinity = std::numeric_limits<double>::infinity();
 template <size_t N>
 double getTimeStepCost(const typename StepResponseAnalyzer<N>::Result &result,
                        double notRisenCost, double notSettledCost,
-                       double overshootCost, double settleTimeCost) {
+                       double risetimeCost, double overshootCost,
+                       double settleTimeCost) {
     const auto &finalerror = result.finalerror;
     const auto &settletime = result.settletime;
     const auto &absdelta   = result.absdelta;
@@ -24,7 +25,7 @@ double getTimeStepCost(const typename StepResponseAnalyzer<N>::Result &result,
                     (abs(overshoot[i]) +  // TODO: maybe overshoot is still zero
                      abs(finalerror[i]));
         else
-            cost += risetime[i]                                        //
+            cost += risetimeCost * risetime[i]                         //
                     + overshootCost * abs(overshoot[i] / absdelta[i])  //
                     + settleTimeCost * (settletime[i] - risetime[i]);
         assert(settletime[i] >= risetime[i] || settletime[i] == -1.0);
@@ -78,7 +79,7 @@ double getRiseTimeCost(Drone::FixedClampAttitudeController &attctrl,
          << ANSIColors::reset;
 #endif
     return getTimeStepCost<4>(result, cost.notRisen, cost.notSettled,
-                              cost.overshoot, cost.settleTime);
+                              cost.risetime, cost.overshoot, cost.settleTime);
 }
 
 double getCost(Drone::FixedClampAttitudeController &ctrl,

@@ -5,12 +5,16 @@
 #include <vector>
 
 namespace MotorControlTransformation {
+/**
+ * @f$ \begin{pmatrix} n_1 \\ n_2 \\ n_3 \\ n_4 \end{pmatrix}
+ *  = M \begin{pmatrix} n_x \\ n_y \\ n_z \\ n_t \end{pmatrix} @f$
+ */
 constexpr Matrix<4, 4> M = {{
     // nx ny nz nt
-    {1, 1, -1, 1},
-    {1, -1, 1, 1},
-    {-1, 1, 1, 1},
-    {-1, -1, -1, 1},
+    {1, 1, -1, 1},    // n1
+    {1, -1, 1, 1},    // n2
+    {-1, 1, 1, 1},    // n3
+    {-1, -1, -1, 1},  // n4
 }};
 
 constexpr Matrix<4, 4> M_inv = 0.25 * transpose(M);
