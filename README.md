@@ -12,5 +12,5 @@ sudo apt install python-numpy
 sudo apt install python-matplotlib
 mkdir ~/tmp/
 mkdir ~/lib/ && cd ~/lib/
-git clone https://github.com/lava/matplotlib-cpp.git
+git clone https://github.com/tttapa/matplotlib-cpp.git
 ```
