@@ -7,9 +7,8 @@
 void plotStepResponseAttitude(const Drone &drone,
                               const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                               const Matrix<Nu_att, Nu_att> &R,
-                              double steperrorfactor,
-                              const Quaternion &q_ref,
-                              const AdaptiveODEOptions &opt) {
+                              double steperrorfactor, const Quaternion &q_ref,
+                              const AdaptiveODEOptions &opt, int colorset = 0) {
     using std::cout;
     using std::endl;
 
@@ -24,6 +23,8 @@ void plotStepResponseAttitude(const Drone &drone,
     const DroneAttitudeState attx0  = x0.getAttitude();
     const DroneAttitudeOutput atty0 = attmodel.getOutput(attx0, {0});
     const Quaternion q0             = atty0.getOrientation();
+
+    const std::string istr = " (" + std::to_string(colorset) + ")";
 
     StepResponseAnalyzerPlotter<4> stepAnalyzerPlt = {q_ref, steperrorfactor,
                                                       q0, false};
@@ -47,7 +48,8 @@ void plotStepResponseAttitude(const Drone &drone,
          << "Settle time: \t" << asrowvector(settletimes) << endl
          << ANSIColors::reset;
 
-    stepAnalyzerPlt.plot({1, 4}, {"q1", "q2", "q3"}, {"r", "g", "b"},
+    stepAnalyzerPlt.plot({1, 4}, {"q1" + istr, "q2" + istr, "q3" + istr},
+                         colorsets.at(colorset),
                          "Step Response of Attitude Controller");
     plt::xlabel("time [s]");
 }

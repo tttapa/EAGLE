@@ -288,6 +288,27 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     /** 
      * @brief   TODO
      */
+    Matrix<Nx_att - 1, Ny_att - 1> getAttitudeObserverMatrixL(
+        const RowVector<Nu_att + Nx_att - 1> &varDynamics,
+        const RowVector<Ny_att - 1> &varSensors) const {
+        return dlqe(Ad_att_r, hcat(eye<9>(), Bd_att_r), Cd_att_r,
+                    diag(varDynamics), diag(varSensors))
+            .L;
+    }
+
+    /** 
+     * @brief   TODO
+     */
+    Attitude::KalmanObserver
+    getAttitudeObserver(const RowVector<Nu_att + Nx_att - 1> &varDynamics,
+                        const RowVector<Ny_att - 1> &varSensors) const {
+        auto L_red = getAttitudeObserverMatrixL(varDynamics, varSensors);
+        return {Ad_att_r, Bd_att_r, Cd_att, L_red, Ts_att};
+    }
+
+    /** 
+     * @brief   TODO
+     */
     Matrix<Nx_alt, Ny_alt>
     getAltitudeObserverMatrixL(const RowVector<Nu_alt> &varDynamics,
                                const RowVector<Ny_alt> &varSensors) const {

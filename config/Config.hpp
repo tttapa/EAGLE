@@ -48,7 +48,16 @@ extern const RowVector<3> Qn;
 extern const Matrix<9, 9> Q;
 extern const Matrix<3, 3> R;
 
-extern const RowVector<3> varDynamics;
+/* ------ Compare two controllers ------------------------------------------- */
+namespace Compare {
+extern const Matrix<9, 9> Q1;
+extern const Matrix<3, 3> R1;
+extern const Matrix<9, 9> Q2;
+extern const Matrix<3, 3> R2;
+extern const bool compare;
+}  // namespace Compare
+
+extern const RowVector<12> varDynamics;
 extern const RowVector<6> varSensors;
 }  // namespace Attitude
 

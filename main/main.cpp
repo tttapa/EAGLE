@@ -89,6 +89,49 @@ int main(int argc, char const *argv[]) {
             plt::show();
     }
 
+    /* ------ Compare two controllers --------------------------------------- */
+    if (Config::Attitude::Compare::compare) {
+        auto ctrl1 = drone.getController(
+            Config::Attitude::Compare::Q1, Config::Attitude::Compare::R1,
+            Config::Altitude::K_p, Config::Altitude::K_i);
+        auto ctrl2 = drone.getController(
+            Config::Attitude::Compare::Q2, Config::Attitude::Compare::R2,
+            Config::Altitude::K_p, Config::Altitude::K_i);
+        auto result1 = drone.simulate(ctrl1, ref, x0, Config::odeopt);
+        result1.resultCode.verbose();
+        auto result2 = drone.simulate(ctrl2, ref, x0, Config::odeopt);
+        result2.resultCode.verbose();
+        plt::figure_size(px_x, px_y);
+        plotDrone(result1, 0);
+        plotDrone(result2, 1);
+        if (!Config::plotAllAtOnce)
+            plt::show();
+
+        plt::figure_size(px_x, px_y);
+        Quaternion q_ref = eul2quat({30_deg, 30_deg, 30_deg});
+        plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
+                                 Config::Attitude::Compare::R1, steperrorfactor,
+                                 q_ref, Config::odeopt, 0);
+        plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
+                                 Config::Attitude::Compare::R2, steperrorfactor,
+                                 q_ref, Config::odeopt, 1);
+        plt::tight_layout();
+        if (!Config::plotAllAtOnce)
+            plt::show();
+
+        plt::figure_size(px_x, px_y);
+        q_ref = eul2quat({0, 10_deg, 10_deg});
+        plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
+                                 Config::Attitude::Compare::R1, steperrorfactor,
+                                 q_ref, Config::odeopt, 0);
+        plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
+                                 Config::Attitude::Compare::R2, steperrorfactor,
+                                 q_ref, Config::odeopt, 1);
+        plt::tight_layout();
+        if (!Config::plotAllAtOnce)
+            plt::show();
+    }
+
     if (Config::plotAllAtOnce)
         plt::show();
 

@@ -81,7 +81,18 @@ void plotDroneSignal(const std::vector<double> &t,
 
 #define DISCRETE_FMT "-"
 
-void plotDrone(const Drone::ControllerSimulationResult &result);
+const std::vector<std::vector<std::string>> colorsets = {{
+    {"r", "g", "b"},
+    {"m", "y", "c"},
+}};
+
+const std::vector<std::vector<std::string>> rcolorsets = {{
+    {"b", "g", "r"},
+    {"c", "y", "m"},
+}};
+
+void plotDrone(const Drone::ControllerSimulationResult &result,
+               int colorset = 0);
 
 inline void plotAttitudeTunerResult(
     Drone::AttitudeModel::ControllerSimulationResult &result) {

@@ -63,13 +63,55 @@ const Matrix<9, 9> Q = diag(hcat(Qq, Qomega, Qn));
 /** Weighting matrix for inputs in LQR design. */
 const Matrix<3, 3> R = diag(Rr);
 
+/* ------ Compare two controllers ------------------------------------------- */
+namespace Compare {
+const RowVector<3> Qq1     = Config::Attitude::Qq;
+const RowVector<3> Qomega1 = Config::Attitude::Qomega;
+const RowVector<3> Qn1     = Config::Attitude::Qn;
+const RowVector<3> Rr1     = Config::Attitude::Rr;
+
+const Matrix<9, 9> Q1 = diag(hcat(Qq1, Qomega1, Qn1));
+const Matrix<3, 3> R1 = diag(Rr1);
+
+const RowVector<9> Qdiag2 = {{
+    200,
+    200,
+    100,
+    0.202,
+    0.202,
+    0.000329,
+    3.78906e-06,
+    3.789057e-06,
+    7.8753e-08,
+}};
+const RowVector<3> Rdiag2 = {{
+    9.1215,
+    9.1215,
+    9.1215,
+}};
+
+const Matrix<9, 9> Q2 = diag(Qdiag2);
+const Matrix<3, 3> R2 = diag(Rdiag2);
+
+const bool compare = true;
+}  // namespace Compare
+
 /** @todo   Tune */
-const RowVector<3> varDynamics = {{
+const RowVector<12> varDynamics = {{
+    1e-2,
+    1e-2,
+    1e-2,
+    1e-2,
+    1e-2,
+    1e-2,
+    1e-2,
+    1e-2,
+    1e-2,
     1e-4,
     1e-4,
     1e-6,
 }};
-const RowVector<6> varSensors  = hcat(  //
+const RowVector<6> varSensors   = hcat(  //
     M_PI / 180.0 * ones<1, 3>(),       //
     0.005 * ones<1, 3>()               //
 );

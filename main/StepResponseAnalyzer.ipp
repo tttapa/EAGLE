@@ -17,6 +17,8 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
     auto x_err = x_ref - x;
 
     for (size_t i = 0; i < N; ++i) {
+        if (x_adif[i] == 0)
+            risetime[i] = settletime[i] = 0.0;
         if (settletime[i] >= 0)
             continue;  // settled already, ignore
 
@@ -59,12 +61,12 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
             lastenter[i] = lastexit[i] = t;
         }
 
-        // if we have been within the settling band for at least 5 times the
+        // if we have been within the settling band for at least 3 times the
         // rise time,  it probably means it has settled
         //   TODO: is this a reasonable assumption?
-        if (t - lastenter[i] >= 5 * risetime[i] && inside[i]) {
+        if (t - lastenter[i] >= 3 * risetime[i] && inside[i]) {
             settletime[i] = risetime[i];
-            cerr << "settled (×5): i = " << i << ", t = " << t
+            cerr << "settled (×3): i = " << i << ", t = " << t
                  << ", lastenter = " << lastenter[i] << endl;
 #ifndef DEBUG
             continueSimulation = false;
@@ -74,8 +76,7 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
 #endif
         }
 
-        if ((lastextremum[i] <= x_thr[i] && extremumcount[i] > 1UL) ||
-            x_adif[i] == 0) {
+        if (lastextremum[i] <= x_thr[i] && extremumcount[i] > 1UL) {
             settletime[i] = lastenter[i];
             cerr << "settled: i = " << i << ", t = " << t
                  << ", lastenter = " << lastenter[i] << endl;
