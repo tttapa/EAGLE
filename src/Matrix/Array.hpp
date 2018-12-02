@@ -366,6 +366,13 @@ operator!=(const Array<T, 1> &a, const U &u) {
     return static_cast<T>(a) != u;
 }
 
+template <class T>
+constexpr T &operator++(Array<T, 1> &a) {
+    T &e = static_cast<T &>(a);
+    ++e;
+    return e;
+}
+
 //
 
 template <class T, class U>

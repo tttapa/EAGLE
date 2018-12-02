@@ -11,11 +11,13 @@ class StepResponseAnalyzer {
     StepResponseAnalyzer() = delete;
     constexpr StepResponseAnalyzer(const ColVector<N> &x_ref, double factor,
                                    const ColVector<N> &x_0)
-        : x_ref{x_ref},                   //
-          x_adif{abs(x_ref - x_0)},       //
-          x_thr{factor * x_adif},         //
-          dir{getDirection(x_ref, x_0)},  //
-          x_prev{x_0} {}
+        : x_ref{x_ref},                      //
+          x_adif{abs(x_ref - x_0)},          //
+          x_thr{factor * x_adif},            //
+          refdir{getDirection(x_ref, x_0)},  //
+          dir{refdir},                       //
+          x_prev{x_0},                       //
+          inside{getInside(x_adif, x_thr)} {}
 
     virtual bool operator()(double t, const ColVector<N> &x) {
         return calculate(t, x);
@@ -57,9 +59,6 @@ class StepResponseAnalyzer {
             .overshoot  = overshoot,
             .settletime = settletime,
         };
-        for (size_t i = 0; i < N; ++i)
-            if (!crossed[i])
-                result.settletime[i] = result.risetime[i];
         return result;
     }
 
@@ -70,30 +69,33 @@ class StepResponseAnalyzer {
 
     // Contains +1.0 if the reference is greater than or equal to the initial
     // value, and -1.0 if the reference is less than the initial value
-    const ColVector<N> dir;
-
+    const ColVector<N> refdir;
+    ColVector<N> dir;
     ColVector<N> x_prev;
     ColVector<N> risetime   = -ones<N, 1>();
     ColVector<N> overshoot  = zeros<N, 1>();
     ColVector<N> settletime = -ones<N, 1>();
 
-    // The time point where the curve last crossed the settling interval
-    ColVector<N> lastthrescross = -ones<N, 1>();
-    // Whether the next crossing of the settling interval will be rising (true)
-    // or falling (false)
-    TColVector<bool, N> nextthrescrossrising = {};
-    // Whether the curve is rising (true) or falling (false)
-    TColVector<bool, N> rising = {};
-    // The last relative maximum error (extrema of overshoot ringing)
-    ColVector<N> maxerr = filledMatrix<N, 1>(infinity);
-    // Whether the curve has crossed the reference or not
-    TColVector<bool, N> crossed            = {};
-    TColVector<bool, N> firstextremum = filledTMatrix<bool, N, 1>(false);
+    // The time point where the curve last entered the settling interval
+    ColVector<N> lastenter = -ones<N, 1>();
+    // The time point where the curve last exited the settling interval
+    ColVector<N> lastexit = -ones<N, 1>();
+    // The last relative maximum error (extrema of overshoot/ringing)
+    ColVector<N> lastextremum = filledMatrix<N, 1>(infinity);
+    // The number of extrema (oscillations)
+    TColVector<size_t, N> extremumcount = filledTMatrix<size_t, N, 1>(0);
+    // Whether the signal is inside of the settling interval or not
+    TColVector<bool, N> inside;
 
     static constexpr ColVector<N> getDirection(const ColVector<N> &x_ref,
                                                const ColVector<N> &x_0) {
         ColVector<N> x_dif = x_ref - x_0;
         return map(x_dif, [](double d) { return d >= 0 ? 1.0 : -1.0; });
+    }
+
+    static constexpr TColVector<bool, N> getInside(const ColVector<N> &x_adif,
+                                                   const ColVector<N> &x_thr) {
+        return x_adif <= x_thr;
     }
 
     bool calculate(double t, const ColVector<N> &x);

@@ -17,145 +17,74 @@ bool StepResponseAnalyzer<N>::calculate(double t, const ColVector<N> &x) {
     auto x_err = x_ref - x;
 
     for (size_t i = 0; i < N; ++i) {
+        if (settletime[i] >= 0)
+            continue;  // settled already, ignore
 
-        // if not risen yet
-        if (risetime[i] < 0.0) {
-            // if we are crossing the threshold
-            // (sign of threshold depends on direction)
-            if (dir[i] * x_err[i] <= x_thr[i]) {
-                risetime[i] = t;
-                // first crossing of the settling interval
-                lastthrescross[i] = t;
-                // if this was a rising crossing, the next crossing will be
-                // falling, and vice versa
-                bool rising             = dir[i] > 0;
-                nextthrescrossrising[i] = !rising;
+        // find extrema and update direction
+        if (dir[i] * x[i] < dir[i] * x_prev[i]) {
+            dir[i]             = -dir[i];
+            double newextremum = dir[i] * (x_ref[i] - x_prev[i]);
+            if (newextremum > lastextremum[i] && extremumcount[i] > 1UL) {
+                settletime[i] = infinity;  // unstable
+#ifndef DEBUG
+                continueSimulation = false;
+                for (size_t i = 0; i < N; ++i)
+                    if (settletime[i] < 0.0)
+                        continueSimulation = true;
+#else
+                cerr << "unstable " << i;
+#endif
             }
+            if (overshoot[i] == 0.0 && risetime[i] > 0.0)
+                overshoot[i] = newextremum;
+            lastextremum[i] = newextremum;
+            ++extremumcount[i];
+        }
+        bool previnside = inside[i];
+        // signal enters error band
+        if (!inside[i] && x_err[i] <= x_thr[i] && -x_err[i] <= x_thr[i]) {
+            lastenter[i] = t;
+            inside[i]    = true;
+            if (risetime[i] < 0.0)
+                risetime[i] = t;
+        }
+        // signal exits error band
+        if (inside[i] && !(x_err[i] <= x_thr[i] && -x_err[i] <= x_thr[i])) {
+            lastexit[i] = t;
+            inside[i]   = false;
+        }
+        // passes through without sample in error band
+        if (!previnside && !inside[i] &&
+            (x_prev[i] < x_ref[i]) != (x[i] < x_ref[i])) {
+            lastenter[i] = lastexit[i] = t;
         }
 
-        // if we have not actually crossed the reference yet,
-        // and we are currently crossing it
-        // (i.e. error crosses 0 in the right direction)
-        if (!crossed[i] && dir[i] * x_err[i] <= 0) {
-            crossed[i] = true;
-            // remember whether we're rising or falling
-            rising[i] = dir[i] > 0;
-        }
-
-        // if we haven't crossed the reference yet after 4 times the rise time
-        // it probably means it has settled without overshoot
+        // if we have been within the settling band for at least 5 times the
+        // rise time,  it probably means it has settled
         //   TODO: is this a reasonable assumption?
-        if (!crossed[i] && t >= 4 * risetime[i] && settletime[i] < 0.0) {
+        if (t - lastenter[i] >= 5 * risetime[i] && inside[i]) {
             settletime[i] = risetime[i];
+            cerr << "settled (×5): i = " << i << ", t = " << t
+                 << ", lastenter = " << lastenter[i] << endl;
 #ifndef DEBUG
             continueSimulation = false;
-            for (size_t i = 0; i < 4; ++i)
+            for (size_t i = 0; i < N; ++i)
                 if (settletime[i] < 0.0)
                     continueSimulation = true;
 #endif
         }
 
-        // if we have crossed the reference, but haven't settled yet (overshoot)
-        if (crossed[i] && settletime[i] < 0.0) {
-            // find relative extrema of error
-            double newmaxerr = maxerr[i];
-            if (rising[i]) {             // curve was previously rising
-                if (x[i] < x_prev[i]) {  // was rising, is now falling again
-                    rising[i] = false;
-                    // previous point was relative maximum
-                    newmaxerr = x_prev[i] - x_ref[i];
-                }
-            } else {                     // curve was previously falling
-                if (x[i] > x_prev[i]) {  // was falling, is now rising again
-                    rising[i] = true;
-                    // previous point was relative minimum
-                    newmaxerr = x_ref[i] - x_prev[i];
-                }
-            }
-
-            double newlastthrescross = lastthrescross[i];
-            // find crossings of settling interval
-            if (rising[i]) {  // curve is currently rising
-                // if we are looking for a rising crossing of the settling
-                // interval, and we are currently crossing the lower bound
-                // of the interval
-                if (nextthrescrossrising[i] == true && x_err[i] <= x_thr[i]) {
-                    // remember this crossing
-                    newlastthrescross = t;
-                    // next crossing will be falling
-                    nextthrescrossrising[i] = false;
-                }
-            } else {  // curve is currently falling
-                // if we are looking for a falling crossing of the settling
-                // interval, and we are currently crossing the upper bound
-                // of the interval
-                if (nextthrescrossrising[i] == false && -x_err[i] <= x_thr[i]) {
-                    // remember this crossing
-                    newlastthrescross = t;
-                    // next crossing will be rising
-                    nextthrescrossrising[i] = true;
-                }
-            }
-
-            bool validnewextremum = false;
-
-            // if extremum is greater than previous extremum,
-            // the oscillations are increasing in amplitude,
-            // so the system is unstable
-            if (newmaxerr > maxerr[i] && !firstextremum[i]) {  // unstable
-                overshoot[i]  = infinity;
-                settletime[i] = infinity;
+        if ((lastextremum[i] <= x_thr[i] && extremumcount[i] > 1UL) ||
+            x_adif[i] == 0) {
+            settletime[i] = lastenter[i];
+            cerr << "settled: i = " << i << ", t = " << t
+                 << ", lastenter = " << lastenter[i] << endl;
 #ifndef DEBUG
-                continueSimulation = false;
-#else
-                cerr << "Unstable " << i << " t = " << t << endl;
+            continueSimulation = false;
+            for (size_t i = 0; i < N; ++i)
+                if (settletime[i] < 0.0)
+                    continueSimulation = true;
 #endif
-            } else if (newmaxerr == maxerr[i]) {  // no new extremum
-                ;
-            } else {                          // stable, new extremum
-                if (maxerr[i] == infinity) {  // this extremum is the first
-                    overshoot[i]     = dir[i] * newmaxerr;
-                    firstextremum[i] = true;
-                } else {  // first extremum doesn't count for settling
-                    firstextremum[i] = false;
-                    validnewextremum = true;
-                }
-                maxerr[i] = newmaxerr;
-            }
-
-            // if the new extremum lies within the settling interval,
-            // the system has settled, and the settling time was the time
-            // of the previous crossing of the settling interval
-            if (maxerr[i] <= x_thr[i] || x_thr[i] == 0.0) {
-                if (validnewextremum || x_thr[i] == 0.0) {
-                    settletime[i] = lastthrescross[i];
-                    if (x_thr[i] == 0.0)
-                        overshoot[i] = 0.0;
-#ifndef DEBUG
-                    continueSimulation = false;
-                    for (size_t i = 0; i < 4; ++i)
-                        if (settletime[i] < 0.0)
-                            continueSimulation = true;
-#endif
-                } else {  // first extremum, but still no new extremum
-                    // probably stable
-                    if (t - lastthrescross[i] >= 4 * risetime[i]) {
-                        settletime[i] = lastthrescross[i];
-#ifndef DEBUG
-                        continueSimulation = false;
-                        for (size_t i = 0; i < 4; ++i)
-                            if (settletime[i] < 0.0)
-                                continueSimulation = true;
-#endif
-                    }
-                }
-            } else {
-                // only a real crossing if the extremum is outside of the
-                // settling interval, otherwise, it doesn't really cross the
-                // bounds of the interval, it just stays inside of it
-                lastthrescross[i] = newlastthrescross;
-                // TODO: ignores first extremum
-            }
         }
     }
 

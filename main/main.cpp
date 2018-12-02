@@ -80,7 +80,7 @@ int main(int argc, char const *argv[]) {
     /* ------ Plot the step response ---------------------------------------- */
     if (Config::plotStepResponse) {
         plt::figure_size(px_x, px_y);
-        Quaternion q_ref = eul2quat({0, 10_deg, 10_deg});
+        Quaternion q_ref = eul2quat({20_deg, 20_deg, 20_deg});
         plotStepResponseAttitude(drone, Config::Attitude::Q,
                                  Config::Attitude::R, steperrorfactor, q_ref,
                                  Config::odeopt);
