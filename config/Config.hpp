@@ -33,6 +33,8 @@ extern const bool plotSimulationResult;
 extern const bool plotMotorControls;
 extern const bool plotStepResponse;
 
+extern const bool plotCSimulationResult;
+
 extern const bool plotAllAtOnce;
 
 /* ------ Time step error factor (for rise and settling time) --------------- */

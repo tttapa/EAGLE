@@ -45,6 +45,9 @@ int main(int argc, char const *argv[]) {
         drone.getController(Config::Attitude::Q, Config::Attitude::R,
                             Config::Altitude::K_p, Config::Altitude::K_i);
 
+    Drone::Controller ccontroller =
+        drone.getCController(Config::Altitude::K_p, Config::Altitude::K_i);
+
     // Drone::Observer observer = drone.getObserver(
     //     Config::Attitude::varDynamics, Config::Attitude::varSensors,
     //     Config::Altitude::varDynamics, Config::Altitude::varSensors);
@@ -57,10 +60,22 @@ int main(int argc, char const *argv[]) {
     auto result = drone.simulate(controller, ref, x0, Config::odeopt);
     result.resultCode.verbose();
 
+    /* ------ Simulate the drone with the generated C controller ------------ */
+    auto cresult = drone.simulate(ccontroller, ref, x0, Config::odeopt);
+    cresult.resultCode.verbose();
+
     /* ------ Plot the simulation result ------------------------------------ */
     if (Config::plotSimulationResult) {
         plt::figure_size(px_x, px_y);
         plotDrone(result);
+        if (!Config::plotAllAtOnce)
+            plt::show();
+    }
+
+    /* ------ Plot the C simulation result ---------------------------------- */
+    if (Config::plotCSimulationResult) {
+        plt::figure_size(px_x, px_y);
+        plotDrone(cresult);
         if (!Config::plotAllAtOnce)
             plt::show();
     }

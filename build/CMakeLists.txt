@@ -56,7 +56,7 @@ SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
 
 # Compiler flags for C
 SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} \
--O2 \
+-O2 -g \
 -Wall -Wextra")
 
 #include Google Test
@@ -78,6 +78,11 @@ include_directories("../config")
 file(GLOB_RECURSE CONFIG "../config/*.cpp")
 add_library(config STATIC ${CONFIG})
 
+# C controller
+include_directories("../C")
+file(GLOB_RECURSE C_CODE "../C/*.c")
+add_library(c_code STATIC ${C_CODE})
+
 # Main source files
 include_directories("../main")
 file(GLOB_RECURSE MAIN "../main/*.cpp" "../main/*.c")
@@ -86,6 +91,7 @@ target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(main 
                       config
                       source
+                      c_code
                       ${PYTHON_LIBRARIES}
                       lapacke
                       stdc++fs)

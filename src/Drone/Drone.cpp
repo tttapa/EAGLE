@@ -175,12 +175,13 @@ operator()(const Drone::Controller::VecX_t &x,
     DroneControl uu;
 
     if (subsampleCounter == 0) {
-        u_alt = uh + clampThrust(altCtrl(xx.getAltitude(), rr.getAltitude()));
+        u_alt =
+            uh + clampThrust((*altCtrl)(xx.getAltitude(), rr.getAltitude()));
         subsampleCounter = subsampleAlt;
     }
     --subsampleCounter;
 
-    auto u_att = attCtrl(xx.getAttitude(), rr.getAttitude());
+    auto u_att = (*attCtrl)(xx.getAttitude(), rr.getAttitude());
     u_att      = clampAttitude(u_att, u_alt);
     uu.setAttitudeControl(u_att);
     uu.setThrustControl(u_alt);

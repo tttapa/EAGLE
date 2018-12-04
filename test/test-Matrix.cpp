@@ -313,7 +313,7 @@ TEST(Matrix, abs) {
 }
 
 TEST(Matrix, isfinite) {
-    Matrix<2, 3> m        = {{
+    Matrix<2, 3> m = {{
         {0.0, -1.1, 2.2},
         {-2.3, 0.0, 1.2},
     }};
@@ -340,4 +340,26 @@ TEST(Matrix, map) {
         {-1, 1, 1},
     }};
     ASSERT_EQ(result, expected);
+}
+
+TEST(Matrix, copyToCArray) {
+    Matrix<2, 3> m = {{
+        {1, 2, 3},
+        {4, 5, 6},
+    }};
+    double a[6];
+    copyToCArray(a, m);
+    ASSERT_EQ(std::vector<double>(a, a + 6),
+              std::vector<double>({1, 2, 3, 4, 5, 6}));
+}
+
+TEST(Matrix, copyFromCArray) {
+    double a[6] = {1, 2, 3, 4, 5, 6};
+    Matrix<2, 3> m;
+    copyFromCArray(m, a);
+    Matrix<2, 3> expected = {{
+        {1, 2, 3},
+        {4, 5, 6},
+    }};
+    ASSERT_EQ(m, expected);
 }

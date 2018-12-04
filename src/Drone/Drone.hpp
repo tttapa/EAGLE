@@ -18,6 +18,8 @@
 #include <filesystem>
 #include <iostream>
 
+#include <Drone/CLQRController.hpp>
+
 struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
 #pragma region Constructors.....................................................
@@ -209,6 +211,24 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         const ColVector<1> uh;
     };
 
+    /** 
+     * A stand-alone attitude controller that clamps the control output using
+     * the (fixed) hover thrust as the common thrust.
+     */
+    class FixedClampCAttitudeController : public Attitude::CLQRController {
+      public:
+        FixedClampCAttitudeController(const Attitude::CLQRController &ctrl,
+                                      double uh)
+            : Attitude::CLQRController{ctrl}, uh{uh} {}
+        VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
+            return Drone::Controller::clampAttitude(
+                getRawControllerOutput(x, r), uh);
+        }
+
+      private:
+        const ColVector<1> uh;
+    };
+
     FixedClampAttitudeController
     getFixedClampAttitudeController(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                                     const Matrix<Nu_att, Nu_att> &R) const {
@@ -220,6 +240,12 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         return {getAttitudeController(K_red), uh};
     }
 
+    FixedClampCAttitudeController getFixedClampCAttitudeController() const {
+        return {Attitude::CLQRController{Ts_att}, uh};
+    }
+
+    // Altitude
+
     Altitude::LQRController getAltitudeController(const Matrix<1, 3> &K_p,
                                                   const Matrix<1, 3> &K_i) {
         return {G_alt, K_p, K_i, Ts_alt};
@@ -227,12 +253,16 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     class Controller : public DiscreteController<Nx, Nu, Ny> {
       public:
-        Controller(const Attitude::LQRController &attCtrl,
-                   const Altitude::LQRController &altCtrl, double uh)
-            : DiscreteController<Nx, Nu, Ny>{attCtrl.Ts}, attCtrl{attCtrl},
-              altCtrl{altCtrl},
-              subsampleAlt{size_t(round(altCtrl.Ts / attCtrl.Ts))}, uh{uh} {
-            assert(attCtrl.Ts < altCtrl.Ts);
+        Controller(
+            std::unique_ptr<DiscreteController<Nx_att, Nu_att, Ny_att>> attCtrl,
+            std::unique_ptr<DiscreteController<Nx_alt, Nu_alt, Ny_alt>> altCtrl,
+            double uh)
+            : DiscreteController<Nx, Nu, Ny>{attCtrl->Ts},
+              attCtrl{std::move(attCtrl)}, altCtrl{std::move(altCtrl)},
+              subsampleAlt{
+                  size_t(round(this->altCtrl->Ts / this->attCtrl->Ts))},
+              uh{uh} {
+            assert(this->attCtrl->Ts < this->altCtrl->Ts);
         }
 
         VecU_t operator()(const VecX_t &x, const VecR_t &r) override;
@@ -246,8 +276,8 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
                       const Altitude::LQRController::VecU_t &u_alt);
 
       private:
-        Attitude::LQRController attCtrl;
-        Altitude::LQRController altCtrl;
+        std::unique_ptr<DiscreteController<Nx_att, Nu_att, Ny_att>> attCtrl;
+        std::unique_ptr<DiscreteController<Nx_alt, Nu_alt, Ny_alt>> altCtrl;
         const size_t subsampleAlt;
         size_t subsampleCounter = 0;
         Altitude::LQRController::VecU_t u_alt;
@@ -258,8 +288,19 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
                              const Matrix<Nu_att, Nu_att> &R_att,
                              const Matrix<1, 3> &K_p_alt,
                              const Matrix<1, 3> &K_i_alt) {
-        return {getAttitudeController(Q_att, R_att),
-                getAltitudeController(K_p_alt, K_i_alt), uh};
+        return {std::make_unique<Attitude::LQRController>(
+                    getAttitudeController(Q_att, R_att)),
+                std::make_unique<Altitude::LQRController>(
+                    getAltitudeController(K_p_alt, K_i_alt)),
+                uh};
+    }
+
+    Controller getCController(const Matrix<1, 3> &K_p_alt,
+                              const Matrix<1, 3> &K_i_alt) {
+        return {std::make_unique<Attitude::CLQRController>(Ts_att),
+                std::make_unique<Altitude::LQRController>(getAltitudeController(
+                    K_p_alt, K_i_alt)),  // TODO: use C controller
+                uh};
     }
 
 #pragma region Observers........................................................

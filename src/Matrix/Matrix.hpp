@@ -34,6 +34,22 @@ const T *toArrayPointer(const TMatrix<T, R, C> &matrix) {
     return &matrix[0][0];
 }
 
+template <class T, size_t R, size_t C, class U>
+void copyToCArray(U *dst, const TMatrix<T, R, C> &src) {
+    size_t i = 0;
+    for (const auto &row : src)
+        for (const T &el : row)
+            dst[i++] = el;
+}
+
+template <class T, size_t R, size_t C, class U>
+void copyFromCArray(TMatrix<T, R, C> &dst, U *src) {
+    size_t i = 0;
+    for (auto &row : dst)
+        for (T &el : row)
+            el = src[i++];
+}
+
 namespace Matrices {
 
 struct TransposeStruct {

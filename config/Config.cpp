@@ -25,9 +25,11 @@ const size_t px_x = 1920;
 const size_t px_y = 1080;
 
 /* ------ Plot settings ----------------------------------------------------- */
-const bool plotSimulationResult = true;
+const bool plotSimulationResult = false;
 const bool plotMotorControls    = false;
-const bool plotStepResponse     = true;
+const bool plotStepResponse     = false;
+
+const bool plotCSimulationResult = true;
 
 const bool plotAllAtOnce = true;
 

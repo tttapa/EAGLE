@@ -16,6 +16,7 @@
                 "${workspaceFolder}/build/googletest/googletest-src/googletest/include",
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/main",
+                "${workspaceFolder}/C",
                 "${HOME}/GitHub/matplotlib-cpp",
                 "/usr/include/python2.7",
                 "${workspaceFolder}/config"
