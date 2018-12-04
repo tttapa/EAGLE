@@ -17,6 +17,7 @@ class DiscreteController {
     typedef TimeFunctionT<VecR_t> ReferenceFunction;
 
     DiscreteController(double Ts) : Ts(Ts) {}
+    virtual ~DiscreteController() = default;
 
     /**
      * @brief   Given a state x, and a reference value r, calculate the
@@ -29,6 +30,8 @@ class DiscreteController {
      * @return  The controller output.
      */
     virtual VecU_t operator()(const VecX_t &x, const VecR_t &r) = 0;
+
+    virtual void reset(){};
 
     const double Ts;
 };

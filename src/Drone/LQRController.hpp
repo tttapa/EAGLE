@@ -200,6 +200,8 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
         return u;
     }
 
+    void reset() override { integral = {}; }
+
     const Matrix<Nu, Nx> K_p;
     const Matrix<Nu, Nx> K_i;
     const Matrix<Nx + Nu, Ny> G;

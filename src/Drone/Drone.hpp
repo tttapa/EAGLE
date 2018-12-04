@@ -267,6 +267,12 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
         VecU_t operator()(const VecX_t &x, const VecR_t &r) override;
 
+        void reset() override {
+            subsampleCounter = 0;
+            attCtrl->reset();
+            altCtrl->reset();
+        }
+
         /** Clamp the marginal thrust between 0.1 and -0.1 */
         static Altitude::LQRController::VecU_t
         clampThrust(Altitude::LQRController::VecU_t u_thrust);

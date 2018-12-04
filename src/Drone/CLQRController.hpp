@@ -1,8 +1,4 @@
-extern "C" {
-#include <attitude.h>
-#include <controllers.h>
-};
-
+#include <attitude-controller.h>
 #include <Drone/LQRController.hpp>
 
 namespace Attitude {
@@ -14,12 +10,15 @@ class CLQRController : public DiscreteController<Nx, Nu, Ny> {
     }
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &ref) {
-        const ColVector<13> x_bias = vcat(x, zeros<3, 1>());
-        copyToCArray(att_hat, x_bias);
-        copyToCArray(att_ref, ref);
-        updateAttitudeController();
+        AttitudeStateX xa;
+        RefQuaternion ra;
+        copyToCArray(xa, x);
+        Quaternion rq = DroneAttitudeOutput{ref}.getOrientation();
+        copyToCArray(ra, rq);
+        AttitudeControllerOutputU ua;
+        getControllerOutput(xa, ra, ua);
         VecU_t u;
-        copyFromCArray(u, att_u);
+        copyFromCArray(u, ua);
         return u;
     }
 };

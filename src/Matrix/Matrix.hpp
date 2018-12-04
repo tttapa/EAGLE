@@ -152,6 +152,17 @@ constexpr TMatrix<T, R, C> operator*(const TMatrix<T, R, M> &lhs,
     return result;
 }
 
+// Inner product
+template <class T, class U, size_t R>
+constexpr auto operator*(const TColVector<T, R> &lhs,
+                         const TColVector<U, R> &rhs) {
+    using sum_t = std::remove_reference_t<decltype(lhs[0][0] * rhs[0][0])>;
+    sum_t sum   = {};
+    for (size_t i = 0; i < R; ++i)
+        sum += lhs[i] * rhs[i];
+    return sum;
+}
+
 // Scalar multiplication
 // template <class T, size_t R, size_t C>
 // constexpr TMatrix<T, R, C> operator*(T scalar, const TMatrix<T, R, C> &matrix) {

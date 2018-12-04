@@ -363,3 +363,10 @@ TEST(Matrix, copyFromCArray) {
     }};
     ASSERT_EQ(m, expected);
 }
+
+TEST(Matrix, innerProduct) {
+    ColVector<3> x  = {1, 2, 3};
+    ColVector<3> y  = {4, 5, 6};
+    double expected = 1 * 4 + 2 * 5 + 3 * 6;
+    ASSERT_EQ(x * y, expected);
+}

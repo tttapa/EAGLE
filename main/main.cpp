@@ -7,6 +7,7 @@
 #include <ODE/ODEEval.hpp>
 #include <PlotStepReponse.hpp>
 #include <Util/Degrees.hpp>
+#include <Util/MeanSquareError.hpp>
 #include <iostream>
 
 using namespace std;
@@ -63,6 +64,29 @@ int main(int argc, char const *argv[]) {
     /* ------ Simulate the drone with the generated C controller ------------ */
     auto cresult = drone.simulate(ccontroller, ref, x0, Config::odeopt);
     cresult.resultCode.verbose();
+
+    /* ------ Compare the C controller to the C++ controller ---------------- */
+    auto sampled  = sampleODEResult(result, Config::odeopt.t_start,
+                                   controller.Ts, Config::odeopt.t_end);
+    auto csampled = sampleODEResult(cresult, Config::odeopt.t_start,
+                                    ccontroller.Ts, Config::odeopt.t_end);
+
+    bool correctCController = true;
+    if (sampled.size() != csampled.size()) {
+        cerr << ANSIColors::redb
+             << "The C controller simulation result length is not correct"
+             << ANSIColors::reset << endl;
+        correctCController = false;
+    } else if (meanSquareError(sampled.begin(), sampled.end(),
+                               csampled.begin()) > 1e-20) {
+        cerr << ANSIColors::redb
+             << "The C controller simulation result is not correct"
+             << ANSIColors::reset << endl;
+        correctCController = false;
+    } else {
+        cout << ANSIColors::greenb << "✔   The C controller result is correct"
+             << ANSIColors::reset << endl;
+    }
 
     /* ------ Plot the simulation result ------------------------------------ */
     if (Config::plotSimulationResult) {
@@ -181,8 +205,8 @@ int main(int argc, char const *argv[]) {
         printCSV(Config::locationCSVFile, 0.0, Config::CSV_Ts, sampledLocation);
     }
 
-    cout << "$$ Q = " << asTeX(Config::Attitude::Q) << " $$" << endl;
-    cout << "$$ R = " << asTeX(Config::Attitude::R) << " $$" << endl;
+    // cout << "$$ Q = " << asTeX(Config::Attitude::Q) << " $$" << endl;
+    // cout << "$$ R = " << asTeX(Config::Attitude::R) << " $$" << endl;
 
-    return EXIT_SUCCESS;
+    return correctCController ? EXIT_SUCCESS : EXIT_FAILURE;
 }

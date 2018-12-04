@@ -1,10 +1,10 @@
-Start testing: Dec 03 20:22 CET
+Start testing: Dec 04 18:59 CET
 ----------------------------------------------------------
-1/67 Testing: ArgParser.ArgParser
-1/67 Test: ArgParser.ArgParser
+1/69 Testing: ArgParser.ArgParser
+1/69 Test: ArgParser.ArgParser
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=ArgParser.ArgParser" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"ArgParser.ArgParser" start time: Dec 03 20:22 CET
+"ArgParser.ArgParser" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = ArgParser.ArgParser
@@ -22,15 +22,15 @@ Note: Google Test filter = ArgParser.ArgParser
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ArgParser.ArgParser" end time: Dec 03 20:22 CET
+"ArgParser.ArgParser" end time: Dec 04 18:59 CET
 "ArgParser.ArgParser" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-2/67 Testing: ArgParser.notEnoughArguments
-2/67 Test: ArgParser.notEnoughArguments
+2/69 Testing: ArgParser.notEnoughArguments
+2/69 Test: ArgParser.notEnoughArguments
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=ArgParser.notEnoughArguments" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"ArgParser.notEnoughArguments" start time: Dec 03 20:22 CET
+"ArgParser.notEnoughArguments" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = ArgParser.notEnoughArguments
@@ -42,21 +42,21 @@ Note: Google Test filter = ArgParser.notEnoughArguments
 [----------] 1 test from ArgParser (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test case ran. (1 ms total)
+[==========] 1 test from 1 test case ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ArgParser.notEnoughArguments" end time: Dec 03 20:22 CET
+"ArgParser.notEnoughArguments" end time: Dec 04 18:59 CET
 "ArgParser.notEnoughArguments" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-3/67 Testing: Array.initializeAndRetrieve
-3/67 Test: Array.initializeAndRetrieve
+3/69 Testing: Array.initializeAndRetrieve
+3/69 Test: Array.initializeAndRetrieve
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.initializeAndRetrieve" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.initializeAndRetrieve" start time: Dec 03 20:22 CET
+"Array.initializeAndRetrieve" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.initializeAndRetrieve
@@ -68,21 +68,21 @@ Note: Google Test filter = Array.initializeAndRetrieve
 [----------] 1 test from Array (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test case ran. (0 ms total)
+[==========] 1 test from 1 test case ran. (1 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.initializeAndRetrieve" end time: Dec 03 20:22 CET
+"Array.initializeAndRetrieve" end time: Dec 04 18:59 CET
 "Array.initializeAndRetrieve" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-4/67 Testing: Array.initializeAndRetrieveConst
-4/67 Test: Array.initializeAndRetrieveConst
+4/69 Testing: Array.initializeAndRetrieveConst
+4/69 Test: Array.initializeAndRetrieveConst
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.initializeAndRetrieveConst" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.initializeAndRetrieveConst" start time: Dec 03 20:22 CET
+"Array.initializeAndRetrieveConst" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.initializeAndRetrieveConst
@@ -100,15 +100,15 @@ Note: Google Test filter = Array.initializeAndRetrieveConst
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.initializeAndRetrieveConst" end time: Dec 03 20:22 CET
+"Array.initializeAndRetrieveConst" end time: Dec 04 18:59 CET
 "Array.initializeAndRetrieveConst" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-5/67 Testing: Array.write
-5/67 Test: Array.write
+5/69 Testing: Array.write
+5/69 Test: Array.write
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.write" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.write" start time: Dec 03 20:22 CET
+"Array.write" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.write
@@ -123,18 +123,18 @@ Note: Google Test filter = Array.write
 [==========] 1 test from 1 test case ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.write" end time: Dec 03 20:22 CET
+"Array.write" end time: Dec 04 18:59 CET
 "Array.write" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-6/67 Testing: Array.rangeFor
-6/67 Test: Array.rangeFor
+6/69 Testing: Array.rangeFor
+6/69 Test: Array.rangeFor
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.rangeFor" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.rangeFor" start time: Dec 03 20:22 CET
+"Array.rangeFor" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.rangeFor
@@ -152,15 +152,15 @@ Note: Google Test filter = Array.rangeFor
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.rangeFor" end time: Dec 03 20:22 CET
+"Array.rangeFor" end time: Dec 04 18:59 CET
 "Array.rangeFor" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-7/67 Testing: Array.rangeForConst
-7/67 Test: Array.rangeForConst
+7/69 Testing: Array.rangeForConst
+7/69 Test: Array.rangeForConst
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.rangeForConst" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.rangeForConst" start time: Dec 03 20:22 CET
+"Array.rangeForConst" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.rangeForConst
@@ -178,15 +178,15 @@ Note: Google Test filter = Array.rangeForConst
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.rangeForConst" end time: Dec 03 20:22 CET
+"Array.rangeForConst" end time: Dec 04 18:59 CET
 "Array.rangeForConst" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-8/67 Testing: Array.equality
-8/67 Test: Array.equality
+8/69 Testing: Array.equality
+8/69 Test: Array.equality
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.equality" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.equality" start time: Dec 03 20:22 CET
+"Array.equality" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.equality
@@ -204,15 +204,15 @@ Note: Google Test filter = Array.equality
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.equality" end time: Dec 03 20:22 CET
+"Array.equality" end time: Dec 04 18:59 CET
 "Array.equality" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-9/67 Testing: Array.equalityOne
-9/67 Test: Array.equalityOne
+9/69 Testing: Array.equalityOne
+9/69 Test: Array.equalityOne
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.equalityOne" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.equalityOne" start time: Dec 03 20:22 CET
+"Array.equalityOne" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.equalityOne
@@ -230,15 +230,15 @@ Note: Google Test filter = Array.equalityOne
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.equalityOne" end time: Dec 03 20:22 CET
+"Array.equalityOne" end time: Dec 04 18:59 CET
 "Array.equalityOne" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-10/67 Testing: Array.operatorT
-10/67 Test: Array.operatorT
+10/69 Testing: Array.operatorT
+10/69 Test: Array.operatorT
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.operatorT" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.operatorT" start time: Dec 03 20:22 CET
+"Array.operatorT" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.operatorT
@@ -253,18 +253,18 @@ Note: Google Test filter = Array.operatorT
 [==========] 1 test from 1 test case ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.operatorT" end time: Dec 03 20:22 CET
+"Array.operatorT" end time: Dec 04 18:59 CET
 "Array.operatorT" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-11/67 Testing: Array.compareLt
-11/67 Test: Array.compareLt
+11/69 Testing: Array.compareLt
+11/69 Test: Array.compareLt
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.compareLt" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.compareLt" start time: Dec 03 20:22 CET
+"Array.compareLt" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.compareLt
@@ -282,15 +282,15 @@ Note: Google Test filter = Array.compareLt
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.compareLt" end time: Dec 03 20:22 CET
+"Array.compareLt" end time: Dec 04 18:59 CET
 "Array.compareLt" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-12/67 Testing: Array.compareLe
-12/67 Test: Array.compareLe
+12/69 Testing: Array.compareLe
+12/69 Test: Array.compareLe
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.compareLe" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.compareLe" start time: Dec 03 20:22 CET
+"Array.compareLe" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.compareLe
@@ -308,15 +308,15 @@ Note: Google Test filter = Array.compareLe
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.compareLe" end time: Dec 03 20:22 CET
+"Array.compareLe" end time: Dec 04 18:59 CET
 "Array.compareLe" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-13/67 Testing: Array.compareGt
-13/67 Test: Array.compareGt
+13/69 Testing: Array.compareGt
+13/69 Test: Array.compareGt
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.compareGt" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.compareGt" start time: Dec 03 20:22 CET
+"Array.compareGt" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.compareGt
@@ -334,15 +334,15 @@ Note: Google Test filter = Array.compareGt
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.compareGt" end time: Dec 03 20:22 CET
+"Array.compareGt" end time: Dec 04 18:59 CET
 "Array.compareGt" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-14/67 Testing: Array.compareGe
-14/67 Test: Array.compareGe
+14/69 Testing: Array.compareGe
+14/69 Test: Array.compareGe
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.compareGe" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.compareGe" start time: Dec 03 20:22 CET
+"Array.compareGe" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.compareGe
@@ -360,15 +360,15 @@ Note: Google Test filter = Array.compareGe
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.compareGe" end time: Dec 03 20:22 CET
+"Array.compareGe" end time: Dec 04 18:59 CET
 "Array.compareGe" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-15/67 Testing: Array.assignSingleElement
-15/67 Test: Array.assignSingleElement
+15/69 Testing: Array.assignSingleElement
+15/69 Test: Array.assignSingleElement
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.assignSingleElement" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.assignSingleElement" start time: Dec 03 20:22 CET
+"Array.assignSingleElement" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.assignSingleElement
@@ -386,15 +386,15 @@ Note: Google Test filter = Array.assignSingleElement
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.assignSingleElement" end time: Dec 03 20:22 CET
+"Array.assignSingleElement" end time: Dec 04 18:59 CET
 "Array.assignSingleElement" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-16/67 Testing: Array.fromCArray
-16/67 Test: Array.fromCArray
+16/69 Testing: Array.fromCArray
+16/69 Test: Array.fromCArray
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.fromCArray" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.fromCArray" start time: Dec 03 20:22 CET
+"Array.fromCArray" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.fromCArray
@@ -412,15 +412,15 @@ Note: Google Test filter = Array.fromCArray
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.fromCArray" end time: Dec 03 20:22 CET
+"Array.fromCArray" end time: Dec 04 18:59 CET
 "Array.fromCArray" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-17/67 Testing: Array.fromCppArray
-17/67 Test: Array.fromCppArray
+17/69 Testing: Array.fromCppArray
+17/69 Test: Array.fromCppArray
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.fromCppArray" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.fromCppArray" start time: Dec 03 20:22 CET
+"Array.fromCppArray" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.fromCppArray
@@ -438,15 +438,15 @@ Note: Google Test filter = Array.fromCppArray
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.fromCppArray" end time: Dec 03 20:22 CET
+"Array.fromCppArray" end time: Dec 04 18:59 CET
 "Array.fromCppArray" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-18/67 Testing: Array.abs
-18/67 Test: Array.abs
+18/69 Testing: Array.abs
+18/69 Test: Array.abs
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.abs" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.abs" start time: Dec 03 20:22 CET
+"Array.abs" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.abs
@@ -464,15 +464,15 @@ Note: Google Test filter = Array.abs
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.abs" end time: Dec 03 20:22 CET
+"Array.abs" end time: Dec 04 18:59 CET
 "Array.abs" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-19/67 Testing: Array.isfinite
-19/67 Test: Array.isfinite
+19/69 Testing: Array.isfinite
+19/69 Test: Array.isfinite
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.isfinite" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.isfinite" start time: Dec 03 20:22 CET
+"Array.isfinite" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.isfinite
@@ -490,15 +490,15 @@ Note: Google Test filter = Array.isfinite
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.isfinite" end time: Dec 03 20:22 CET
+"Array.isfinite" end time: Dec 04 18:59 CET
 "Array.isfinite" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-20/67 Testing: Array.map
-20/67 Test: Array.map
+20/69 Testing: Array.map
+20/69 Test: Array.map
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Array.map" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Array.map" start time: Dec 03 20:22 CET
+"Array.map" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Array.map
@@ -513,18 +513,18 @@ Note: Google Test filter = Array.map
 [==========] 1 test from 1 test case ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.map" end time: Dec 03 20:22 CET
+"Array.map" end time: Dec 04 18:59 CET
 "Array.map" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-21/67 Testing: generateArray.simple
-21/67 Test: generateArray.simple
+21/69 Testing: generateArray.simple
+21/69 Test: generateArray.simple
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=generateArray.simple" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"generateArray.simple" start time: Dec 03 20:22 CET
+"generateArray.simple" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = generateArray.simple
@@ -542,15 +542,15 @@ Note: Google Test filter = generateArray.simple
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"generateArray.simple" end time: Dec 03 20:22 CET
+"generateArray.simple" end time: Dec 04 18:59 CET
 "generateArray.simple" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-22/67 Testing: fillArray.simple
-22/67 Test: fillArray.simple
+22/69 Testing: fillArray.simple
+22/69 Test: fillArray.simple
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=fillArray.simple" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"fillArray.simple" start time: Dec 03 20:22 CET
+"fillArray.simple" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = fillArray.simple
@@ -568,15 +568,15 @@ Note: Google Test filter = fillArray.simple
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"fillArray.simple" end time: Dec 03 20:22 CET
+"fillArray.simple" end time: Dec 04 18:59 CET
 "fillArray.simple" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-23/67 Testing: DLQE.DLQE
-23/67 Test: DLQE.DLQE
+23/69 Testing: DLQE.DLQE
+23/69 Test: DLQE.DLQE
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=DLQE.DLQE" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"DLQE.DLQE" start time: Dec 03 20:22 CET
+"DLQE.DLQE" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = DLQE.DLQE
@@ -594,15 +594,15 @@ Note: Google Test filter = DLQE.DLQE
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"DLQE.DLQE" end time: Dec 03 20:22 CET
+"DLQE.DLQE" end time: Dec 04 18:59 CET
 "DLQE.DLQE" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-24/67 Testing: DoPri.euler
-24/67 Test: DoPri.euler
+24/69 Testing: DoPri.euler
+24/69 Test: DoPri.euler
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=DoPri.euler" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"DoPri.euler" start time: Dec 03 20:22 CET
+"DoPri.euler" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = DoPri.euler
@@ -617,21 +617,21 @@ error = 3.1086244689504383e-15
 [----------] 1 test from DoPri (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test case ran. (0 ms total)
+[==========] 1 test from 1 test case ran. (1 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"DoPri.euler" end time: Dec 03 20:22 CET
+"DoPri.euler" end time: Dec 04 18:59 CET
 "DoPri.euler" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-25/67 Testing: DoPri.eulerVector
-25/67 Test: DoPri.eulerVector
+25/69 Testing: DoPri.eulerVector
+25/69 Test: DoPri.eulerVector
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=DoPri.eulerVector" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"DoPri.eulerVector" start time: Dec 03 20:22 CET
+"DoPri.eulerVector" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = DoPri.eulerVector
@@ -650,15 +650,15 @@ e = 2.71828182845905
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"DoPri.eulerVector" end time: Dec 03 20:22 CET
+"DoPri.eulerVector" end time: Dec 04 18:59 CET
 "DoPri.eulerVector" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-26/67 Testing: FileLoader.LoadMatrix
-26/67 Test: FileLoader.LoadMatrix
+26/69 Testing: FileLoader.LoadMatrix
+26/69 Test: FileLoader.LoadMatrix
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=FileLoader.LoadMatrix" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"FileLoader.LoadMatrix" start time: Dec 03 20:22 CET
+"FileLoader.LoadMatrix" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = FileLoader.LoadMatrix
@@ -676,15 +676,15 @@ Note: Google Test filter = FileLoader.LoadMatrix
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"FileLoader.LoadMatrix" end time: Dec 03 20:22 CET
+"FileLoader.LoadMatrix" end time: Dec 04 18:59 CET
 "FileLoader.LoadMatrix" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-27/67 Testing: FileLoader.LoadMatrixWrongRows
-27/67 Test: FileLoader.LoadMatrixWrongRows
+27/69 Testing: FileLoader.LoadMatrixWrongRows
+27/69 Test: FileLoader.LoadMatrixWrongRows
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=FileLoader.LoadMatrixWrongRows" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"FileLoader.LoadMatrixWrongRows" start time: Dec 03 20:22 CET
+"FileLoader.LoadMatrixWrongRows" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = FileLoader.LoadMatrixWrongRows
@@ -702,15 +702,15 @@ Note: Google Test filter = FileLoader.LoadMatrixWrongRows
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"FileLoader.LoadMatrixWrongRows" end time: Dec 03 20:22 CET
+"FileLoader.LoadMatrixWrongRows" end time: Dec 04 18:59 CET
 "FileLoader.LoadMatrixWrongRows" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-28/67 Testing: FileLoader.LoadMatrixWrongCols
-28/67 Test: FileLoader.LoadMatrixWrongCols
+28/69 Testing: FileLoader.LoadMatrixWrongCols
+28/69 Test: FileLoader.LoadMatrixWrongCols
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=FileLoader.LoadMatrixWrongCols" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"FileLoader.LoadMatrixWrongCols" start time: Dec 03 20:22 CET
+"FileLoader.LoadMatrixWrongCols" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = FileLoader.LoadMatrixWrongCols
@@ -728,15 +728,15 @@ Note: Google Test filter = FileLoader.LoadMatrixWrongCols
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"FileLoader.LoadMatrixWrongCols" end time: Dec 03 20:22 CET
+"FileLoader.LoadMatrixWrongCols" end time: Dec 04 18:59 CET
 "FileLoader.LoadMatrixWrongCols" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-29/67 Testing: FileLoader.LoadDouble
-29/67 Test: FileLoader.LoadDouble
+29/69 Testing: FileLoader.LoadDouble
+29/69 Test: FileLoader.LoadDouble
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=FileLoader.LoadDouble" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"FileLoader.LoadDouble" start time: Dec 03 20:22 CET
+"FileLoader.LoadDouble" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = FileLoader.LoadDouble
@@ -754,15 +754,15 @@ Note: Google Test filter = FileLoader.LoadDouble
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"FileLoader.LoadDouble" end time: Dec 03 20:22 CET
+"FileLoader.LoadDouble" end time: Dec 04 18:59 CET
 "FileLoader.LoadDouble" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-30/67 Testing: LQR.LQR
-30/67 Test: LQR.LQR
+30/69 Testing: LQR.LQR
+30/69 Test: LQR.LQR
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=LQR.LQR" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"LQR.LQR" start time: Dec 03 20:22 CET
+"LQR.LQR" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = LQR.LQR
@@ -780,15 +780,15 @@ Note: Google Test filter = LQR.LQR
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"LQR.LQR" end time: Dec 03 20:22 CET
+"LQR.LQR" end time: Dec 04 18:59 CET
 "LQR.LQR" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-31/67 Testing: DLQR.DLQR
-31/67 Test: DLQR.DLQR
+31/69 Testing: DLQR.DLQR
+31/69 Test: DLQR.DLQR
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=DLQR.DLQR" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"DLQR.DLQR" start time: Dec 03 20:22 CET
+"DLQR.DLQR" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = DLQR.DLQR
@@ -806,15 +806,15 @@ Note: Google Test filter = DLQR.DLQR
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"DLQR.DLQR" end time: Dec 03 20:22 CET
+"DLQR.DLQR" end time: Dec 04 18:59 CET
 "DLQR.DLQR" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-32/67 Testing: LeastSquares.solveLeastSquaresSquare
-32/67 Test: LeastSquares.solveLeastSquaresSquare
+32/69 Testing: LeastSquares.solveLeastSquaresSquare
+32/69 Test: LeastSquares.solveLeastSquaresSquare
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=LeastSquares.solveLeastSquaresSquare" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"LeastSquares.solveLeastSquaresSquare" start time: Dec 03 20:22 CET
+"LeastSquares.solveLeastSquaresSquare" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = LeastSquares.solveLeastSquaresSquare
@@ -832,15 +832,15 @@ Note: Google Test filter = LeastSquares.solveLeastSquaresSquare
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"LeastSquares.solveLeastSquaresSquare" end time: Dec 03 20:22 CET
+"LeastSquares.solveLeastSquaresSquare" end time: Dec 04 18:59 CET
 "LeastSquares.solveLeastSquaresSquare" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-33/67 Testing: Matrix.equals
-33/67 Test: Matrix.equals
+33/69 Testing: Matrix.equals
+33/69 Test: Matrix.equals
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.equals" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.equals" start time: Dec 03 20:22 CET
+"Matrix.equals" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.equals
@@ -858,15 +858,15 @@ Note: Google Test filter = Matrix.equals
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.equals" end time: Dec 03 20:22 CET
+"Matrix.equals" end time: Dec 04 18:59 CET
 "Matrix.equals" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-34/67 Testing: Matrix.notEquals
-34/67 Test: Matrix.notEquals
+34/69 Testing: Matrix.notEquals
+34/69 Test: Matrix.notEquals
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.notEquals" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.notEquals" start time: Dec 03 20:22 CET
+"Matrix.notEquals" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.notEquals
@@ -884,15 +884,15 @@ Note: Google Test filter = Matrix.notEquals
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.notEquals" end time: Dec 03 20:22 CET
+"Matrix.notEquals" end time: Dec 04 18:59 CET
 "Matrix.notEquals" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-35/67 Testing: Matrix.operatorTMatrix
-35/67 Test: Matrix.operatorTMatrix
+35/69 Testing: Matrix.operatorTMatrix
+35/69 Test: Matrix.operatorTMatrix
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.operatorTMatrix" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.operatorTMatrix" start time: Dec 03 20:22 CET
+"Matrix.operatorTMatrix" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.operatorTMatrix
@@ -910,15 +910,15 @@ Note: Google Test filter = Matrix.operatorTMatrix
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.operatorTMatrix" end time: Dec 03 20:22 CET
+"Matrix.operatorTMatrix" end time: Dec 04 18:59 CET
 "Matrix.operatorTMatrix" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-36/67 Testing: Matrix.operatorTMatrixConst
-36/67 Test: Matrix.operatorTMatrixConst
+36/69 Testing: Matrix.operatorTMatrixConst
+36/69 Test: Matrix.operatorTMatrixConst
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.operatorTMatrixConst" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.operatorTMatrixConst" start time: Dec 03 20:22 CET
+"Matrix.operatorTMatrixConst" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.operatorTMatrixConst
@@ -936,15 +936,15 @@ Note: Google Test filter = Matrix.operatorTMatrixConst
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.operatorTMatrixConst" end time: Dec 03 20:22 CET
+"Matrix.operatorTMatrixConst" end time: Dec 04 18:59 CET
 "Matrix.operatorTMatrixConst" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-37/67 Testing: Matrix.multiply
-37/67 Test: Matrix.multiply
+37/69 Testing: Matrix.multiply
+37/69 Test: Matrix.multiply
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.multiply" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.multiply" start time: Dec 03 20:22 CET
+"Matrix.multiply" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.multiply
@@ -956,21 +956,21 @@ Note: Google Test filter = Matrix.multiply
 [----------] 1 test from Matrix (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test case ran. (0 ms total)
+[==========] 1 test from 1 test case ran. (1 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.multiply" end time: Dec 03 20:22 CET
+"Matrix.multiply" end time: Dec 04 18:59 CET
 "Matrix.multiply" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-38/67 Testing: Matrix.scalarMultiply
-38/67 Test: Matrix.scalarMultiply
+38/69 Testing: Matrix.scalarMultiply
+38/69 Test: Matrix.scalarMultiply
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.scalarMultiply" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.scalarMultiply" start time: Dec 03 20:22 CET
+"Matrix.scalarMultiply" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.scalarMultiply
@@ -988,15 +988,15 @@ Note: Google Test filter = Matrix.scalarMultiply
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.scalarMultiply" end time: Dec 03 20:22 CET
+"Matrix.scalarMultiply" end time: Dec 04 18:59 CET
 "Matrix.scalarMultiply" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-39/67 Testing: Matrix.Tdiag
-39/67 Test: Matrix.Tdiag
+39/69 Testing: Matrix.Tdiag
+39/69 Test: Matrix.Tdiag
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.Tdiag" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.Tdiag" start time: Dec 03 20:22 CET
+"Matrix.Tdiag" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.Tdiag
@@ -1014,15 +1014,15 @@ Note: Google Test filter = Matrix.Tdiag
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.Tdiag" end time: Dec 03 20:22 CET
+"Matrix.Tdiag" end time: Dec 04 18:59 CET
 "Matrix.Tdiag" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-40/67 Testing: Matrix.diag
-40/67 Test: Matrix.diag
+40/69 Testing: Matrix.diag
+40/69 Test: Matrix.diag
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.diag" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.diag" start time: Dec 03 20:22 CET
+"Matrix.diag" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.diag
@@ -1040,15 +1040,15 @@ Note: Google Test filter = Matrix.diag
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.diag" end time: Dec 03 20:22 CET
+"Matrix.diag" end time: Dec 04 18:59 CET
 "Matrix.diag" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-41/67 Testing: Matrix.add
-41/67 Test: Matrix.add
+41/69 Testing: Matrix.add
+41/69 Test: Matrix.add
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.add" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.add" start time: Dec 03 20:22 CET
+"Matrix.add" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.add
@@ -1066,15 +1066,15 @@ Note: Google Test filter = Matrix.add
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.add" end time: Dec 03 20:22 CET
+"Matrix.add" end time: Dec 04 18:59 CET
 "Matrix.add" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-42/67 Testing: Matrix.subtract
-42/67 Test: Matrix.subtract
+42/69 Testing: Matrix.subtract
+42/69 Test: Matrix.subtract
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.subtract" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.subtract" start time: Dec 03 20:22 CET
+"Matrix.subtract" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.subtract
@@ -1092,15 +1092,15 @@ Note: Google Test filter = Matrix.subtract
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.subtract" end time: Dec 03 20:22 CET
+"Matrix.subtract" end time: Dec 04 18:59 CET
 "Matrix.subtract" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-43/67 Testing: Matrix.transpose
-43/67 Test: Matrix.transpose
+43/69 Testing: Matrix.transpose
+43/69 Test: Matrix.transpose
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.transpose" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.transpose" start time: Dec 03 20:22 CET
+"Matrix.transpose" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.transpose
@@ -1118,15 +1118,15 @@ Note: Google Test filter = Matrix.transpose
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.transpose" end time: Dec 03 20:22 CET
+"Matrix.transpose" end time: Dec 04 18:59 CET
 "Matrix.transpose" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-44/67 Testing: Matrix.assignBlock
-44/67 Test: Matrix.assignBlock
+44/69 Testing: Matrix.assignBlock
+44/69 Test: Matrix.assignBlock
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.assignBlock" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.assignBlock" start time: Dec 03 20:22 CET
+"Matrix.assignBlock" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.assignBlock
@@ -1144,15 +1144,15 @@ Note: Google Test filter = Matrix.assignBlock
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.assignBlock" end time: Dec 03 20:22 CET
+"Matrix.assignBlock" end time: Dec 04 18:59 CET
 "Matrix.assignBlock" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-45/67 Testing: Matrix.getBlock
-45/67 Test: Matrix.getBlock
+45/69 Testing: Matrix.getBlock
+45/69 Test: Matrix.getBlock
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.getBlock" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.getBlock" start time: Dec 03 20:22 CET
+"Matrix.getBlock" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.getBlock
@@ -1170,15 +1170,15 @@ Note: Google Test filter = Matrix.getBlock
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.getBlock" end time: Dec 03 20:22 CET
+"Matrix.getBlock" end time: Dec 04 18:59 CET
 "Matrix.getBlock" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-46/67 Testing: Matrix.hcat
-46/67 Test: Matrix.hcat
+46/69 Testing: Matrix.hcat
+46/69 Test: Matrix.hcat
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.hcat" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.hcat" start time: Dec 03 20:22 CET
+"Matrix.hcat" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.hcat
@@ -1196,15 +1196,15 @@ Note: Google Test filter = Matrix.hcat
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.hcat" end time: Dec 03 20:22 CET
+"Matrix.hcat" end time: Dec 04 18:59 CET
 "Matrix.hcat" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-47/67 Testing: Matrix.hcat3
-47/67 Test: Matrix.hcat3
+47/69 Testing: Matrix.hcat3
+47/69 Test: Matrix.hcat3
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.hcat3" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.hcat3" start time: Dec 03 20:22 CET
+"Matrix.hcat3" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.hcat3
@@ -1222,15 +1222,15 @@ Note: Google Test filter = Matrix.hcat3
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.hcat3" end time: Dec 03 20:22 CET
+"Matrix.hcat3" end time: Dec 04 18:59 CET
 "Matrix.hcat3" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-48/67 Testing: Matrix.vcat3
-48/67 Test: Matrix.vcat3
+48/69 Testing: Matrix.vcat3
+48/69 Test: Matrix.vcat3
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.vcat3" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.vcat3" start time: Dec 03 20:22 CET
+"Matrix.vcat3" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.vcat3
@@ -1242,21 +1242,21 @@ Note: Google Test filter = Matrix.vcat3
 [----------] 1 test from Matrix (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test case ran. (1 ms total)
+[==========] 1 test from 1 test case ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.vcat3" end time: Dec 03 20:22 CET
+"Matrix.vcat3" end time: Dec 04 18:59 CET
 "Matrix.vcat3" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-49/67 Testing: Matrix.vcathcat
-49/67 Test: Matrix.vcathcat
+49/69 Testing: Matrix.vcathcat
+49/69 Test: Matrix.vcathcat
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.vcathcat" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.vcathcat" start time: Dec 03 20:22 CET
+"Matrix.vcathcat" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.vcathcat
@@ -1274,15 +1274,15 @@ Note: Google Test filter = Matrix.vcathcat
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.vcathcat" end time: Dec 03 20:22 CET
+"Matrix.vcathcat" end time: Dec 04 18:59 CET
 "Matrix.vcathcat" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-50/67 Testing: Matrix.abs
-50/67 Test: Matrix.abs
+50/69 Testing: Matrix.abs
+50/69 Test: Matrix.abs
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.abs" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.abs" start time: Dec 03 20:22 CET
+"Matrix.abs" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.abs
@@ -1300,15 +1300,15 @@ Note: Google Test filter = Matrix.abs
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.abs" end time: Dec 03 20:22 CET
+"Matrix.abs" end time: Dec 04 18:59 CET
 "Matrix.abs" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-51/67 Testing: Matrix.isfinite
-51/67 Test: Matrix.isfinite
+51/69 Testing: Matrix.isfinite
+51/69 Test: Matrix.isfinite
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.isfinite" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.isfinite" start time: Dec 03 20:22 CET
+"Matrix.isfinite" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.isfinite
@@ -1326,15 +1326,15 @@ Note: Google Test filter = Matrix.isfinite
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.isfinite" end time: Dec 03 20:22 CET
+"Matrix.isfinite" end time: Dec 04 18:59 CET
 "Matrix.isfinite" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-52/67 Testing: Matrix.map
-52/67 Test: Matrix.map
+52/69 Testing: Matrix.map
+52/69 Test: Matrix.map
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.map" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.map" start time: Dec 03 20:22 CET
+"Matrix.map" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.map
@@ -1352,15 +1352,15 @@ Note: Google Test filter = Matrix.map
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.map" end time: Dec 03 20:22 CET
+"Matrix.map" end time: Dec 04 18:59 CET
 "Matrix.map" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-53/67 Testing: Matrix.copyToCArray
-53/67 Test: Matrix.copyToCArray
+53/69 Testing: Matrix.copyToCArray
+53/69 Test: Matrix.copyToCArray
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.copyToCArray" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.copyToCArray" start time: Dec 03 20:22 CET
+"Matrix.copyToCArray" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.copyToCArray
@@ -1375,18 +1375,18 @@ Note: Google Test filter = Matrix.copyToCArray
 [==========] 1 test from 1 test case ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.copyToCArray" end time: Dec 03 20:22 CET
+"Matrix.copyToCArray" end time: Dec 04 18:59 CET
 "Matrix.copyToCArray" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-54/67 Testing: Matrix.copyFromCArray
-54/67 Test: Matrix.copyFromCArray
+54/69 Testing: Matrix.copyFromCArray
+54/69 Test: Matrix.copyFromCArray
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.copyFromCArray" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Matrix.copyFromCArray" start time: Dec 03 20:22 CET
+"Matrix.copyFromCArray" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Matrix.copyFromCArray
@@ -1404,15 +1404,67 @@ Note: Google Test filter = Matrix.copyFromCArray
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.copyFromCArray" end time: Dec 03 20:22 CET
+"Matrix.copyFromCArray" end time: Dec 04 18:59 CET
 "Matrix.copyFromCArray" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-55/67 Testing: ODEEval.interpolate
-55/67 Test: ODEEval.interpolate
+55/69 Testing: Matrix.innerProduct
+55/69 Test: Matrix.innerProduct
+Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Matrix.innerProduct" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/GitHub/EAGLE/build
+"Matrix.innerProduct" start time: Dec 04 18:59 CET
+Output:
+----------------------------------------------------------
+Note: Google Test filter = Matrix.innerProduct
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from Matrix
+[ RUN      ] Matrix.innerProduct
+[       OK ] Matrix.innerProduct (0 ms)
+[----------] 1 test from Matrix (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (1 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Matrix.innerProduct" end time: Dec 04 18:59 CET
+"Matrix.innerProduct" time elapsed: 00:00:00
+----------------------------------------------------------
+
+56/69 Testing: squareError.squareError
+56/69 Test: squareError.squareError
+Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=squareError.squareError" "--gtest_also_run_disabled_tests"
+Directory: /home/pieter/GitHub/EAGLE/build
+"squareError.squareError" start time: Dec 04 18:59 CET
+Output:
+----------------------------------------------------------
+Note: Google Test filter = squareError.squareError
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from squareError
+[ RUN      ] squareError.squareError
+[       OK ] squareError.squareError (0 ms)
+[----------] 1 test from squareError (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"squareError.squareError" end time: Dec 04 18:59 CET
+"squareError.squareError" time elapsed: 00:00:00
+----------------------------------------------------------
+
+57/69 Testing: ODEEval.interpolate
+57/69 Test: ODEEval.interpolate
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=ODEEval.interpolate" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"ODEEval.interpolate" start time: Dec 03 20:22 CET
+"ODEEval.interpolate" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = ODEEval.interpolate
@@ -1430,15 +1482,15 @@ Note: Google Test filter = ODEEval.interpolate
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.interpolate" end time: Dec 03 20:22 CET
+"ODEEval.interpolate" end time: Dec 04 18:59 CET
 "ODEEval.interpolate" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-56/67 Testing: ODEEval.sampleODEResult
-56/67 Test: ODEEval.sampleODEResult
+58/69 Testing: ODEEval.sampleODEResult
+58/69 Test: ODEEval.sampleODEResult
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=ODEEval.sampleODEResult" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"ODEEval.sampleODEResult" start time: Dec 03 20:22 CET
+"ODEEval.sampleODEResult" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = ODEEval.sampleODEResult
@@ -1450,21 +1502,21 @@ Note: Google Test filter = ODEEval.sampleODEResult
 [----------] 1 test from ODEEval (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test case ran. (1 ms total)
+[==========] 1 test from 1 test case ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.sampleODEResult" end time: Dec 03 20:22 CET
+"ODEEval.sampleODEResult" end time: Dec 04 18:59 CET
 "ODEEval.sampleODEResult" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-57/67 Testing: ODEEval.sampleODEResultJustBeforeEnd
-57/67 Test: ODEEval.sampleODEResultJustBeforeEnd
+59/69 Testing: ODEEval.sampleODEResultJustBeforeEnd
+59/69 Test: ODEEval.sampleODEResultJustBeforeEnd
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=ODEEval.sampleODEResultJustBeforeEnd" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"ODEEval.sampleODEResultJustBeforeEnd" start time: Dec 03 20:22 CET
+"ODEEval.sampleODEResultJustBeforeEnd" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = ODEEval.sampleODEResultJustBeforeEnd
@@ -1482,15 +1534,15 @@ Note: Google Test filter = ODEEval.sampleODEResultJustBeforeEnd
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.sampleODEResultJustBeforeEnd" end time: Dec 03 20:22 CET
+"ODEEval.sampleODEResultJustBeforeEnd" end time: Dec 04 18:59 CET
 "ODEEval.sampleODEResultJustBeforeEnd" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-58/67 Testing: ODEEval.sampleODEResultJustAfterEnd
-58/67 Test: ODEEval.sampleODEResultJustAfterEnd
+60/69 Testing: ODEEval.sampleODEResultJustAfterEnd
+60/69 Test: ODEEval.sampleODEResultJustAfterEnd
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=ODEEval.sampleODEResultJustAfterEnd" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"ODEEval.sampleODEResultJustAfterEnd" start time: Dec 03 20:22 CET
+"ODEEval.sampleODEResultJustAfterEnd" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = ODEEval.sampleODEResultJustAfterEnd
@@ -1502,21 +1554,21 @@ Note: Google Test filter = ODEEval.sampleODEResultJustAfterEnd
 [----------] 1 test from ODEEval (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test case ran. (1 ms total)
+[==========] 1 test from 1 test case ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.sampleODEResultJustAfterEnd" end time: Dec 03 20:22 CET
+"ODEEval.sampleODEResultJustAfterEnd" end time: Dec 04 18:59 CET
 "ODEEval.sampleODEResultJustAfterEnd" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-59/67 Testing: ODEEval.sampleODEResultOutOfBounds
-59/67 Test: ODEEval.sampleODEResultOutOfBounds
+61/69 Testing: ODEEval.sampleODEResultOutOfBounds
+61/69 Test: ODEEval.sampleODEResultOutOfBounds
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=ODEEval.sampleODEResultOutOfBounds" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"ODEEval.sampleODEResultOutOfBounds" start time: Dec 03 20:22 CET
+"ODEEval.sampleODEResultOutOfBounds" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = ODEEval.sampleODEResultOutOfBounds
@@ -1534,15 +1586,15 @@ Note: Google Test filter = ODEEval.sampleODEResultOutOfBounds
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.sampleODEResultOutOfBounds" end time: Dec 03 20:22 CET
+"ODEEval.sampleODEResultOutOfBounds" end time: Dec 04 18:59 CET
 "ODEEval.sampleODEResultOutOfBounds" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-60/67 Testing: QR.QR
-60/67 Test: QR.QR
+62/69 Testing: QR.QR
+62/69 Test: QR.QR
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=QR.QR" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"QR.QR" start time: Dec 03 20:22 CET
+"QR.QR" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = QR.QR
@@ -1560,15 +1612,15 @@ Note: Google Test filter = QR.QR
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"QR.QR" end time: Dec 03 20:22 CET
+"QR.QR" end time: Dec 04 18:59 CET
 "QR.QR" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-61/67 Testing: Quaternion.quatmultiply
-61/67 Test: Quaternion.quatmultiply
+63/69 Testing: Quaternion.quatmultiply
+63/69 Test: Quaternion.quatmultiply
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Quaternion.quatmultiply" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Quaternion.quatmultiply" start time: Dec 03 20:22 CET
+"Quaternion.quatmultiply" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Quaternion.quatmultiply
@@ -1586,15 +1638,15 @@ Note: Google Test filter = Quaternion.quatmultiply
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.quatmultiply" end time: Dec 03 20:22 CET
+"Quaternion.quatmultiply" end time: Dec 04 18:59 CET
 "Quaternion.quatmultiply" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-62/67 Testing: Quaternion.quatrotate
-62/67 Test: Quaternion.quatrotate
+64/69 Testing: Quaternion.quatrotate
+64/69 Test: Quaternion.quatrotate
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Quaternion.quatrotate" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Quaternion.quatrotate" start time: Dec 03 20:22 CET
+"Quaternion.quatrotate" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Quaternion.quatrotate
@@ -1616,15 +1668,15 @@ Note: Google Test filter = Quaternion.quatrotate
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.quatrotate" end time: Dec 03 20:22 CET
+"Quaternion.quatrotate" end time: Dec 04 18:59 CET
 "Quaternion.quatrotate" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-63/67 Testing: Quaternion.conjugate
-63/67 Test: Quaternion.conjugate
+65/69 Testing: Quaternion.conjugate
+65/69 Test: Quaternion.conjugate
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Quaternion.conjugate" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Quaternion.conjugate" start time: Dec 03 20:22 CET
+"Quaternion.conjugate" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Quaternion.conjugate
@@ -1636,21 +1688,21 @@ Note: Google Test filter = Quaternion.conjugate
 [----------] 1 test from Quaternion (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test case ran. (0 ms total)
+[==========] 1 test from 1 test case ran. (1 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.conjugate" end time: Dec 03 20:22 CET
+"Quaternion.conjugate" end time: Dec 04 18:59 CET
 "Quaternion.conjugate" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-64/67 Testing: Quaternion.eul2quat
-64/67 Test: Quaternion.eul2quat
+66/69 Testing: Quaternion.eul2quat
+66/69 Test: Quaternion.eul2quat
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Quaternion.eul2quat" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Quaternion.eul2quat" start time: Dec 03 20:22 CET
+"Quaternion.eul2quat" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Quaternion.eul2quat
@@ -1665,18 +1717,18 @@ Note: Google Test filter = Quaternion.eul2quat
 [==========] 1 test from 1 test case ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.eul2quat" end time: Dec 03 20:22 CET
+"Quaternion.eul2quat" end time: Dec 04 18:59 CET
 "Quaternion.eul2quat" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-65/67 Testing: Quaternion.quat2eul
-65/67 Test: Quaternion.quat2eul
+67/69 Testing: Quaternion.quat2eul
+67/69 Test: Quaternion.quat2eul
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=Quaternion.quat2eul" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"Quaternion.quat2eul" start time: Dec 03 20:22 CET
+"Quaternion.quat2eul" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = Quaternion.quat2eul
@@ -1694,15 +1746,15 @@ Note: Google Test filter = Quaternion.quat2eul
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.quat2eul" end time: Dec 03 20:22 CET
+"Quaternion.quat2eul" end time: Dec 04 18:59 CET
 "Quaternion.quat2eul" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-66/67 Testing: ReducedQuaternion.convertAndBack
-66/67 Test: ReducedQuaternion.convertAndBack
+68/69 Testing: ReducedQuaternion.convertAndBack
+68/69 Test: ReducedQuaternion.convertAndBack
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=ReducedQuaternion.convertAndBack" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"ReducedQuaternion.convertAndBack" start time: Dec 03 20:22 CET
+"ReducedQuaternion.convertAndBack" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = ReducedQuaternion.convertAndBack
@@ -1720,15 +1772,15 @@ Note: Google Test filter = ReducedQuaternion.convertAndBack
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ReducedQuaternion.convertAndBack" end time: Dec 03 20:22 CET
+"ReducedQuaternion.convertAndBack" end time: Dec 04 18:59 CET
 "ReducedQuaternion.convertAndBack" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-67/67 Testing: System.discretizeTustin
-67/67 Test: System.discretizeTustin
+69/69 Testing: System.discretizeTustin
+69/69 Test: System.discretizeTustin
 Command: "/home/pieter/GitHub/EAGLE/build/bin/tests" "--gtest_filter=System.discretizeTustin" "--gtest_also_run_disabled_tests"
 Directory: /home/pieter/GitHub/EAGLE/build
-"System.discretizeTustin" start time: Dec 03 20:22 CET
+"System.discretizeTustin" start time: Dec 04 18:59 CET
 Output:
 ----------------------------------------------------------
 Note: Google Test filter = System.discretizeTustin
@@ -1760,14 +1812,14 @@ Dd =        52197.1252076128      52345.914480380779
 [----------] 1 test from System (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test case ran. (0 ms total)
+[==========] 1 test from 1 test case ran. (1 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"System.discretizeTustin" end time: Dec 03 20:22 CET
+"System.discretizeTustin" end time: Dec 04 18:59 CET
 "System.discretizeTustin" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Dec 03 20:22 CET
+End testing: Dec 04 18:59 CET
