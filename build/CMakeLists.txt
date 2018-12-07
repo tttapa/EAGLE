@@ -47,7 +47,7 @@ enable_testing()
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
 -O3 -g \
--Wall -Wextra \
+-Wall -Wextra -Werror \
 -Wsuggest-override \
 -Wno-register \
 -Wno-missing-braces -Wno-unknown-pragmas \
@@ -79,9 +79,10 @@ file(GLOB_RECURSE CONFIG "../config/*.cpp")
 add_library(config STATIC ${CONFIG})
 
 # C controller
-include_directories("../C")
-file(GLOB_RECURSE C_CODE "../C/*.c")
-add_library(c_code STATIC ${C_CODE})
+include_directories("../C/include")
+# file(GLOB_RECURSE C_CODE "../C/src/*.c")
+# add_library(c_code STATIC ${C_CODE})
+add_library(c_code STATIC "../C/src/attitude-controller.c" "../C/src/altitude-controller.c")
 
 # Main source files
 include_directories("../main")

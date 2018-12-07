@@ -35,7 +35,7 @@ const T *toArrayPointer(const TMatrix<T, R, C> &matrix) {
 }
 
 template <class T, size_t R, size_t C, class U>
-void copyToCArray(U *dst, const TMatrix<T, R, C> &src) {
+void copyToCArray(U (&dst)[R * C], const TMatrix<T, R, C> &src) {
     size_t i = 0;
     for (const auto &row : src)
         for (const T &el : row)
@@ -43,7 +43,7 @@ void copyToCArray(U *dst, const TMatrix<T, R, C> &src) {
 }
 
 template <class T, size_t R, size_t C, class U>
-void copyFromCArray(TMatrix<T, R, C> &dst, U *src) {
+void copyFromCArray(TMatrix<T, R, C> &dst, U (&src)[R * C]) {
     size_t i = 0;
     for (auto &row : dst)
         for (T &el : row)

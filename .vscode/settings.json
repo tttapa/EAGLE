@@ -63,7 +63,8 @@
         "filesystem": "cpp",
         "string_view": "cpp",
         "cassert": "cpp",
-        "controllers.h": "c"
+        "controllers.h": "c",
+        "attitude-controller.h": "c"
     },
     "files.exclude": {
         "**/.git": true,

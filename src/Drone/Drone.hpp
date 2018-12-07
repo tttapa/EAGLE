@@ -141,7 +141,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         result.resize(xs.size());
         transform(
             xs.begin(), xs.end(), result.begin(),
-            [f, idx](const ColVector<RS> &x) { return (S(x).*f)()[idx]; });
+            [f, idx](const ColVector<RS> &x) { return (S{x}.*f)()[idx]; });
         return result;
     }
 
@@ -301,12 +301,9 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
                 uh};
     }
 
-    Controller getCController(const Matrix<1, 3> &K_p_alt,
-                              const Matrix<1, 3> &K_i_alt) {
+    Controller getCController() {
         return {std::make_unique<Attitude::CLQRController>(Ts_att),
-                std::make_unique<Altitude::LQRController>(getAltitudeController(
-                    K_p_alt, K_i_alt)),  // TODO: use C controller
-                uh};
+                std::make_unique<Altitude::CLQRController>(Ts_alt), uh};
     }
 
 #pragma region Observers........................................................

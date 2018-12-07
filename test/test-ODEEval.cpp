@@ -17,7 +17,7 @@ TEST(ODEEval, interpolate) {
 TEST(ODEEval, sampleODEResult) {
     vector<double> t          = {0, 2, 4, 6};
     vector<double> x          = {0, 1, -1, -1};
-    ODEResultX<double> oderes = {t, x};
+    ODEResultX<double> oderes = {t, x, ODEResultCodes::SUCCESS, 0};
     vector<double> sampled    = sampleODEResult(oderes, 0, 1, 6);
     vector<double> expected   = {0, 0.5, 1, 0, -1, -1, -1};
     ASSERT_EQ(sampled, expected);
@@ -26,7 +26,7 @@ TEST(ODEEval, sampleODEResult) {
 TEST(ODEEval, sampleODEResultJustBeforeEnd) {
     vector<double> t          = {0, 2, 4, 6};
     vector<double> x          = {0, 1, -1, -1};
-    ODEResultX<double> oderes = {t, x};
+    ODEResultX<double> oderes = {t, x, ODEResultCodes::SUCCESS, 0};
     vector<double> sampled    = sampleODEResult(oderes, 0, 1, 5.999);
     vector<double> expected   = {0, 0.5, 1, 0, -1, -1};
     ASSERT_EQ(sampled, expected);
@@ -35,7 +35,7 @@ TEST(ODEEval, sampleODEResultJustBeforeEnd) {
 TEST(ODEEval, sampleODEResultJustAfterEnd) {
     vector<double> t          = {0, 2, 4, 6};
     vector<double> x          = {0, 1, -1, -1};
-    ODEResultX<double> oderes = {t, x};
+    ODEResultX<double> oderes = {t, x, ODEResultCodes::SUCCESS, 0};
     vector<double> sampled    = sampleODEResult(oderes, 0, 1, 6.001);
     vector<double> expected   = {0, 0.5, 1, 0, -1, -1, -1};
     ASSERT_EQ(sampled, expected);
@@ -44,7 +44,7 @@ TEST(ODEEval, sampleODEResultJustAfterEnd) {
 TEST(ODEEval, sampleODEResultOutOfBounds) {
     vector<double> t          = {0, 2, 4, 6};
     vector<double> x          = {0, 1, -1, -1};
-    ODEResultX<double> oderes = {t, x};
+    ODEResultX<double> oderes = {t, x, ODEResultCodes::SUCCESS, 0};
     vector<double> sampled    = sampleODEResult(oderes, 0, 1, 8);
     // samples after t = 6 are invalid
     vector<double> expected   = {0, 0.5, 1, 0, -1, -1, -1};

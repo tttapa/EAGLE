@@ -46,8 +46,7 @@ int main(int argc, char const *argv[]) {
         drone.getController(Config::Attitude::Q, Config::Attitude::R,
                             Config::Altitude::K_p, Config::Altitude::K_i);
 
-    Drone::Controller ccontroller =
-        drone.getCController(Config::Altitude::K_p, Config::Altitude::K_i);
+    Drone::Controller ccontroller = drone.getCController();
 
     // Drone::Observer observer = drone.getObserver(
     //     Config::Attitude::varDynamics, Config::Attitude::varSensors,
@@ -84,7 +83,8 @@ int main(int argc, char const *argv[]) {
              << ANSIColors::reset << endl;
         correctCController = false;
     } else {
-        cout << ANSIColors::greenb << "✔   The C controller result is correct"
+        cout << ANSIColors::greenb
+             << "✔   The C controller simulation result is correct"
              << ANSIColors::reset << endl;
     }
 
