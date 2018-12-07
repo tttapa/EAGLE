@@ -35,9 +35,7 @@ class CLQRController : public DiscreteController<Nx, Nu, Ny> {
     }
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &ref) {
-        static_assert(sizeof(VecX_t) == sizeof(AltitudeState));
         AltitudeState xa;
-        static_assert(sizeof(x) == sizeof(xa));
         AltitudeReference ra;
         copyToCArray(xa, x);
         copyToCArray(ra, ref);
