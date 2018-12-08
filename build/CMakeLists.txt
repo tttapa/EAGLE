@@ -56,8 +56,8 @@ SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
 
 # Compiler flags for C
 SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} \
--O2 -g \
--Wall -Wextra")
+-O3 -g \
+-Wall -Wextra -Werror")
 
 #include Google Test
 include_directories(${CMAKE_BINARY_DIR}/googletest/googletest-src/googletest/include)
@@ -140,3 +140,7 @@ gtest_discover_tests(tests)
 # Add Doxygen target
 add_custom_target(documentation rm -r html && doxygen
                   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/../doc/")
+
+# Add MATLAB Code Gen target 
+add_custom_target(codegen matlab -nodisplay -nosplash -nodesktop -nojvm -r "\"run('codegen.m');exit;\""
+                  WORKING_DIRECTORY "$ENV{HOME}/Documents/KUL/2018-2019/P_O/EAGLE/EAGLE1/EAGLE-students-2018/Groups/ANC/MATLAB/Definitive/Codegen/")
