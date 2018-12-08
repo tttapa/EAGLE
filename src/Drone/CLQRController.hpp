@@ -1,6 +1,6 @@
-#include <attitude-controller.h>
-#include <altitude-controller.h>
 #include <Drone/LQRController.hpp>
+#include <altitude-controller.h>
+#include <attitude-controller.h>
 
 namespace Attitude {
 class CLQRController : public DiscreteController<Nx, Nu, Ny> {
@@ -11,16 +11,11 @@ class CLQRController : public DiscreteController<Nx, Nu, Ny> {
     }
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &ref) {
-        auto xbias = vcat(x, zeros<3, 1>());
-        AttitudeState xa;
-        AttitudeReference ra;
-        copyToCArray(xa, xbias);
-        Quaternion rq = DroneAttitudeOutput{ref}.getOrientation();
-        copyToCArray(ra, rq);
-        AttitudeControl ua;
-        getAttitudeControllerOutput(xa, ra, ua);
+        const auto xbias = vcat(x, zeros<3, 1>());
+        Quaternion rq    = DroneAttitudeOutput{ref}.getOrientation();
         VecU_t u;
-        copyFromCArray(u, ua);
+        getAttitudeControllerOutput(toArrayPointer(xbias), toArrayPointer(rq),
+                                    toArrayPointer(u));
         return u;
     }
 };
@@ -35,14 +30,9 @@ class CLQRController : public DiscreteController<Nx, Nu, Ny> {
     }
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &ref) {
-        AltitudeState xa;
-        AltitudeReference ra;
-        copyToCArray(xa, x);
-        copyToCArray(ra, ref);
-        AltitudeOutput ua;
-        getAltitudeControllerOutput(xa, ra, ua);
         VecU_t u;
-        copyFromCArray(u, ua);
+        getAltitudeControllerOutput(toArrayPointer(x), toArrayPointer(ref),
+                                    toArrayPointer(u));
         return u;
     }
 };
