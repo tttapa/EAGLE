@@ -71,6 +71,7 @@ void Drone::load(const filesystem::path &loadPath) {
     cout << "uh  = " << uh << endl;
     cout << "Fzh = " << Fzh << endl;
     cout << "Fg  = " << Fg << endl;
+    cout << "Ts_alt  = " << setprecision(17) << Ts_alt << endl;
 
     cout << "Ts_alt / Ts_att = " << (Ts_alt / Ts_att) << endl;
 
@@ -225,13 +226,13 @@ Drone::Observer::VecX_t Drone::Observer::getStateChange(const VecX_t &x_hat,
     DroneControl uu   = {u};
 
     if (subsampleCounter == 0) {
-        xx_hat.setAltitude(altObsv.getStateChange(
+        xx_hat.setAltitude(altObsv->getStateChange(
             xx_hat.getAltitude(), yy.getAltitude(), {uu.getThrustControl()}));
         subsampleCounter = subsampleAlt;
     }
     --subsampleCounter;
 
-    xx_hat.setAttitude(attObsv.getStateChange(
+    xx_hat.setAttitude(attObsv->getStateChange(
         xx_hat.getAttitude(), yy.getAttitude(), uu.getAttitudeControl()));
     return xx_hat;
 }

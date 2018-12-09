@@ -13,6 +13,7 @@
 using namespace std;
 
 int main(int argc, char const *argv[]) {
+    /* ------ Parse command line arguments ---------------------------------- */
     filesystem::path loadPath = Config::loadPath;
     filesystem::path outPath  = "";
     double steperrorfactor    = Config::steperrorfactor;
@@ -40,11 +41,12 @@ int main(int argc, char const *argv[]) {
     parser.parse(argc, argv);
     cout << ANSIColors::reset << endl;
 
+    /* ------ Load drone data and get models, controllers and observers ----- */
+
     Drone drone = loadPath;
 
-    Drone::Controller controller =
-        drone.getController(Config::Attitude::Q, Config::Attitude::R,
-                            Config::Altitude::K_p, Config::Altitude::K_i);
+    Drone::Controller controller = drone.getController(
+        Config::Attitude::Q, Config::Attitude::R, Config::Altitude::K_pi);
 
     Drone::Controller ccontroller = drone.getCController();
 
@@ -79,7 +81,9 @@ int main(int argc, char const *argv[]) {
     } else if (meanSquareError(sampled.begin(), sampled.end(),
                                csampled.begin()) > 1e-20) {
         cerr << ANSIColors::redb
-             << "The C controller simulation result is not correct"
+             << "The C controller simulation result is not correct. MSE = "
+             << meanSquareError(sampled.begin(), sampled.end(),
+                                csampled.begin())
              << ANSIColors::reset << endl;
         correctCController = false;
     } else {
@@ -139,12 +143,12 @@ int main(int argc, char const *argv[]) {
 
     /* ------ Compare two controllers --------------------------------------- */
     if (Config::Attitude::Compare::compare) {
-        auto ctrl1 = drone.getController(
-            Config::Attitude::Compare::Q1, Config::Attitude::Compare::R1,
-            Config::Altitude::K_p, Config::Altitude::K_i);
-        auto ctrl2 = drone.getController(
-            Config::Attitude::Compare::Q2, Config::Attitude::Compare::R2,
-            Config::Altitude::K_p, Config::Altitude::K_i);
+        auto ctrl1   = drone.getController(Config::Attitude::Compare::Q1,
+                                         Config::Attitude::Compare::R1,
+                                         Config::Altitude::K_pi);
+        auto ctrl2   = drone.getController(Config::Attitude::Compare::Q2,
+                                         Config::Attitude::Compare::R2,
+                                         Config::Altitude::K_pi);
         auto result1 = drone.simulate(ctrl1, ref, x0, Config::odeopt);
         result1.resultCode.verbose();
         auto result2 = drone.simulate(ctrl2, ref, x0, Config::odeopt);

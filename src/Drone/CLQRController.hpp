@@ -11,11 +11,10 @@ class CLQRController : public DiscreteController<Nx, Nu, Ny> {
     }
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &ref) {
-        const auto xbias = vcat(x, zeros<3, 1>());
-        Quaternion rq    = DroneAttitudeOutput{ref}.getOrientation();
+        Quaternion rq = DroneAttitudeOutput{ref}.getOrientation();
         VecU_t u;
-        getAttitudeControllerOutput(toArrayPointer(xbias), toArrayPointer(rq),
-                                    toArrayPointer(u));
+        getAttitudeControllerOutput(toCppArray(x), toCppArray(rq),
+                                    toCppArray(u));
         return u;
     }
 };
@@ -25,15 +24,22 @@ namespace Altitude {
 class CLQRController : public DiscreteController<Nx, Nu, Ny> {
   public:
     CLQRController(double Ts) : DiscreteController<Nx, Nu, Ny>{Ts} {}
+
+    void reset() override { integral = {}; }
+
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
         return getRawControllerOutput(x, r);
     }
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &ref) {
         VecU_t u;
-        getAltitudeControllerOutput(toArrayPointer(x), toArrayPointer(ref),
-                                    toArrayPointer(u));
+        getAltitudeControllerOutput(toCppArray(x), toCppArray(ref),
+                                    toCppArray(u), toCppArray(integral));
+        std::cerr << double(integral) << std::endl;
         return u;
     }
+
+  private:
+    VecR_t integral = {};
 };
 }  // namespace Altitude

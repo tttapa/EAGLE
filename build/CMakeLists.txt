@@ -142,5 +142,9 @@ add_custom_target(documentation rm -r html && doxygen
                   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/../doc/")
 
 # Add MATLAB Code Gen target 
-add_custom_target(codegen matlab -nodisplay -nosplash -nodesktop -nojvm -r "\"run('codegen.m');exit;\""
-                  WORKING_DIRECTORY "$ENV{HOME}/Documents/KUL/2018-2019/P_O/EAGLE/EAGLE1/EAGLE-students-2018/Groups/ANC/MATLAB/Definitive/Codegen/")
+add_custom_target(codegen matlab -nodisplay -nosplash -nodesktop -nojvm -r "\"run('Codegen.m');exit;\""
+                  WORKING_DIRECTORY "$ENV{HOME}/Documents/KUL/2018-2019/P_O/EAGLE/EAGLE1/EAGLE-students-2018/Groups/ANC/MATLAB/Codegen/Codegen/")
+
+# Add MATLAB Parameter export target 
+add_custom_target(parameters matlab -nodisplay -nosplash -nodesktop -nojvm -r "\"run('ExportParamsAndMatrices.m');exit;\""
+                  WORKING_DIRECTORY "$ENV{HOME}/Documents/KUL/2018-2019/P_O/EAGLE/EAGLE1/EAGLE-students-2018/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/")

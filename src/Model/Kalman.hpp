@@ -11,6 +11,8 @@ class DiscreteObserver {
 
     DiscreteObserver(double Ts) : Ts{Ts} {}
 
+    virtual void reset() {}
+
     /**
      * @brief   Get the state change, given the previous estimated state, the
      *          current sensor reading, and the current control input.

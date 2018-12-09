@@ -34,6 +34,17 @@ const T *toArrayPointer(const TMatrix<T, R, C> &matrix) {
     return &matrix[0][0];
 }
 
+template <class T, size_t R, size_t C>
+T (&toCppArray(TMatrix<T, R, C> &matrix))
+[R * C] {
+    return *reinterpret_cast<T(*)[R * C]>(&matrix.data[0].data);
+}
+
+template <class T, size_t R, size_t C>
+const T (&toCppArray(const TMatrix<T, R, C> &matrix))[R * C] {
+    return *reinterpret_cast<const T(*)[R * C]>(&matrix.data[0].data);
+}
+
 template <class T, size_t R, size_t C, class U>
 void copyToCArray(U (&dst)[R * C], const TMatrix<T, R, C> &src) {
     size_t i = 0;

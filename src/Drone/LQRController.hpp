@@ -5,6 +5,7 @@
 #include <Quaternions/QuaternionStateAddSub.hpp>
 #include <Quaternions/ReducedQuaternion.hpp>
 #include <iostream>
+#include <cassert>
 
 /**
  *  Solves the system of equations
@@ -107,11 +108,11 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
         ColVector<Nu> ueq     = getBlock<Nx, Nx + Nu, 0, 1>(eq);
 
         // error
-        ColVector<Nx> xdiff       = quaternionStatesSub(x, xeq);
-        ColVector<Nx - 1> xdiff_r = quat2red(xdiff);
+        ColVector<Nx> x_err       = quaternionStatesSub(x, xeq);
+        ColVector<Nx - 1> x_err_r = quat2red(x_err);
 
         // controller
-        ColVector<Nu> u_ctrl = K * xdiff_r;
+        ColVector<Nu> u_ctrl = K * x_err_r;
         ColVector<Nu> u      = u_ctrl + ueq;
         return u;
     }
@@ -145,9 +146,9 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
      * @param   Ts
      *          The sample time of the discrete controller.
      */
-    LQRController(const Matrix<Nx + Nu, Ny> &G, const Matrix<Nu, Nx> &K_p,
-                  const Matrix<Nu, Nx> &K_i, double Ts)
-        : DiscreteController<Nx, Nu, Ny>{Ts}, K_p(K_p), K_i(K_i), G(G) {}
+    LQRController(const Matrix<Nx + Nu, Ny> &G, const Matrix<Ny, Nx> &C,
+                  const Matrix<Nu, Nx + Ny> &K_pi, double Ts)
+        : DiscreteController<Nx, Nu, Ny>{Ts}, K_pi{K_pi}, G{G}, C{C} {}
 
     /** 
      * @brief   Construct a new instance of LQRController with the 
@@ -171,10 +172,9 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
      */
     LQRController(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                   const Matrix<Ny, Nx> &C, const Matrix<Ny, Nu> &D,
-                  const Matrix<Nu, Nx> &K_p, const Matrix<Nu, Nx> &K_i,
-                  double Ts)
-        : DiscreteController<Nx, Nu, Ny>{Ts}, K_p(K_p), K_i(K_i),
-          G(calculateG(A, B, C, D)) {
+                  const Matrix<Nu, Nx + Ny> &K_pi, double Ts)
+        : DiscreteController<Nx, Nu, Ny>{Ts}, K_pi{K_pi},
+          G(calculateG(A, B, C, D)), C{C} {
         std::cout << "Altitude::LQRController::G = " << std::endl << G;
     }
 
@@ -184,29 +184,36 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &r) {
         // new equilibrium state
+        assert((G == Matrix<4, 1>{0, 1, 0, 0}));
+        assert((C == Matrix<1, 3>{0, 1, 0}));
+        assert(Ts == 1.0 / 238.0 * 24.0);
         ColVector<Nx + Nu> eq = G * r;
         VecX_t xeq            = getBlock<0, Nx, 0, 1>(eq);
         VecU_t ueq            = getBlock<Nx, Nx + Nu, 0, 1>(eq);
 
+        VecR_t y = C * x;
+
         // error
-        VecX_t xdiff = xeq - x;
+        VecX_t x_err = xeq - x;
+        VecR_t y_err = r - y;
 
         // integral
-        integral += xdiff;
+        integral += y_err * Ts;
+        std::cerr << double(integral) << std::endl;
 
         // controller
-        VecU_t u_ctrl = K_p * xdiff + K_i * integral;
+        VecU_t u_ctrl = K_pi * vcat(x_err, integral);
         VecU_t u      = u_ctrl + ueq;
         return u;
     }
 
     void reset() override { integral = {}; }
 
-    const Matrix<Nu, Nx> K_p;
-    const Matrix<Nu, Nx> K_i;
+    const Matrix<Nu, Nx + Ny> K_pi;
     const Matrix<Nx + Nu, Ny> G;
+    const Matrix<Ny, Nx> C;
 
-    VecX_t integral = {};
+    VecR_t integral = {};
 };
 
 }  // namespace Altitude

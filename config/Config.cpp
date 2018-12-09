@@ -18,7 +18,7 @@ const double CSV_Ts = 1.0 / CSV_fs;
 
 /* ------ Matrix & Parameter data loading ----------------------------------- */
 const std::filesystem::path loadPath =
-    home / "PO-EAGLE/Groups/ANC/MATLAB/Codegen";
+    home / "PO-EAGLE/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/Output";
 
 /* ------ Image export dimensions ------------------------------------------- */
 const size_t px_x = 1920;
@@ -117,9 +117,11 @@ const RowVector<6> varSensors   = hcat(  //
 
 namespace Altitude {
 /** Proporional altitude controller */
-const Matrix<1, 3> K_p = {0.0001, 1.2, 0.54};  // n, z, v
+const Matrix<1, 3> K_p = {0.0001, 1.0, 0.44};  // n, z, v
 /** Integral altitude controller */
-const Matrix<1, 3> K_i = {0.0, 0.001, 0.0};
+const Matrix<1, 1> K_i = {0.005};
+/** Complete altitude controller */
+const Matrix<1, 4> K_pi = hcat(K_p, K_i);
 
 const RowVector<1> varDynamics = {0.01};
 const RowVector<1> varSensors  = {0.02};  // 2 cm
@@ -131,9 +133,9 @@ const RowVector<1> varSensors  = {0.02};  // 2 cm
 const AdaptiveODEOptions odeopt = {
     .t_start = 0,
     .t_end   = 16,
-    .epsilon = 1e-5,
+    .epsilon = 1e-6,
     .h_start = 1e-6,
-    .h_min   = 1e-6,
+    .h_min   = 1e-8,
     .maxiter = (unsigned long) 1e6,
 };
 

@@ -63,7 +63,8 @@ extern const RowVector<6> varSensors;
 
 namespace Altitude {
 extern const Matrix<1, 3> K_p;
-extern const Matrix<1, 3> K_i;
+extern const Matrix<1, 1> K_i;
+extern const Matrix<1, 4> K_pi;
 
 extern const RowVector<1> varDynamics;
 extern const RowVector<1> varSensors;
