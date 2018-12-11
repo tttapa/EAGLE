@@ -24,6 +24,9 @@ extern const double CSV_Ts;
 /* ------ Matrix & Parameter data loading ----------------------------------- */
 extern const std::filesystem::path loadPath;
 
+/* ------ Logger data loading ----------------------------------------------- */
+extern const std::filesystem::path logLoadPath;
+
 /* ------ Image export dimensions ------------------------------------------- */
 extern const size_t px_x;
 extern const size_t px_y;

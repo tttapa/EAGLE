@@ -46,7 +46,7 @@ enable_testing()
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
--O3 -g \
+-O0 -g3 \
 -Wall -Wextra -Werror \
 -Wsuggest-override \
 -Wno-register \
@@ -56,7 +56,7 @@ SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
 
 # Compiler flags for C
 SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} \
--O3 -g \
+-O3 -g3 \
 -Wall -Wextra -Werror")
 
 #include Google Test

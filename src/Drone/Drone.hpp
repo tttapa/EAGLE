@@ -165,6 +165,10 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     AttitudeModel getAttitudeModel() const { return {*this}; }
 
+    struct AltitudeModel : public ContinuousModel<Nx_alt, Nu_alt, Ny_alt> {
+
+    };
+
 #pragma region Controllers......................................................
 
     /** 
@@ -417,7 +421,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     }
 
 #pragma region System matrices Attitude.........................................
-  private:
+  // private: TODO
     /** 
      * ```
      *  Aa_att =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]

@@ -163,8 +163,8 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
      *          System matrix C.
      * @param   Dd
      *          System matrix D.
-     * @param   K_p
-     *          Proportional controller matrix K.
+     * @param   K_pi
+     *          Proportional and integral controller matrix K.
      * @param   K_i
      *          Integral controller matrix K.
      * @param   Ts
@@ -184,9 +184,6 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
 
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &r) {
         // new equilibrium state
-        assert((G == Matrix<4, 1>{0, 1, 0, 0}));
-        assert((C == Matrix<1, 3>{0, 1, 0}));
-        assert(Ts == 1.0 / 238.0 * 24.0);
         ColVector<Nx + Nu> eq = G * r;
         VecX_t xeq            = getBlock<0, Nx, 0, 1>(eq);
         VecU_t ueq            = getBlock<Nx, Nx + Nu, 0, 1>(eq);
@@ -195,11 +192,11 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
 
         // error
         VecX_t x_err = xeq - x;
-        VecR_t y_err = r - y;
+        // VecR_t y_err = r - y; // TODO
+        VecR_t y_err = y - r;
 
         // integral
         integral += y_err * Ts;
-        std::cerr << double(integral) << std::endl;
 
         // controller
         VecU_t u_ctrl = K_pi * vcat(x_err, integral);

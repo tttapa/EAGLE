@@ -20,6 +20,9 @@ const double CSV_Ts = 1.0 / CSV_fs;
 const std::filesystem::path loadPath =
     home / "PO-EAGLE/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/Output";
 
+/* ------ Logger data loading ----------------------------------------------- */
+const std::filesystem::path logLoadPath = "/tmp/eagle.dat";
+
 /* ------ Image export dimensions ------------------------------------------- */
 const size_t px_x = 1920;
 const size_t px_y = 1080;
@@ -29,7 +32,7 @@ const bool plotSimulationResult = false;
 const bool plotMotorControls    = false;
 const bool plotStepResponse     = false;
 
-const bool plotCSimulationResult = true;
+const bool plotCSimulationResult = false;
 
 const bool plotAllAtOnce = true;
 
@@ -42,13 +45,13 @@ namespace Attitude {
 const RowVector<9> Qdiag = {{
     139.6245112700232,
     139.6245112700232,
-    240.2811761590895,
-    0.1505204155597211,
-    0.1505204155597211,
-    0.0409919487616804,
-    9.976475759487083e-11,
-    9.976475759487083e-11,
-    9.976475759487083e-11,
+    24.2811761590895,
+    1.1505204155597211,
+    1.1505204155597211,
+    0.3409919487616804,
+    9.976475759487083e-08,
+    9.976475759487083e-08,
+    9.976475759487083e-09,
 }};
 const RowVector<3> Rdiag = {{
     1,
@@ -59,7 +62,7 @@ const RowVector<3> Rdiag = {{
 /** Weighting matrix for states in LQR design. */
 const Matrix<9, 9> Q = diag(Qdiag);
 /** Weighting matrix for inputs in LQR design. */
-const Matrix<3, 3> R = diag(Rdiag);
+const Matrix<3, 3> R = 8 * diag(Rdiag);
 
 /* ------ Compare two controllers ------------------------------------------- */
 namespace Compare {
@@ -117,9 +120,9 @@ const RowVector<6> varSensors   = hcat(  //
 
 namespace Altitude {
 /** Proporional altitude controller */
-const Matrix<1, 3> K_p = {0.0001, 1.0, 0.44};  // n, z, v
+const Matrix<1, 3> K_p = {0.0, 0.4, 0.4};  // n, z, v
 /** Integral altitude controller */
-const Matrix<1, 1> K_i = {0.005};
+const Matrix<1, 1> K_i = {-0.005};
 /** Complete altitude controller */
 const Matrix<1, 4> K_pi = hcat(K_p, K_i);
 
@@ -143,7 +146,7 @@ const AdaptiveODEOptions odeopt = {
 namespace Tuner {
 
 /* ------ Matrix & Parameter data loading ----------------------------------- */
-const std::filesystem::path loadPath = home / "Private" / "EAGLE-Params";
+const std::filesystem::path loadPath = Config::loadPath;
 
 const AdaptiveODEOptions odeopt = {
     .t_start = 0.0,
@@ -164,7 +167,7 @@ const AdaptiveODEOptions odeoptdisp = {
 };
 
 /* ------ LQR --------------------------------------------------------------- */
-#if 0
+#if 1
 /** Weighting matrix for states in LQR design. */
 const ColVector<9> Q_diag_initial = {
     1, 1, 1, 1, 1, 1, 1, 1, 1,

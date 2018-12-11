@@ -61,6 +61,14 @@ void copyFromCArray(TMatrix<T, R, C> &dst, U (&src)[R * C]) {
             el = src[i++];
 }
 
+template <size_t R, class U>
+ColVector<R> ColVectorFromCppArray(const U (&a)[R]) {
+    ColVector<R> result;
+    for (size_t i = 0; i < R; ++i)
+        result[i] = a[i];
+    return result;
+}
+
 namespace Matrices {
 
 struct TransposeStruct {

@@ -1,4 +1,5 @@
 #include "Config.hpp"
+#include "DroneLogLoader.hpp"
 #include "InputSignals.hpp"
 #include "Plot.hpp"
 #include "PrintCSV.hpp"
@@ -14,11 +15,12 @@ using namespace std;
 
 int main(int argc, char const *argv[]) {
     /* ------ Parse command line arguments ---------------------------------- */
-    filesystem::path loadPath = Config::loadPath;
-    filesystem::path outPath  = "";
-    double steperrorfactor    = Config::steperrorfactor;
-    size_t px_x               = Config::px_x;
-    size_t px_y               = Config::px_y;
+    filesystem::path loadPath    = Config::loadPath;
+    filesystem::path outPath     = "";
+    double steperrorfactor       = Config::steperrorfactor;
+    size_t px_x                  = Config::px_x;
+    size_t px_y                  = Config::px_y;
+    filesystem::path logLoadPath = Config::logLoadPath;
 
     ArgParser parser;
     parser.add("--out", "-o", [&](const char *argv[]) {
@@ -36,6 +38,10 @@ int main(int argc, char const *argv[]) {
     parser.add("--height", "-h", [&](const char *argv[]) {
         px_y = strtoul(argv[1], nullptr, 10);
         cout << "Setting the image height to: " << px_y << endl;
+    });
+    parser.add("--load-log", [&](const char *argv[]) {
+        logLoadPath = argv[1];
+        cout << "Setting the log load path to: " << logLoadPath << endl;
     });
     cout << ANSIColors::blue;
     parser.parse(argc, argv);
@@ -79,7 +85,7 @@ int main(int argc, char const *argv[]) {
              << ANSIColors::reset << endl;
         correctCController = false;
     } else if (meanSquareError(sampled.begin(), sampled.end(),
-                               csampled.begin()) > 1e-20) {
+                               csampled.begin()) > 1e-15) {
         cerr << ANSIColors::redb
              << "The C controller simulation result is not correct. MSE = "
              << meanSquareError(sampled.begin(), sampled.end(),
@@ -96,6 +102,7 @@ int main(int argc, char const *argv[]) {
     if (Config::plotSimulationResult) {
         plt::figure_size(px_x, px_y);
         plotDrone(result);
+        plt::axhline(drone.uh, "--", "r");
         if (!Config::plotAllAtOnce)
             plt::show();
     }
@@ -104,6 +111,7 @@ int main(int argc, char const *argv[]) {
     if (Config::plotCSimulationResult) {
         plt::figure_size(px_x, px_y);
         plotDrone(cresult);
+        plt::axhline(drone.uh, "--", "r");
         if (!Config::plotAllAtOnce)
             plt::show();
     }
@@ -188,9 +196,6 @@ int main(int argc, char const *argv[]) {
             plt::show();
     }
 
-    if (Config::plotAllAtOnce)
-        plt::show();
-
     /* ------ Export the simulation result as CSV --------------------------- */
 
     if (Config::exportCSV) {
@@ -211,6 +216,20 @@ int main(int argc, char const *argv[]) {
 
     // cout << "$$ Q = " << asTeX(Config::Attitude::Q) << " $$" << endl;
     // cout << "$$ R = " << asTeX(Config::Attitude::R) << " $$" << endl;
+
+    cerr << "Before log load\r\n";
+    DroneLogLoader dronelog = logLoadPath;
+    plt::figure_size(px_x, px_y);
+    plotDrone(dronelog);
+    if (!Config::plotAllAtOnce)
+        plt::show();
+
+    /* ------ Plot all figures ---------------------------------------------- */
+
+    if (Config::plotAllAtOnce)
+        plt::show();
+
+    cerr << "Done.\r\n";
 
     return correctCController ? EXIT_SUCCESS : EXIT_FAILURE;
 }

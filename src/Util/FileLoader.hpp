@@ -5,6 +5,8 @@
 #include <fstream>
 #include <string>
 
+#include <iostream>
+
 template <size_t R, size_t C>
 Matrix<R, C> loadMatrix(const std::string &name) {
     auto filename = name + ".matrix";

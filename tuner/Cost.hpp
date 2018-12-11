@@ -9,12 +9,17 @@ namespace CostReferences {
 constexpr Quaternion qz                   = eul2quat({22.5_deg, 0, 0});
 constexpr Quaternion qy                   = eul2quat({0, 22.5_deg, 0});
 constexpr Quaternion qx                   = eul2quat({0, 0, 22.5_deg});
-constexpr Array<Quaternion, 5> references = {{
+constexpr Quaternion qz3                  = eul2quat({30_deg, 0, 0});
+constexpr Quaternion qy3                  = eul2quat({0, 30_deg, 0});
+constexpr Quaternion qx3                  = eul2quat({0, 0, 30_deg});
+constexpr Array<Quaternion, 7> references = {{
     quatmultiply(qx, quatmultiply(qy, qz)),
     quatmultiply(qx, qy),
     qx,
-    qy,
     qz,
+    quatmultiply(qx3, qy3),
+    qx3,
+    qz3,
 }};
 }  // namespace CostReferences
 

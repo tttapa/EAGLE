@@ -1,1 +1,1 @@
-convert -fuzz 1% -delay 1x2 *.png -coalesce -layers OptimizeTransparency animation.gif
+convert -fuzz 1% -delay 1x4 generation*.png -coalesce -layers OptimizeTransparency animation.gif

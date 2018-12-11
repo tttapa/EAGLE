@@ -100,15 +100,18 @@ Drone::VecX_t Drone::operator()(const VecX_t &x, const VecU_t &u) {
     double n_thrust = xx.getThrustMotorSpeed();
     double u_thrust = uu.getThrustControl();
 
-    double F_local_z     = ct * rho * pow(Dp, 4) * pow(n_thrust, 2) * Nm;
+    double F_local_z =
+        ct * rho * pow(Dp, 4) * Nm *
+        (pow(n_thrust + nh, 2) + pow(n[0], 2) + pow(n[1], 2) + pow(n[2], 2));
     ColVector<3> F_local = {0, 0, F_local_z};
     ColVector<3> F_world = quatrotate(quatconjugate(q), F_local);  // TODO
-    ColVector<3> F_grav  = {0, 0, -g * m};
-    ColVector<3> a       = (F_world + F_grav) / m;
+    ColVector<3> a_world = F_world / m;
+    ColVector<3> a_grav  = {0, 0, -g};
+    ColVector<3> a       = a_world + a_grav;
 
     x_dot.setVelocity(a);
     x_dot.setPosition(v);
-    x_dot.setThrustMotorSpeed(k2 * (k1 * u_thrust - n_thrust));
+    x_dot.setThrustMotorSpeed(k2 * (k1 * (u_thrust - uh) - n_thrust));
 
     return x_dot;
 }
@@ -129,7 +132,7 @@ DroneState Drone::getStableState() const {
     xx.setMotorSpeed({0, 0, 0});
     xx.setVelocity({0, 0, 0});
     xx.setPosition({0, 0, 0});
-    xx.setThrustMotorSpeed(nh);
+    xx.setThrustMotorSpeed(0);
     return xx;
 }
 

@@ -10,7 +10,7 @@ std::vector<double> makeTimeVector(double t_start, double Ts, double t_end) {
     return timevector;
 }
 
-void plotDrone(const Drone::ControllerSimulationResult &result, int colorset) {
+void plotDrone(const DronePlottable &result, int colorset) {
     constexpr size_t row = 5;
     constexpr size_t col = 2;
 
@@ -38,34 +38,34 @@ void plotDrone(const Drone::ControllerSimulationResult &result, int colorset) {
 
     plt::subplot(row, col, 3);
     plotDroneSignal(
-        result.time, result.solution, &DroneState::getOrientationEuler,
+        result.time, result.states, &DroneState::getOrientationEuler,
         {"z" + istr, "y'" + istr, "x\"" + istr}, rc, "Orientation of drone");
     plt::xlim(t_start, t_end * 1.1);
 
     plt::subplot(row, col, 5);
     plotDroneSignal(
-        result.time, result.solution, &DroneState::getAngularVelocity,
+        result.time, result.states, &DroneState::getAngularVelocity,
         {"x" + istr, "y" + istr, "z" + istr}, c, "Angular velocity of drone");
     plt::xlim(t_start, t_end * 1.1);
 
     plt::subplot(row, col, 7);
-    plotDroneSignal(result.time, result.solution, &DroneState::getMotorSpeed,
+    plotDroneSignal(result.time, result.states, &DroneState::getMotorSpeed,
                     {"x" + istr, "y" + istr, "z" + istr}, c,
                     "Angular velocity of torque motors");
     plt::xlim(t_start, t_end * 1.1);
 
     plt::subplot(row, col, 4);
-    plotDroneSignal(result.time, result.solution, &DroneState::getPosition,
+    plotDroneSignal(result.time, result.states, &DroneState::getPosition,
                     {"x" + istr, "y" + istr, "z" + istr}, c, "Position");
     plt::xlim(t_start, t_end * 1.1);
 
     plt::subplot(row, col, 6);
-    plotDroneSignal(result.time, result.solution, &DroneState::getVelocity,
+    plotDroneSignal(result.time, result.states, &DroneState::getVelocity,
                     {"x" + istr, "y" + istr, "z" + istr}, c, "Velocity");
     plt::xlim(t_start, t_end * 1.1);
 
     plt::subplot(row, col, 8);
-    plotDroneSignal(result.time, result.solution,
+    plotDroneSignal(result.time, result.states,
                     &DroneState::getThrustMotorSpeed, {"z'" + istr}, c,
                     "Angular velocity of thrust motor");
     plt::xlim(t_start, t_end * 1.1);

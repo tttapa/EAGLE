@@ -1,10 +1,27 @@
 #pragma once
 
+#include "DroneLogLoader.hpp"
 #include <Drone/Drone.hpp>
 #include <Util/ANSIColors.hpp>
 #include <matplotlibcpp.h>
 
 namespace plt = matplotlibcpp;
+
+struct DronePlottable {
+    DronePlottable(const Drone::ControllerSimulationResult &d)
+        : time{d.time}, sampledTime{d.sampledTime}, states{d.solution},
+          control{d.control}, reference{d.reference} {}
+    DronePlottable(const DroneLogLoader &d)
+        : time{d.getTimeStamps()}, sampledTime{time}, states{d.getStates()},
+          control{d.getControl()}, reference{d.getReference()} {}
+    DronePlottable() = default;
+
+    std::vector<double> time;
+    std::vector<double> sampledTime;
+    std::vector<Drone::VecX_t> states;
+    std::vector<Drone::VecU_t> control;
+    std::vector<Drone::VecR_t> reference;
+};
 
 std::vector<double> makeTimeVector(double t_start, double Ts, double t_end);
 
@@ -91,8 +108,7 @@ const std::vector<std::vector<std::string>> rcolorsets = {{
     {"c", "y", "m"},
 }};
 
-void plotDrone(const Drone::ControllerSimulationResult &result,
-               int colorset = 0);
+void plotDrone(const DronePlottable &result, int colorset = 0);
 
 inline void plotAttitudeTunerResult(
     Drone::AttitudeModel::ControllerSimulationResult &result) {

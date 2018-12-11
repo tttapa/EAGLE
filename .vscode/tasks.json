@@ -16,7 +16,7 @@
         {
             "type": "shell",
             "label": "Make & Main",
-            "command": "cd build && make -j$(nproc) main && ./bin/main",
+            "command": "cd build && make -j$(nproc) main && ./bin/main --load-log /tmp/eagle.dat",
             "problemMatcher": "$gcc",
             "group": {
                 "kind": "build",

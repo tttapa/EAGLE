@@ -35,7 +35,6 @@ class CLQRController : public DiscreteController<Nx, Nu, Ny> {
         VecU_t u;
         getAltitudeControllerOutput(toCppArray(x), toCppArray(ref),
                                     toCppArray(u), toCppArray(integral));
-        std::cerr << double(integral) << std::endl;
         return u;
     }
 
