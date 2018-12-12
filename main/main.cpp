@@ -214,15 +214,14 @@ int main(int argc, char const *argv[]) {
         printCSV(Config::locationCSVFile, 0.0, Config::CSV_Ts, sampledLocation);
     }
 
-    // cout << "$$ Q = " << asTeX(Config::Attitude::Q) << " $$" << endl;
-    // cout << "$$ R = " << asTeX(Config::Attitude::R) << " $$" << endl;
-
-    cerr << "Before log load\r\n";
-    DroneLogLoader dronelog = logLoadPath;
-    plt::figure_size(px_x, px_y);
-    plotDrone(dronelog);
-    if (!Config::plotAllAtOnce)
-        plt::show();
+    /* ------ Plot the logged actual drone data ----------------------------- */
+    if (Config::plotLoggedDroneData) {
+        DroneLogLoader dronelog = logLoadPath;
+        plt::figure_size(px_x, px_y);
+        plotDrone(dronelog);
+        if (!Config::plotAllAtOnce)
+            plt::show();
+    }
 
     /* ------ Plot all figures ---------------------------------------------- */
 

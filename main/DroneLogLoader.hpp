@@ -73,6 +73,10 @@ class DroneLogLoader {
 
     const DroneLogEntry &operator[](size_t i) const { return entries[i]; }
 
+    size_t size() const { return entries.size(); }
+    const auto begin() const { return entries.begin(); }
+    const auto end() const { return entries.end(); }
+
     std::vector<double> getTimeStamps() const {
         std::vector<double> timestamps(entries.size());
         std::transform(entries.begin(), entries.end(), timestamps.begin(),

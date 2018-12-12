@@ -21,7 +21,7 @@ const std::filesystem::path loadPath =
     home / "PO-EAGLE/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/Output";
 
 /* ------ Logger data loading ----------------------------------------------- */
-const std::filesystem::path logLoadPath = "/tmp/eagle.dat";
+const std::filesystem::path logLoadPath = home / "eagle.dat";
 
 /* ------ Image export dimensions ------------------------------------------- */
 const size_t px_x = 1920;
@@ -33,6 +33,8 @@ const bool plotMotorControls    = false;
 const bool plotStepResponse     = false;
 
 const bool plotCSimulationResult = false;
+
+const bool plotLoggedDroneData = true;
 
 const bool plotAllAtOnce = true;
 

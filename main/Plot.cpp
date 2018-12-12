@@ -14,6 +14,14 @@ void plotDrone(const DronePlottable &result, int colorset) {
     constexpr size_t row = 5;
     constexpr size_t col = 2;
 
+    constexpr double marginRight = 0.15;
+
+    assert(!result.time.empty());
+    assert(!result.sampledTime.empty());
+    assert(!result.states.empty());
+    assert(!result.control.empty());
+    assert(!result.reference.empty());
+
     const double t_start = result.time[0];
     const double t_end   = result.time.back();
 
@@ -28,59 +36,59 @@ void plotDrone(const DronePlottable &result, int colorset) {
     plotDroneSignal(
         result.sampledTime, result.reference, &DroneOutput::getOrientationEuler,
         {"z" + istr, "y'" + istr, "x\"" + istr}, rc, "Reference orientation");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
     plt::subplot(row, col, 2);
     plotDroneSignal(
         result.sampledTime, result.reference, &DroneOutput::getPosition,
         {"x" + istr, "y" + istr, "z" + istr}, c, "Reference position");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
     plt::subplot(row, col, 3);
     plotDroneSignal(
         result.time, result.states, &DroneState::getOrientationEuler,
         {"z" + istr, "y'" + istr, "x\"" + istr}, rc, "Orientation of drone");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
     plt::subplot(row, col, 5);
     plotDroneSignal(
         result.time, result.states, &DroneState::getAngularVelocity,
         {"x" + istr, "y" + istr, "z" + istr}, c, "Angular velocity of drone");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
     plt::subplot(row, col, 7);
     plotDroneSignal(result.time, result.states, &DroneState::getMotorSpeed,
                     {"x" + istr, "y" + istr, "z" + istr}, c,
                     "Angular velocity of torque motors");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
     plt::subplot(row, col, 4);
     plotDroneSignal(result.time, result.states, &DroneState::getPosition,
                     {"x" + istr, "y" + istr, "z" + istr}, c, "Position");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
     plt::subplot(row, col, 6);
     plotDroneSignal(result.time, result.states, &DroneState::getVelocity,
                     {"x" + istr, "y" + istr, "z" + istr}, c, "Velocity");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
     plt::subplot(row, col, 8);
     plotDroneSignal(result.time, result.states,
                     &DroneState::getThrustMotorSpeed, {"z'" + istr}, c,
                     "Angular velocity of thrust motor");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
     plt::subplot(row, col, 9);
     plotDroneSignal(
         result.sampledTime, result.control, &DroneControl::getAttitudeControl,
         {"x" + istr, "y" + istr, "z" + istr}, c, "Torque motor control");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
     plt::xlabel("time [s]");
 
     plt::subplot(row, col, 10);
     plotDroneSignal(result.sampledTime, result.control,
                     &DroneControl::getThrustControl, {"t" + istr}, c,
                     "Thrust motor control");
-    plt::xlim(t_start, t_end * 1.1);
+    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
     plt::xlabel("time [s]");
 }

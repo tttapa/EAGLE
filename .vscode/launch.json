@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/build/bin/main",
             "args": [
                 "--load",
-                "$HOME/PO-EAGLE/Groups/ANC/MATLAB/Codegen",
+                "$HOME/PO-EAGLE/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/Output",
                 "--out",
                 "/tmp",
                 "--generations",

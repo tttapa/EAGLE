@@ -1,8 +1,8 @@
 #include "DroneLogLoader.hpp"
+#include <Util/ANSIColors.hpp>
 #include <cassert>
 #include <fstream>
 #include <iterator>
-#include <Util/ANSIColors.hpp>
 
 #include <iostream>
 
@@ -18,7 +18,7 @@ void DroneLogLoader::load(const std::filesystem::path &loadfile) {
     file.seekg(0, std::ios::beg);
     assert(filesize % sizeof(DroneLogEntry) == 0);
     entries.clear();
-    entries.reserve(filesize / sizeof(DroneLogEntry));
+    entries.resize(filesize / sizeof(DroneLogEntry));
     file.read(reinterpret_cast<char *>(entries.data()), filesize);
     assert(bool(file));
 }
