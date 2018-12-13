@@ -31,8 +31,8 @@ constexpr Quaternion quatDifference(const Quaternion &p, const Quaternion &q) {
 using EulerAngles = ColVector<3>;
 
 constexpr Quaternion eul2quat(const EulerAngles &eulerAngles) {
-    using std::sin;
     using std::cos;
+    using std::sin;
     double phi   = eulerAngles[2];
     double theta = eulerAngles[1];
     double psi   = eulerAngles[0];
@@ -90,4 +90,53 @@ constexpr Matrix<3, C> quatrotate(const Quaternion &q, const Matrix<3, C> &v) {
         },
     }};
     return M * v;
+}
+
+enum AngleFormat {
+        radians,
+        degrees,
+        degreesTeX,
+    };
+
+struct PrintAsEulerAngles : public Printable {
+    PrintAsEulerAngles(const EulerAngles &e, AngleFormat format, size_t precision)
+        : e{e}, format{format}, precision{precision} {}
+
+    void print(std::ostream &os) const override {
+        const char *sep = ", ";
+        os << '(';
+        formatAngle(os, double(e[0]));
+        for (size_t i = 1; i < EulerAngles::length; ++i) {
+            os << sep;
+            formatAngle(os, e[i]);
+        }
+        os << ')';
+    }
+
+  private:
+    const EulerAngles e;
+    AngleFormat format;
+    const size_t precision;
+
+    std::ostream &formatAngle(std::ostream &os, double d) const {
+        const char *unit;
+        switch (format) {
+            case degrees:
+            case degreesTeX: d *= 180.0 / M_PI; break;
+            case radians:
+            default:;
+        }
+        switch (format) {
+            case degrees: unit = "°"; break;
+            case degreesTeX: unit = "\\degree"; break;
+            case radians:
+            default: unit = "r";
+        }
+        return os << std::setprecision(precision) << std::setw(precision + 6)
+                  << d << unit;
+    }
+};
+
+inline PrintAsEulerAngles asEulerAngles(const EulerAngles &e, AngleFormat format = radians, size_t precision = 2) {
+    return {e, format, precision};
 }

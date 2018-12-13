@@ -9,11 +9,11 @@ struct DroneLogEntry {
     DroneLogEntry() {
         static_assert(sizeof(float) == 4, "Error: unsupported float size");
         static_assert(sizeof(uint32_t) == 4, "Error: unsupported uint32 size");
-        static_assert(sizeof(DroneLogEntry) == 4 * 40,
+        static_assert(sizeof(DroneLogEntry) == 4 * 52,
                       "Error: incorrect DroneLogEntry size");
     }
 
-    uint32_t data;                        // 0
+    uint32_t mode;                        // 0
     float frametime;                      // 1
     float tuningParameter;                // 2
     uint32_t size;                        // 3
@@ -33,6 +33,21 @@ struct DroneLogEntry {
     float observerAltitudeVelocity;       // 37
     float altitudeControlSignal;          // 38 = u_h + u_t
     float yawOffset;                      // 39
+
+    float currentRCThrottle;
+    float currentRCRoll;
+    float currentRCPitch;
+    float currentRCYaw;
+
+		/* Currrent drone configuration */
+    uint32_t currentDroneConfiguration;
+    uint32_t configurationCounter;
+    uint32_t beepCounter;
+    uint32_t isBeeping;
+    uint32_t configurationBeepsLeft;
+    uint32_t warningBeepsLeft;
+    uint32_t currentNumWiggles;
+    uint32_t wiggleCounter;
 
     DroneAttitudeState getAttitudeState() const {
         return vcat(ColVectorFromCppArray(observerOrientation),

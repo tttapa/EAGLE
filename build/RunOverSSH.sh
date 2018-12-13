@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-targetpc="pc-klas1-4"
+targetpc="vierre64"
 generations=100
 make -j$(nproc) tuner
 rm *.png

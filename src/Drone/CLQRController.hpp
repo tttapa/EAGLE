@@ -14,7 +14,7 @@ class CLQRController : public DiscreteController<Nx, Nu, Ny> {
         Quaternion rq = DroneAttitudeOutput{ref}.getOrientation();
         VecU_t u;
         getAttitudeControllerOutput(toCppArray(x), toCppArray(rq),
-                                    toCppArray(u));
+                                    toCppArray(u), 1);
         return u;
     }
 };
@@ -34,7 +34,7 @@ class CLQRController : public DiscreteController<Nx, Nu, Ny> {
     VecU_t getRawControllerOutput(const VecX_t &x, const VecR_t &ref) {
         VecU_t u;
         getAltitudeControllerOutput(toCppArray(x), toCppArray(ref),
-                                    toCppArray(u), toCppArray(integral));
+                                    toCppArray(u), toCppArray(integral), 1);
         return u;
     }
 

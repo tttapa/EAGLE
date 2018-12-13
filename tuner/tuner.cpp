@@ -197,7 +197,8 @@ int main(int argc, char const *argv[]) {
 
         plt::figure_size(px_x, px_y);
         plotAttitudeTunerResult(result);
-        plt::suptitle("Generation #" + gstr);
+        plt::tight_layout();
+        // plt::suptitle("Generation #" + gstr);
 
         plt::save(outputfile);
         if (g + 1 < generations || !show)
@@ -215,8 +216,10 @@ int main(int argc, char const *argv[]) {
         size_t i   = 0;
         for (const Quaternion &ref : CostReferences::references) {
             plt::figure_size(px_x, px_y);
+            stringstream ss;
+            ss << '$' << asEulerAngles(quat2eul(ref), degreesTeX, 2) << '$';
             plotStepResponseAttitude(drone, best.Q(), best.R(), steperrorfactor,
-                                     ref, Config::Tuner::odeopt, "");
+                                     ref, Config::Tuner::odeopt, ss.str());
             std::stringstream filename;
             filename << "stepresponse" << std::setw(4) << std::setfill('0')
                      << (++i) << ".png";

@@ -10,7 +10,7 @@ class CKalmanObserver : public DiscreteObserver<Nx, Nu, Ny> {
                           const VecU_t &u) override {
         VecX_t x_hat_cpy = x_hat;
         updateAttitudeKFEstimate(toCppArray(x_hat_cpy), toCppArray(u),
-                                 toCppArray(y_sensor));
+                                 toCppArray(y_sensor), 1);
         return x_hat_cpy;
     }
 };
@@ -25,7 +25,7 @@ class CKalmanObserver : public DiscreteObserver<Nx, Nu, Ny> {
                           const VecU_t &u) override {
         VecX_t x_hat_cpy = x_hat;
         updateAltitudeKFEstimate(toCppArray(x_hat_cpy), toCppArray(u),
-                                 toCppArray(y_sensor));
+                                 toCppArray(y_sensor), 1);
         return x_hat_cpy;
     }
 };
