@@ -18,13 +18,18 @@ struct DroneLogEntry {
     float tuningParameter;                // 2
     uint32_t size;                        // 3
     float referenceOrientation[4];        // 4-7
+
     float measurementOrientation[4];      // 8-11
     float measurementAngularVelocity[3];  // 12-14
+
     float attitudeControlSignals[3];      // 15-17
+
     float observerOrientation[4];         // 18-20
     float observerAngularVelocity[3];     // 22-24
     float observerMotorSpeeds[3];         // 25-27
+
     float motorControlSignals[4];         // 28-31
+    
     float referenceHeight;                // 32
     float measurementHeight;              // 33
     float altitudeMarginalControlSignal;  // 34 = u_t
