@@ -165,9 +165,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     AttitudeModel getAttitudeModel() const { return {*this}; }
 
-    struct AltitudeModel : public ContinuousModel<Nx_alt, Nu_alt, Ny_alt> {
-
-    };
+    struct AltitudeModel : public ContinuousModel<Nx_alt, Nu_alt, Ny_alt> {};
 
 #pragma region Controllers......................................................
 
@@ -251,13 +249,12 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     // Altitude
 
-    Altitude::LQRController getAltitudeController(const Matrix<1, 4> &K_pi) {
-        return {G_alt, Cd_alt, K_pi, Ts_alt};
+    Altitude::LQRController getAltitudeController(const Matrix<1, 4> &K_pi,
+                                                  double maxIntegralInfluence) {
+        return {G_alt, Cd_alt, K_pi, Ts_alt, maxIntegralInfluence};
     }
 
-    Altitude::CLQRController getCAltitudeController() {
-        return {Ts_alt};
-    }
+    Altitude::CLQRController getCAltitudeController() { return {Ts_alt}; }
 
     class Controller : public DiscreteController<Nx, Nu, Ny> {
       public:
@@ -300,11 +297,12 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     Controller getController(const Matrix<Nx_att - 1, Nx_att - 1> &Q_att,
                              const Matrix<Nu_att, Nu_att> &R_att,
-                             const Matrix<1, 4> &K_pi_alt) {
+                             const Matrix<1, 4> &K_pi_alt,
+                             double maxIntegralInfluence) {
         return {std::make_unique<Attitude::LQRController>(
                     getAttitudeController(Q_att, R_att)),
                 std::make_unique<Altitude::LQRController>(
-                    getAltitudeController(K_pi_alt)),
+                    getAltitudeController(K_pi_alt, maxIntegralInfluence)),
                 uh};
     }
 
@@ -421,7 +419,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     }
 
 #pragma region System matrices Attitude.........................................
-  // private: TODO
+    // private: TODO
     /** 
      * ```
      *  Aa_att =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]

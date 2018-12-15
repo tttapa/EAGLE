@@ -4,8 +4,8 @@
 #include <Model/Controller.hpp>
 #include <Quaternions/QuaternionStateAddSub.hpp>
 #include <Quaternions/ReducedQuaternion.hpp>
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 /**
  *  Solves the system of equations
@@ -147,8 +147,10 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
      *          The sample time of the discrete controller.
      */
     LQRController(const Matrix<Nx + Nu, Ny> &G, const Matrix<Ny, Nx> &C,
-                  const Matrix<Nu, Nx + Ny> &K_pi, double Ts)
-        : DiscreteController<Nx, Nu, Ny>{Ts}, K_pi{K_pi}, G{G}, C{C} {}
+                  const Matrix<Nu, Nx + Ny> &K_pi, double Ts,
+                  double maxIntegralInfluence)
+        : DiscreteController<Nx, Nu, Ny>{Ts}, K_pi{K_pi}, G{G}, C{C},
+          maxIntegral{fabs(maxIntegralInfluence / K_pi[0][Nx])} {}
 
     /** 
      * @brief   Construct a new instance of LQRController with the 
@@ -172,11 +174,11 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
      */
     LQRController(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                   const Matrix<Ny, Nx> &C, const Matrix<Ny, Nu> &D,
-                  const Matrix<Nu, Nx + Ny> &K_pi, double Ts)
+                  const Matrix<Nu, Nx + Ny> &K_pi, double Ts,
+                  double maxIntegralInfluence)
         : DiscreteController<Nx, Nu, Ny>{Ts}, K_pi{K_pi},
-          G(calculateG(A, B, C, D)), C{C} {
-        std::cout << "Altitude::LQRController::G = " << std::endl << G;
-    }
+          G(calculateG(A, B, C, D)), C{C},
+          maxIntegral{fabs(maxIntegralInfluence / K_pi[0][Nx])} {}
 
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
         return getRawControllerOutput(x, r);
@@ -192,15 +194,24 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
 
         // error
         VecX_t x_err = xeq - x;
-        // VecR_t y_err = r - y; // TODO
         VecR_t y_err = y - r;
-
-        // integral
-        integral += y_err * Ts;
 
         // controller
         VecU_t u_ctrl = K_pi * vcat(x_err, integral);
         VecU_t u      = u_ctrl + ueq;
+
+        // TODO: should the controller be based on the new integral?
+        // integral
+        double newIntegral = integral + y_err * Ts;
+#if 0
+        // TODO: is this better?
+        if (abs(newIntegral) > maxIntegral)
+            newIntegral = copysign(maxIntegral, newIntegral);
+        integral = {newIntegral};
+#else
+        if (abs(newIntegral) <= maxIntegral)
+            integral = {newIntegral};
+#endif
         return u;
     }
 
@@ -209,6 +220,8 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
     const Matrix<Nu, Nx + Ny> K_pi;
     const Matrix<Nx + Nu, Ny> G;
     const Matrix<Ny, Nx> C;
+
+    const double maxIntegral;
 
     VecR_t integral = {};
 };

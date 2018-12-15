@@ -28,13 +28,13 @@ const size_t px_x = 1920;
 const size_t px_y = 1080;
 
 /* ------ Plot settings ----------------------------------------------------- */
-const bool plotSimulationResult = false;
+const bool plotSimulationResult = true;
 const bool plotMotorControls    = false;
 const bool plotStepResponse     = false;
 
-const bool plotCSimulationResult = false;
+const bool plotCSimulationResult = true;
 
-const bool plotLoggedDroneData = true;
+const bool plotLoggedDroneData = false;
 
 const bool plotAllAtOnce = true;
 
@@ -45,26 +45,20 @@ const double steperrorfactor = 0.01;  // 1% of step size
 
 namespace Attitude {
 const RowVector<9> Qdiag = {{
-    139.6245112700232,
-    139.6245112700232,
-    24.2811761590895,
-    1.1505204155597211,
-    1.1505204155597211,
-    0.3409919487616804,
-    9.976475759487083e-08,
-    9.976475759487083e-08,
-    9.976475759487083e-09,
+    139.6245112700232,139.6245112700232,15.2811761590895,
+    1.1505204155597211,1.1505204155597211,0.1209919487616804,
+    9.976475759487083e-08,9.976475759487083e-08,9.976475759487083e-09,
 }};
 const RowVector<3> Rdiag = {{
-    1,
-    1,
-    1.001966068300933,
+    8,
+    8,
+    8,
 }};
 
 /** Weighting matrix for states in LQR design. */
 const Matrix<9, 9> Q = diag(Qdiag);
 /** Weighting matrix for inputs in LQR design. */
-const Matrix<3, 3> R = 8 * diag(Rdiag);
+const Matrix<3, 3> R = diag(Rdiag);
 
 /* ------ Compare two controllers ------------------------------------------- */
 namespace Compare {
@@ -122,11 +116,13 @@ const RowVector<6> varSensors   = hcat(  //
 
 namespace Altitude {
 /** Proporional altitude controller */
-const Matrix<1, 3> K_p = {0.0, 0.4, 0.4};  // n, z, v
+const Matrix<1, 3> K_p = {0.0, 0.9, 0.5};  // n, z, v
 /** Integral altitude controller */
-const Matrix<1, 1> K_i = {-0.005};
+const Matrix<1, 1> K_i = {-0.01};
 /** Complete altitude controller */
 const Matrix<1, 4> K_pi = hcat(K_p, K_i);
+/** Anti-windup for integral controller */
+const double maxIntegralInfluence = 0.1;
 
 const RowVector<1> varDynamics = {0.01};
 const RowVector<1> varSensors  = {0.02};  // 2 cm

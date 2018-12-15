@@ -20,3 +20,15 @@ template <class InputIt>
 auto rootMeanSquareError(InputIt first1, InputIt last1, InputIt first2) {
     return sqrt(meanSquareError(first1, last1, first2));
 }
+
+template <class InputIt>
+auto maxSquareError(InputIt first1, InputIt last1, InputIt first2) {
+    auto square     = [](auto x) { return x * x; };
+    auto maxSquareError = decltype(square(*first1 - *first2)){};
+    while (first1 != last1) {
+        auto errorSq = square(*first1++ - *first2++);
+        if (errorSq > maxSquareError)
+            maxSquareError = errorSq;
+    }
+    return maxSquareError;
+}

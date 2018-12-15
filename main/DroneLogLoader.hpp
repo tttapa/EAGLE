@@ -91,6 +91,8 @@ class DroneLogLoader {
 
     void load(const std::filesystem::path &loadfile);
 
+    explicit operator bool() const { return !entries.empty(); }
+
     const DroneLogEntry &operator[](size_t i) const { return entries[i]; }
 
     size_t size() const { return entries.size(); }

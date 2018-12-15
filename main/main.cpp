@@ -52,7 +52,8 @@ int main(int argc, char const *argv[]) {
     Drone drone = loadPath;
 
     Drone::Controller controller = drone.getController(
-        Config::Attitude::Q, Config::Attitude::R, Config::Altitude::K_pi);
+        Config::Attitude::Q, Config::Attitude::R, Config::Altitude::K_pi,
+        Config::Altitude::maxIntegralInfluence);
 
     Drone::Controller ccontroller = drone.getCController();
 
@@ -90,15 +91,52 @@ int main(int argc, char const *argv[]) {
              << "The C controller simulation result is not correct. MSE = "
              << meanSquareError(sampled.begin(), sampled.end(),
                                 csampled.begin())
+             << ", max error squared = "
+             << maxSquareError(sampled.begin(), sampled.end(), csampled.begin())
              << ANSIColors::reset << endl;
         correctCController = false;
+        vector<double> errorSq(sampled.size());
+        transform(sampled.begin(), sampled.end(), csampled.begin(),
+                  errorSq.begin(),
+                  [](auto x, auto cx) { return (x - cx) * (x - cx); });
+        auto sampledTime = makeTimeVector(Config::odeopt.t_start, controller.Ts,
+                                          Config::odeopt.t_end);
+        plt::figure_size(px_x, px_y);
+        plt::plot(sampledTime, errorSq);
+        plt::title("$\\left|x_{\\mathrm{C++}} - x_{C}\\right|^2$");
+        plt::tight_layout();
+        if (!Config::plotAllAtOnce)
+            plt::show();
     } else {
         cout << ANSIColors::greenb
              << "✔   The C controller simulation result is correct"
              << ANSIColors::reset << endl;
     }
 
+    /* ------ Test the C Attitude controller -------------------------------- */
+
+    Attitude::LQRController attCtrl =
+        drone.getAttitudeController(Config::Attitude::Q, Config::Attitude::R);
+    Attitude::CLQRController cattCtrl = {drone.Ts_att};
+
+    Attitude::LQRController::VecX_t x =
+        vcat(eul2quat({25_deg, 26_deg, 22_deg}), ColVector<3>{2, 4, 3},
+             ColVector<3>{20, 30, 40});
+    Attitude::LQRController::VecR_t r =
+        vcat(eul2quat({2_deg, 3_deg, -2_deg}), zeros<3, 1>());
+
+    Attitude::LQRController::VecU_t u   = attCtrl(x, r);
+    Attitude::CLQRController::VecU_t cu = cattCtrl(x, r);
+
+    if (!isAlmostEqual(u, cu, 1e-10)) {
+        cerr << ANSIColors::redb
+             << "error u  = " << asrowvector(u - cu, ", ", 10)
+             << ANSIColors::reset << endl;
+        correctCController = false;
+    }
+
     /* ------ Plot the simulation result ------------------------------------ */
+
     if (Config::plotSimulationResult) {
         plt::figure_size(px_x, px_y);
         plotDrone(result);
@@ -108,6 +146,7 @@ int main(int argc, char const *argv[]) {
     }
 
     /* ------ Plot the C simulation result ---------------------------------- */
+
     if (Config::plotCSimulationResult) {
         plt::figure_size(px_x, px_y);
         plotDrone(cresult);
@@ -117,6 +156,7 @@ int main(int argc, char const *argv[]) {
     }
 
     /* ------ Plot the motor control signals -------------------------------- */
+
     if (Config::plotMotorControls) {
         auto motorControl = convertControlSignalToMotorOutputs(result.control);
         plt::figure_size(px_x, px_y);
@@ -129,6 +169,7 @@ int main(int argc, char const *argv[]) {
     }
 
     /* ------ Plot the step response ---------------------------------------- */
+
     if (Config::plotStepResponse) {
         plt::figure_size(px_x, px_y);
         Quaternion q_ref = eul2quat({0, 0, 10_deg});
@@ -150,13 +191,14 @@ int main(int argc, char const *argv[]) {
     }
 
     /* ------ Compare two controllers --------------------------------------- */
+
     if (Config::Attitude::Compare::compare) {
-        auto ctrl1   = drone.getController(Config::Attitude::Compare::Q1,
-                                         Config::Attitude::Compare::R1,
-                                         Config::Altitude::K_pi);
-        auto ctrl2   = drone.getController(Config::Attitude::Compare::Q2,
-                                         Config::Attitude::Compare::R2,
-                                         Config::Altitude::K_pi);
+        auto ctrl1 = drone.getController(
+            Config::Attitude::Compare::Q1, Config::Attitude::Compare::R1,
+            Config::Altitude::K_pi, Config::Altitude::maxIntegralInfluence);
+        auto ctrl2 = drone.getController(
+            Config::Attitude::Compare::Q2, Config::Attitude::Compare::R2,
+            Config::Altitude::K_pi, Config::Altitude::maxIntegralInfluence);
         auto result1 = drone.simulate(ctrl1, ref, x0, Config::odeopt);
         result1.resultCode.verbose();
         auto result2 = drone.simulate(ctrl2, ref, x0, Config::odeopt);
@@ -215,12 +257,15 @@ int main(int argc, char const *argv[]) {
     }
 
     /* ------ Plot the logged actual drone data ----------------------------- */
+
     if (Config::plotLoggedDroneData) {
         DroneLogLoader dronelog = logLoadPath;
-        plt::figure_size(px_x, px_y);
-        plotDrone(dronelog);
-        if (!Config::plotAllAtOnce)
-            plt::show();
+        if (dronelog) {
+            plt::figure_size(px_x, px_y);
+            plotDrone(dronelog);
+            if (!Config::plotAllAtOnce)
+                plt::show();
+        }
     }
 
     /* ------ Plot all figures ---------------------------------------------- */
@@ -228,7 +273,7 @@ int main(int argc, char const *argv[]) {
     if (Config::plotAllAtOnce)
         plt::show();
 
-    cerr << "Done.\r\n";
+    cout << "Done." << endl;
 
     return correctCController ? EXIT_SUCCESS : EXIT_FAILURE;
 }
