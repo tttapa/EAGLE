@@ -25,7 +25,7 @@ const std::filesystem::path logLoadPath = home / "eagle.dat";
 
 /* ------ Image export dimensions ------------------------------------------- */
 const size_t px_x = 1920 * 1.5;
-const size_t px_y = round(px_x / sqrt(2));
+const size_t px_y = round(px_x / sqrt(2)) - 360;
 
 /* ------ Plot settings ----------------------------------------------------- */
 const bool plotSimulationResult = true;
