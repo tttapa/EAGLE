@@ -9,7 +9,7 @@ void plotStepResponseAttitude(const Drone &drone,
                               const Matrix<Nu_att, Nu_att> &R,
                               double steperrorfactor, const Quaternion &q_ref,
                               const AdaptiveODEOptions &opt,
-                              const std::string &referencestr,
+                              const std::string &title,
                               ColorSet colorset               = 0,
                               Format format = 0,
                               const std::string &legendSuffix = "") {
@@ -55,8 +55,7 @@ void plotStepResponseAttitude(const Drone &drone,
     stepAnalyzerPlt.plot({1, 4}, {"q1" + lstr, "q2" + lstr, "q3" + lstr},
                          colorset,
                          format,
-                         "Step Response of Attitude Controller for reference " +
-                             referencestr);
+                         title);
     plt::ylabel("Unit Quaternion components [-]");
     plt::xlabel("time [$s$]");
 }

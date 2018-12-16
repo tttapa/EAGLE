@@ -208,8 +208,8 @@ int main(int argc, char const *argv[]) {
         auto result2 = drone.simulate(ctrl2, ref, x0, Config::odeopt);
         result2.resultCode.verbose();
         plt::figure_size(px_x, px_y);
-        plotDrone(result1, 0, "-", " (1)");
-        plotDrone(result2, 1, "--", " (2)");
+        plotDrone(result1, 0, "-", " (Flying)", true);
+        plotDrone(result2, 1, "-.", " (GA)", false);
         plt::tight_layout();
         plt::save(outPath / "Comparison.svg");
         if (!Config::plotAllAtOnce)
@@ -225,11 +225,14 @@ int main(int argc, char const *argv[]) {
             plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
                                      Config::Attitude::Compare::R1,
                                      steperrorfactor, q_ref, Config::odeopt,
-                                     "$" + ss.str() + "$", 0, ".-", " (1)");
+                                     "Step Response of Final Attitude "
+                                     "Controller vs Best GA Member for "
+                                     "Reference Euler " "$" + ss.str() + "$", 
+                                     0, ".-", " (Final Attitude Controller)");
             plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
                                      Config::Attitude::Compare::R2,
-                                     steperrorfactor, q_ref, Config::odeopt,
-                                     "$" + ss.str() + "$", 1, ".--", " (2)");
+                                     steperrorfactor, q_ref, Config::odeopt, "",
+                                     1, ".--", " (Best GA Result)");
             plt::tight_layout();
             plt::save(outPath / "Comparison-Step-1.svg");
             if (!Config::plotAllAtOnce)
@@ -244,11 +247,14 @@ int main(int argc, char const *argv[]) {
             plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
                                      Config::Attitude::Compare::R1,
                                      steperrorfactor, q_ref, Config::odeopt,
-                                     "$" + ss.str() + "$", 0, ".-", " (1)");
+                                     "Step Response of Final Attitude "
+                                     "Controller vs Best GA Member for "
+                                     "Reference Euler " "$" + ss.str() + "$", 
+                                     0, ".-", " (Final Attitude Controller)");
             plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
                                      Config::Attitude::Compare::R2,
-                                     steperrorfactor, q_ref, Config::odeopt,
-                                     "$" + ss.str() + "$", 1, ".--", " (2)");
+                                     steperrorfactor, q_ref, Config::odeopt, "",
+                                     1, ".--", " (Best GA Result)");
             plt::tight_layout();
             plt::save(outPath / "Comparison-Step-2.svg");
             if (!Config::plotAllAtOnce)

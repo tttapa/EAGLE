@@ -72,17 +72,26 @@ void plotVectors(const std::vector<double> &t,
 }
 
 template <class T, size_t RS, size_t RP>
-void plotDroneSignal(const std::vector<double> &t,
-                     const std::vector<ColVector<RS>> &signal,
-                     ColVector<RP> (T::*extractor)() const,
-                     const std::vector<std::string> &legends = {},
-                     const std::vector<std::string> &formats = {},
-                     const std::vector<std::string> &colors  = {},
-                     const std::string &title                = "") {
+std::pair<double, double> plotDroneSignal(
+    const std::vector<double> &t, const std::vector<ColVector<RS>> &signal,
+    ColVector<RP> (T::*extractor)() const,
+    const std::vector<std::string> &legends = {},
+    const std::vector<std::string> &formats = {},
+    const std::vector<std::string> &colors = {}, const std::string &title = "",
+    double rel_y_margin = 0.05, // TODO: use `matplotlib.pyplot.margins`
+    double y_min = std::numeric_limits<double>::infinity(), double y_max = 0) {
     try {
         for (size_t i = 0; i < RP; ++i) {
             std::vector<double> plotdata =
                 Drone::extractSignal(signal, extractor, i);
+            double curr_y_max =
+                *std::max_element(plotdata.begin(), plotdata.end());
+            double curr_y_min =
+                *std::min_element(plotdata.begin(), plotdata.end());
+            if (curr_y_max > y_max)
+                y_max = curr_y_max;
+            if (curr_y_min < y_min)
+                y_min = curr_y_min;
             std::string fmt = i < formats.size() ? formats[i] : "";
             std::string clr = i < colors.size() ? colors[i] : "";
             if (i < legends.size())
@@ -90,6 +99,8 @@ void plotDroneSignal(const std::vector<double> &t,
             else
                 plt::plot(t, plotdata, fmt, clr);
         }
+        double y_margin = (y_max - y_min) * rel_y_margin;
+        plt::ylim(y_min - y_margin, y_max + y_margin);
         if (legends.size() > 0)
             plt::legend();
         if (!title.empty())
@@ -98,6 +109,7 @@ void plotDroneSignal(const std::vector<double> &t,
         std::cerr << ANSIColors::red << "Error: " << e.what()
                   << ANSIColors::reset << std::endl;
     }
+    return {y_min, y_max};
 }
 
 #define DISCRETE_FMT "-"
@@ -157,7 +169,7 @@ class ColorSet : public ColorFormatSet {
 };
 
 void plotDrone(const DronePlottable &result, ColorSet c = 0, Format format = 0,
-               const std::string &legendSuffix = "");
+               const std::string &legendSuffix = "", bool plotReference = true);
 
 inline void plotAttitudeTunerResult(
     Drone::AttitudeModel::ControllerSimulationResult &result) {

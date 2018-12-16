@@ -23,7 +23,7 @@ const Array<ColorSet, 2> ColorSet::colorsets = {{
 }};
 
 void plotDrone(const DronePlottable &result, ColorSet c, Format format,
-               const std::string &legendSuffix) {
+               const std::string &legendSuffix, bool plotReference) {
     constexpr size_t row = 5;
     constexpr size_t col = 2;
 
@@ -44,20 +44,21 @@ void plotDrone(const DronePlottable &result, ColorSet c, Format format,
     const std::string &lstr = legendSuffix;
 
     // Plot all results
-    plt::subplot(row, col, 1);
-    plotDroneSignal(result.sampledTime, result.reference,
-                    &DroneOutput::getOrientationEuler,
-                    {"z" + lstr, "y'" + lstr, "x\"" + lstr}, fmt, rc,
-                    "Reference orientation");
-    plt::ylabel("Euler angles [$\\mathrm{rad}$]");
-    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
+    if (plotReference) {
+        plt::subplot(row, col, 1);
+        plotDroneSignal(result.sampledTime, result.reference,
+                        &DroneOutput::getOrientationEuler, {"z", "y'", "x\""},
+                        fmt, rc, "Reference orientation");
+        plt::ylabel("Euler angles [$\\mathrm{rad}$]");
+        plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
-    plt::subplot(row, col, 2);
-    plotDroneSignal(
-        result.sampledTime, result.reference, &DroneOutput::getPosition,
-        {"x" + lstr, "y" + lstr, "z" + lstr}, fmt, c, "Reference position");
-    plt::ylabel("Position [$m$]");
-    plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
+        plt::subplot(row, col, 2);
+        plotDroneSignal(result.sampledTime, result.reference,
+                        &DroneOutput::getPosition, {"x", "y", "z"}, fmt, c,
+                        "Reference position");
+        plt::ylabel("Position [$m$]");
+        plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
+    }
 
     plt::subplot(row, col, 3);
     plotDroneSignal(result.time, result.states,
@@ -101,9 +102,10 @@ void plotDrone(const DronePlottable &result, ColorSet c, Format format,
     plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
 
     plt::subplot(row, col, 9);
-    plotDroneSignal(
-        result.sampledTime, result.control, &DroneControl::getAttitudeControl,
-        {"x" + lstr, "y" + lstr, "z" + lstr}, fmt, c, "Torque motor control");
+    plotDroneSignal(result.sampledTime, result.control,
+                    &DroneControl::getAttitudeControl,
+                    {"x" + lstr, "y" + lstr, "z" + lstr}, fmt, c,
+                    "Torque motor control signal");
     plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
     plt::ylabel("Control signal [-]");
     plt::xlabel("time [$s$]");
@@ -111,7 +113,7 @@ void plotDrone(const DronePlottable &result, ColorSet c, Format format,
     plt::subplot(row, col, 10);
     plotDroneSignal(result.sampledTime, result.control,
                     &DroneControl::getThrustControl, {"t" + lstr}, fmt, c,
-                    "Thrust motor control");
+                    "Thrust motor control signal");
     plt::xlim(t_start, t_end + (t_end - t_start) * marginRight);
     plt::ylabel("Control signal [-]");
     plt::xlabel("time [$s$]");
