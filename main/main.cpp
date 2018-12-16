@@ -209,7 +209,7 @@ int main(int argc, char const *argv[]) {
         result2.resultCode.verbose();
         plt::figure_size(px_x, px_y);
         plotDrone(result1, 0, "-", " (1)");
-        plotDrone(result2, 1, ":", " (2)");
+        plotDrone(result2, 1, "--", " (2)");
         plt::tight_layout();
         plt::save(outPath / "Comparison.svg");
         if (!Config::plotAllAtOnce)
@@ -229,7 +229,7 @@ int main(int argc, char const *argv[]) {
             plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
                                      Config::Attitude::Compare::R2,
                                      steperrorfactor, q_ref, Config::odeopt,
-                                     "$" + ss.str() + "$", 1, ":.", " (2)");
+                                     "$" + ss.str() + "$", 1, ".--", " (2)");
             plt::tight_layout();
             plt::save(outPath / "Comparison-Step-1.svg");
             if (!Config::plotAllAtOnce)
@@ -248,7 +248,7 @@ int main(int argc, char const *argv[]) {
             plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
                                      Config::Attitude::Compare::R2,
                                      steperrorfactor, q_ref, Config::odeopt,
-                                     "$" + ss.str() + "$", 1, ":.", " (2)");
+                                     "$" + ss.str() + "$", 1, ".--", " (2)");
             plt::tight_layout();
             plt::save(outPath / "Comparison-Step-2.svg");
             if (!Config::plotAllAtOnce)

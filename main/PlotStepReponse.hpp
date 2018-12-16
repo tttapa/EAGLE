@@ -57,5 +57,6 @@ void plotStepResponseAttitude(const Drone &drone,
                          format,
                          "Step Response of Attitude Controller for reference " +
                              referencestr);
+    plt::ylabel("Unit Quaternion components [-]");
     plt::xlabel("time [$s$]");
 }
