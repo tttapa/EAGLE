@@ -141,6 +141,7 @@ int main(int argc, char const *argv[]) {
         plt::figure_size(px_x, px_y);
         plotDrone(result);
         plt::axhline(drone.uh, "--", "r");
+        plt::save(outPath / "Simulation.svg");
         if (!Config::plotAllAtOnce)
             plt::show();
     }
@@ -162,7 +163,8 @@ int main(int argc, char const *argv[]) {
         plt::figure_size(px_x, px_y);
         plotVectors(result.sampledTime, motorControl, {0, 4},
                     {"motor 1", "motor 2", "motor 3", "motor 4"},
-                    {"r", "g", "b", "orange"}, "Motor PWM control");
+                    Format{"-"}.repeat(4), {"r", "g", "b", "orange"},
+                    "Motor PWM control");
         plt::tight_layout();
         if (!Config::plotAllAtOnce)
             plt::show();
@@ -173,18 +175,20 @@ int main(int argc, char const *argv[]) {
     if (Config::plotStepResponse) {
         plt::figure_size(px_x, px_y);
         Quaternion q_ref = eul2quat({0, 0, 10_deg});
-        plotStepResponseAttitude(
-            drone, Config::Attitude::Q, Config::Attitude::R, steperrorfactor,
-            q_ref, Config::odeopt, "$(0\\degree, 0\\degree, 10\\degree)$");
+        plotStepResponseAttitude(drone, Config::Attitude::Q,
+                                 Config::Attitude::R, steperrorfactor, q_ref,
+                                 Config::odeopt, 0, 0,
+                                 "$(0\\degree, 0\\degree, 10\\degree)$");
         plt::tight_layout();
         if (!Config::plotAllAtOnce)
             plt::show();
 
         plt::figure_size(px_x, px_y);
         q_ref = eul2quat({0, 10_deg, 10_deg});
-        plotStepResponseAttitude(
-            drone, Config::Attitude::Q, Config::Attitude::R, steperrorfactor,
-            q_ref, Config::odeopt, "$(0\\degree, 10\\degree, 10\\degree)$");
+        plotStepResponseAttitude(drone, Config::Attitude::Q,
+                                 Config::Attitude::R, steperrorfactor, q_ref,
+                                 Config::odeopt, 0, 0,
+                                 "$(0\\degree, 10\\degree, 10\\degree)$");
         plt::tight_layout();
         if (!Config::plotAllAtOnce)
             plt::show();
@@ -204,38 +208,52 @@ int main(int argc, char const *argv[]) {
         auto result2 = drone.simulate(ctrl2, ref, x0, Config::odeopt);
         result2.resultCode.verbose();
         plt::figure_size(px_x, px_y);
-        plotDrone(result1, 0);
-        plotDrone(result2, 1);
+        plotDrone(result1, 0, "-", " (1)");
+        plotDrone(result2, 1, ":", " (2)");
+        plt::tight_layout();
+        plt::save(outPath / "Comparison.svg");
         if (!Config::plotAllAtOnce)
             plt::show();
 
-        plt::figure_size(px_x, px_y);
-        Quaternion q_ref = eul2quat({0, 30_deg, 30_deg});
-        plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
-                                 Config::Attitude::Compare::R1, steperrorfactor,
-                                 q_ref, Config::odeopt,
-                                 "$(0\\degree, 30\\degree, 30\\degree)$", 0);
-        plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
-                                 Config::Attitude::Compare::R2, steperrorfactor,
-                                 q_ref, Config::odeopt,
-                                 "$(0\\degree, 30\\degree, 30\\degree)$", 1);
-        plt::tight_layout();
-        if (!Config::plotAllAtOnce)
-            plt::show();
-
-        plt::figure_size(px_x, px_y);
-        q_ref = eul2quat({0, 0, 10_deg});
-        plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
-                                 Config::Attitude::Compare::R1, steperrorfactor,
-                                 q_ref, Config::odeopt,
-                                 "$(0\\degree, 0\\degree, 10\\degree)$", 0);
-        plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
-                                 Config::Attitude::Compare::R2, steperrorfactor,
-                                 q_ref, Config::odeopt,
-                                 "$(0\\degree, 0\\degree, 10\\degree)$", 1);
-        plt::tight_layout();
-        if (!Config::plotAllAtOnce)
-            plt::show();
+        {
+            plt::figure_size(px_x, px_y);
+            EulerAngles e_ref = {0, 30_deg, 30_deg};
+            Quaternion q_ref  = eul2quat(e_ref);
+            assert(isAlmostEqual(e_ref, quat2eul(q_ref), 1e-10));
+            std::stringstream ss;
+            ss << asEulerAngles(e_ref, degreesTeX);
+            plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
+                                     Config::Attitude::Compare::R1,
+                                     steperrorfactor, q_ref, Config::odeopt,
+                                     "$" + ss.str() + "$", 0, ".-", " (1)");
+            plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
+                                     Config::Attitude::Compare::R2,
+                                     steperrorfactor, q_ref, Config::odeopt,
+                                     "$" + ss.str() + "$", 1, ":.", " (2)");
+            plt::tight_layout();
+            plt::save(outPath / "Comparison-Step-1.svg");
+            if (!Config::plotAllAtOnce)
+                plt::show();
+        }
+        {
+            plt::figure_size(px_x, px_y);
+            EulerAngles e_ref = {0, 0, 10_deg};
+            Quaternion q_ref  = eul2quat(e_ref);
+            std::stringstream ss;
+            ss << asEulerAngles(e_ref, degreesTeX);
+            plotStepResponseAttitude(drone, Config::Attitude::Compare::Q1,
+                                     Config::Attitude::Compare::R1,
+                                     steperrorfactor, q_ref, Config::odeopt,
+                                     "$" + ss.str() + "$", 0, ".-", " (1)");
+            plotStepResponseAttitude(drone, Config::Attitude::Compare::Q2,
+                                     Config::Attitude::Compare::R2,
+                                     steperrorfactor, q_ref, Config::odeopt,
+                                     "$" + ss.str() + "$", 1, ":.", " (2)");
+            plt::tight_layout();
+            plt::save(outPath / "Comparison-Step-2.svg");
+            if (!Config::plotAllAtOnce)
+                plt::show();
+        }
     }
 
     /* ------ Export the simulation result as CSV --------------------------- */

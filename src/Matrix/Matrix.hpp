@@ -553,8 +553,11 @@ template <size_t R, size_t C>
 Matrix<R, C> round(const Matrix<R, C> &m, size_t digits) {
     auto result = m;
     for (auto &row : result)
-        for (auto &el : row)
+        for (auto &el : row) {
             el = round(el * pow(10, digits)) / pow(10, digits);
+            if (el == 0.0) // fix -0.0
+                el = 0.0;
+        }
     return result;
 }
 

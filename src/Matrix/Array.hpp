@@ -164,9 +164,9 @@ struct Array {
     /** 
      * @brief   Comparison of arrays: less than
      */
-    constexpr Array<decltype(data[0] < data[0]), N>
-    operator<(const Array<T, N> &rhs) const {
-        Array<decltype(data[0] < data[0]), N> result = {};
+    template <class U>
+    constexpr auto operator<(const Array<U, N> &rhs) const {
+        Array<decltype(this->data[0] < rhs.data[0]), N> result = {};
         for (size_t i = 0; i < N; ++i)
             result[i] = this->data[i] < rhs.data[i];
         return result;
@@ -175,9 +175,9 @@ struct Array {
     /** 
      * @brief   Comparison of arrays: less than or equal
      */
-    constexpr Array<decltype(data[0] <= data[0]), N>
-    operator<=(const Array<T, N> &rhs) const {
-        Array<decltype(data[0] <= data[0]), N> result = {};
+    template <class U>
+    constexpr auto operator<=(const Array<U, N> &rhs) const {
+        Array<decltype(this->data[0] <= rhs.data[0]), N> result = {};
         for (size_t i = 0; i < N; ++i)
             result[i] = this->data[i] <= rhs.data[i];
         return result;
@@ -186,9 +186,9 @@ struct Array {
     /** 
      * @brief   Comparison of arrays: greater than
      */
-    constexpr Array<decltype(data[0] > data[0]), N>
-    operator>(const Array<T, N> &rhs) const {
-        Array<decltype(data[0] > data[0]), N> result = {};
+    template <class U>
+    constexpr auto operator>(const Array<U, N> &rhs) const {
+        Array<decltype(this->data[0] > rhs.data[0]), N> result = {};
         for (size_t i = 0; i < N; ++i)
             result[i] = this->data[i] > rhs.data[i];
         return result;
@@ -197,9 +197,9 @@ struct Array {
     /** 
      * @brief   Comparison of arrays: greater than or equal
      */
-    constexpr Array<decltype(data[0] >= data[0]), N>
-    operator>=(const Array<T, N> &rhs) const {
-        Array<decltype(data[0] >= data[0]), N> result = {};
+    template <class U>
+    constexpr auto operator>=(const Array<U, N> &rhs) const {
+        Array<decltype(this->data[0] >= rhs.data[0]), N> result = {};
         for (size_t i = 0; i < N; ++i)
             result[i] = this->data[i] >= rhs.data[i];
         return result;

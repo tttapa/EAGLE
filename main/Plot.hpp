@@ -47,6 +47,7 @@ void plotVectors(const std::vector<double> &t,
                  const IndexRange idx                    = {0, N},
                  const std::vector<std::string> &legends = {},
                  const std::vector<std::string> &formats = {},
+                 const std::vector<std::string> &colors  = {},
                  const std::string &title                = "") {
     assert(idx.start < idx.end);
     assert(idx.end <= N);
@@ -54,10 +55,11 @@ void plotVectors(const std::vector<double> &t,
         for (size_t i = 0; i < (idx.end - idx.start); ++i) {
             std::vector<double> plotdata = extractRow(vectors, i + idx.start);
             std::string fmt              = i < formats.size() ? formats[i] : "";
+            std::string clr              = i < colors.size() ? colors[i] : "";
             if (i < legends.size())
-                plt::named_plot(legends[i], t, plotdata, fmt);
+                plt::named_plot(legends[i], t, plotdata, fmt, clr);
             else
-                plt::plot(t, plotdata, fmt);
+                plt::plot(t, plotdata, fmt, clr);
         }
         if (!legends.empty())
             plt::legend();
@@ -75,16 +77,18 @@ void plotDroneSignal(const std::vector<double> &t,
                      ColVector<RP> (T::*extractor)() const,
                      const std::vector<std::string> &legends = {},
                      const std::vector<std::string> &formats = {},
+                     const std::vector<std::string> &colors  = {},
                      const std::string &title                = "") {
     try {
         for (size_t i = 0; i < RP; ++i) {
             std::vector<double> plotdata =
                 Drone::extractSignal(signal, extractor, i);
             std::string fmt = i < formats.size() ? formats[i] : "";
+            std::string clr = i < colors.size() ? colors[i] : "";
             if (i < legends.size())
-                plt::named_plot(legends[i], t, plotdata, fmt);
+                plt::named_plot(legends[i], t, plotdata, fmt, clr);
             else
-                plt::plot(t, plotdata, fmt);
+                plt::plot(t, plotdata, fmt, clr);
         }
         if (legends.size() > 0)
             plt::legend();
@@ -98,45 +102,94 @@ void plotDroneSignal(const std::vector<double> &t,
 
 #define DISCRETE_FMT "-"
 
-const std::vector<std::vector<std::string>> colorsets = {{
-    {"r", "g", "b"},
-    {"m", "y", "c"},
-}};
+class ColorFormatSet {
+  public:  // protected: // TODO
+    ColorFormatSet(std::vector<std::string> v) : vec{std::move(v)} {}
 
-const std::vector<std::vector<std::string>> rcolorsets = {{
-    {"b", "g", "r"},
-    {"c", "y", "m"},
-}};
+  public:
+    operator std::vector<std::string>() const { return vec; }
+    std::string operator[](size_t i) const { return vec[i]; }
+    size_t size() const { return vec.size(); }
+    const auto begin() const { return vec.begin(); }
+    const auto end() const { return vec.end(); }
 
-void plotDrone(const DronePlottable &result, int colorset = 0);
+  private:
+    const std::vector<std::string> vec;
+};
+
+class Format {
+  public:
+    template <class T>
+    Format(T &&fmt) : fmt{std::forward<T>(fmt)} {}
+    Format(int i) : fmt{getFormat(i)} {}
+
+    ColorFormatSet repeat(size_t times) const {
+        std::vector<std::string> r(times);
+        std::fill(r.begin(), r.end(), *this);
+        return r;
+    }
+
+    operator std::string() const { return fmt; }
+    static Format getFormat(size_t i) { return formats[i]; }
+
+  private:
+    const std::string fmt;
+    static const Array<Format, 5> formats;
+};
+
+class ColorSet : public ColorFormatSet {
+  public:
+    ColorSet(std::vector<std::string> v) : ColorFormatSet{std::move(v)} {}
+    ColorSet(int i) : ColorFormatSet{getColorSet(i)} {}
+
+    ColorSet reverse() const {
+        std::vector<std::string> cs = *this;
+        std::reverse(cs.begin(), cs.end());
+        return cs;
+    }
+    static ColorSet getColorSet(size_t i) { return colorsets[i]; }
+    static ColorSet getReverseColorSet(size_t i) {
+        return getColorSet(i).reverse();
+    }
+
+  private:
+    static const Array<ColorSet, 2> colorsets;
+};
+
+void plotDrone(const DronePlottable &result, ColorSet c = 0, Format format = 0,
+               const std::string &legendSuffix = "");
 
 inline void plotAttitudeTunerResult(
     Drone::AttitudeModel::ControllerSimulationResult &result) {
     const double t_start = result.time[0];
     const double t_end   = result.time.back();
 
+    const ColorFormatSet fmt  = Format{"-"}.repeat(3);
+    const ColorFormatSet dfmt = Format{".-"}.repeat(3);
+    const ColorSet c          = ColorSet::getColorSet(0);
+    const ColorSet rc         = ColorSet::getReverseColorSet(0);
+
     plt::subplot(4, 1, 1);
-    plotDroneSignal(
-        result.time, result.solution, &DroneAttitudeState::getOrientationEuler,
-        {"z", "y'", "x\""}, {"b-", "g-", "r-"}, "Orientation of drone");
+    plotDroneSignal(result.time, result.solution,
+                    &DroneAttitudeState::getOrientationEuler,
+                    {"z", "y'", "x\""}, fmt, rc, "Orientation of drone");
     plt::xlim(t_start, t_end * 1.1);
 
     plt::subplot(4, 1, 2);
     plotDroneSignal(result.time, result.solution,
                     &DroneAttitudeState::getAngularVelocity, {"x", "y", "z"},
-                    {"r-", "g-", "b-"}, "Angular velocity of drone");
+                    fmt, c, "Angular velocity of drone");
     plt::xlim(t_start, t_end * 1.1);
 
     plt::subplot(4, 1, 3);
     plotDroneSignal(result.time, result.solution,
-                    &DroneAttitudeState::getMotorSpeed, {"x", "y", "z"},
-                    {"r-", "g-", "b-"}, "Angular velocity of torque motors");
+                    &DroneAttitudeState::getMotorSpeed, {"x", "y", "z"}, fmt, c,
+                    "Angular velocity of torque motors");
     plt::xlim(t_start, t_end * 1.1);
 
     plt::subplot(4, 1, 4);
     plotDroneSignal(result.sampledTime, result.control,
-                    &DroneControl::getAttitudeControl, {"x", "y", "z"},
-                    {"r" DISCRETE_FMT, "g" DISCRETE_FMT, "b" DISCRETE_FMT},
+                    &DroneControl::getAttitudeControl, {"x", "y", "z"}, dfmt, c,
                     "Torque motor control");
     plt::xlim(t_start, t_end * 1.1);
     plt::xlabel("time [s]");

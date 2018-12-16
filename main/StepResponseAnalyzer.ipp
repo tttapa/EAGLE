@@ -130,7 +130,7 @@ double RealTimeCostCalculator<N>::getCost(double notRisenCost,
 template <size_t N>
 void StepResponseAnalyzerPlotter<N>::plot(
     IndexRange idx, const std::vector<std::string> &legends,
-    const std::vector<std::string> &colors, const std::string &title) const {
+    ColorSet colors, Format format, const std::string &title) const {
 
     if (t_v.empty() || x_v.empty())
         return;
@@ -142,14 +142,12 @@ void StepResponseAnalyzerPlotter<N>::plot(
     const auto &x_ref      = this->x_ref;
     const auto &x_thr      = this->x_thr;
 
-    std::vector<std::string> formats;
-    std::transform(colors.begin(), colors.end(), std::back_inserter(formats),
-                   [](const std::string &c) { return c + ".-"; });
-    plotVectors(t_v, x_v, idx, legends, formats, title);
+    ColorFormatSet fmt = format.repeat(colors.size());
+    plotVectors(t_v, x_v, idx, legends, fmt, colors, title);
 
     for (size_t k = 0; k < (idx.end - idx.start); ++k) {
         size_t i          = k + idx.start;
-        std::string color = k < colors.size() ? colors[k] : "";
+        std::string color = k < colors.size() ? colors[k] : ""; // TODO: hardcoded 3
         if (x_ref[i] != 0.0) {
             plt::axhline(x_ref[i], "--", color);
             plt::axhline(x_ref[i] - x_thr[i], "-.", color);

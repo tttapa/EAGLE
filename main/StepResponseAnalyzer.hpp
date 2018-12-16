@@ -116,10 +116,8 @@ class StepResponseAnalyzerPlotter : public StepResponseAnalyzer<N> {
           continueToEnd{continueToEnd} {}
 
     void plot(IndexRange idx                          = {0, N},
-              const std::vector<std::string> &legends = {},
-              const std::vector<std::string> &colors = {"r", "g", "b", "m", "c",
-                                                        "y"},
-              const std::string &title               = "") const;
+              const std::vector<std::string> &legends = {}, ColorSet colors = 0,
+              Format format = 0, const std::string &title = "") const;
 
     bool operator()(double t, const ColVector<N> &x) override {
         t_v.push_back(t);

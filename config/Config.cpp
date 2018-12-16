@@ -24,8 +24,8 @@ const std::filesystem::path loadPath =
 const std::filesystem::path logLoadPath = home / "eagle.dat";
 
 /* ------ Image export dimensions ------------------------------------------- */
-const size_t px_x = 1920;
-const size_t px_y = 1080;
+const size_t px_x = 1920 * 1.5;
+const size_t px_y = round(px_x / sqrt(2));
 
 /* ------ Plot settings ----------------------------------------------------- */
 const bool plotSimulationResult = true;
@@ -69,26 +69,26 @@ const Matrix<9, 9> Q1 = diag(Qdiag1);
 const Matrix<3, 3> R1 = diag(Rdiag1);
 
 const RowVector<9> Qdiag2 = {{
-    510.25,
-    510.25,
-    477.64,
-    0.202,
-    0.202,
-    0.000329,
-    3.78906e-06,
-    3.789057e-06,
-    7.8753e-08,
+    139.6245112700232,
+    139.6245112700232,
+    240.2811761590895,
+    0.1505204155597211,
+    0.1505204155597211,
+    0.0409919487616804,
+    9.976475759487083e-11,
+    9.976475759487083e-11,
+    9.976475759487083e-11,
 }};
 const RowVector<3> Rdiag2 = {{
-    9.1215,
-    9.1215,
-    9.1215,
+    1,
+    1,
+    1.001966068300933,
 }};
 
 const Matrix<9, 9> Q2 = diag(Qdiag2);
 const Matrix<3, 3> R2 = diag(Rdiag2);
 
-const bool compare = false;
+const bool compare = true;
 }  // namespace Compare
 
 /** @todo   Tune */
