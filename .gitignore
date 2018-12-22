@@ -3,7 +3,9 @@ googletest-*/
 bin/
 lib/
 CMakeFiles/
+Makefile
 *.cmake
+!Find*.cmake
 CMakeCache.txt
 build/googletest/CMakeLists.txt
 build/googletest/Makefile

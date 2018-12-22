@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "Makefile.common": "makefile",
+        "iostream": "cpp",
+        "limits": "cpp",
+        "vector": "cpp"
+    }
+}
