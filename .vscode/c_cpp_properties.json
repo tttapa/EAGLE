@@ -11,15 +11,8 @@
             "intelliSenseMode": "gcc-x64",
             "includePath": [
                 "${default}",
-                "${workspaceFolder}",
-                "${workspaceFolder}/build/googletest/googletest-src/googlemock/include",
-                "${workspaceFolder}/build/googletest/googletest-src/googletest/include",
-                "${workspaceFolder}/src",
-                "${workspaceFolder}/main",
-                "${workspaceFolder}/C/include",
-                "${HOME}/GitHub/matplotlib-cpp",
-                "/usr/include/python2.7",
-                "${workspaceFolder}/config"
+                "${workspaceFolder}/**",
+                "/usr/include/python3.5m"
             ]
         }
     ],
