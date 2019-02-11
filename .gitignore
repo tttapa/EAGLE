@@ -5,7 +5,7 @@ lib/
 CMakeFiles/
 Makefile
 *.cmake
-!Find*.cmake
+cmake/
 CMakeCache.txt
 build/googletest/CMakeLists.txt
 build/googletest/Makefile
