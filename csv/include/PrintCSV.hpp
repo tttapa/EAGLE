@@ -1,10 +1,9 @@
 #include <fstream>
 #include <iostream>
 
-
 #include <ANSIColors.hpp>
-#include <ODEResult.hpp>
 #include <Matrix.hpp>
+#include <ODEResult.hpp>
 
 template <class T, size_t N>
 void printCSV(std::ostream &out, const ODEResultX<TColVector<T, N>> &result) {
