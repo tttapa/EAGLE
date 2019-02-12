@@ -129,7 +129,7 @@ target_link_libraries(plot-simulation PRIVATE argparser
 ################################################################################
 
 # Add Doxygen target
-add_custom_target(documentation rm -r html && doxygen
+add_custom_target(documentation rm -rf html && doxygen
                   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/../doc/")
 
 # # Add MATLAB Code Gen target 
