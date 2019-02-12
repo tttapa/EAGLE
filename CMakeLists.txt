@@ -16,7 +16,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # <copy>
 # Download and unpack googletest at configure time
-configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/GoogleTest-CMakeLists.txt.in googletest/CMakeLists.txt)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/GoogleTest-CMakeLists.txt.in 
+               googletest/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest )
@@ -53,7 +54,7 @@ enable_testing()
 SET (CMAKE_C_COMPILER "gcc-8")
 SET (CMAKE_CXX_COMPILER "g++-8")
 
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
+# set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
@@ -99,7 +100,7 @@ add_executable(plot-simulation ${SRCS_plot_simulation})
 target_link_libraries(plot-simulation PRIVATE argparser 
                                               plot
                                               config
-                                              lapacke)
+                                              matrix)
 
 # # Tuner
 # file(GLOB_RECURSE TUNER "../tuner/*.cpp" "../tuner/*.c")

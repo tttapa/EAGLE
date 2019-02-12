@@ -14,3 +14,4 @@ CTestCostData.txt
 doc/html/
 *.png
 *.gif
+*.pyc

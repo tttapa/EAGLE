@@ -141,7 +141,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         result.resize(xs.size());
         transform(
             xs.begin(), xs.end(), result.begin(),
-            [f, idx](const ColVector<RS> &x) { return (S{x}.*f)()[idx]; });
+            [f, idx](const ColVector<RS> &x) { return (S(x).*f)()[idx]; });
         return result;
     }
 

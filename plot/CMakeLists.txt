@@ -17,6 +17,8 @@ target_include_directories(plot
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+find_package(pybind11 REQUIRED)
+
 # target_compile_features(plot PRIVATE cxx_std_17)
 # target_compile_options(plot PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Werror -pedantic>)
 target_link_libraries(plot
@@ -25,7 +27,9 @@ target_link_libraries(plot
         StepResponse::step-response
         DroneLogLoader::drone-log-loader 
     PRIVATE
-        Util::util 
+        Util::util
+        pybind11::embed
+        stdc++fs
 )
 
 # add_subdirectory(test) # TODO
