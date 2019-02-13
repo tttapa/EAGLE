@@ -10,30 +10,58 @@
  * @brief   Convert a DronePlottable (a collection of an array of state vectors,
  *          an array of control signal vectors and an array of reference 
  *          vectors) to a Python dictionary (associative array).
+ * 
+ * @note    Expects the Python interpreter to be active.
  */
 static pybind11::dict dronePlottableToPythonDict(const DronePlottable &result);
 
-void plot(const DronePlottable &result) {
-    namespace py = pybind11;
-    using py::dict;
-    using namespace py::literals;
-    
-    py::scoped_interpreter guard{};
+/**
+ * @brief   Load the Plot.py Python script and its functions.
+ * 
+ * @note    Expects the Python interpreter to be active.
+ */
+static pybind11::module getPythonPlotModuleInitial() {
+    using pybind11::dict;
+    using namespace pybind11::literals;
 
     std::filesystem::path filepath = __FILE__;
     auto path                      = filepath.parent_path();
     auto locals                    = dict{"path"_a = path.c_str()};
-    py::exec(R"(
+    pybind11::exec(R"(
         import sys
         sys.path.append(path)
-        import Plot as plotmodule
-    )",
-             py::globals(), locals);
-    auto pm     = locals["plotmodule"];
+    )", pybind11::globals(), locals);
+    pybind11::module pm = pybind11::module::import("Plot");
+    return pm;
+}
+
+/**
+ * @brief   Load the Plot.py Python script and its functions, or return the
+ *          module that was loaded already.
+ * 
+ * @note    Expects the Python interpreter to be active.
+ */
+static pybind11::module getPythonPlotModule() {
+    static pybind11::module pm = getPythonPlotModuleInitial();
+    return pm;
+}
+/// I'm lazy
+static pybind11::scoped_interpreter guard {};
+
+/**
+ * @brief   Plot the result of a drone simulation.
+ *
+ * @note    Expects the Python interpreter to be active.
+ */
+void plot(const DronePlottable &result) {
+    using pybind11::dict;
+    using namespace pybind11::literals;
+
+    auto pm     = getPythonPlotModule();
     auto pyplot = pm.attr("plot");
 
-    auto time  = result.time;
-    auto dtime = result.sampledTime;
+    auto time   = result.time;
+    auto dtime  = result.sampledTime;
     auto states = dronePlottableToPythonDict(result);
 
     pyplot(time, dtime, states);

@@ -74,6 +74,8 @@ int main(int argc, char const *argv[]) {
 
     if (plotResult)
         plot(result);
+    if (plotResult)
+        plot(result);
 
     cout << "Done." << endl;
 
