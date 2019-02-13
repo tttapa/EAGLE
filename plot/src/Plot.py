@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from math import pi
 
-
-def plot(time, dtime, states):
+def plot(time, dtime, states, w, h):
     fig, (
         #
         (ax_ref_ori,      ax_ref_pos),
@@ -12,7 +10,7 @@ def plot(time, dtime, states):
         (ax_torque,       ax_thrust),
         (ax_torque_ctrl,  ax_thrust_ctrl)
         #
-    ) = plt.subplots(nrows=5, ncols=2, figsize=(20, 10))
+    ) = plt.subplots(nrows=5, ncols=2, figsize=(w, h))
 
     # TODO: I don't know if the order of x, y, z for Euler angles is correct.
 
@@ -102,5 +100,12 @@ def plot(time, dtime, states):
     ax_thrust_ctrl.set_xlabel("Time [$s$]")
     ax_thrust_ctrl.set_xlim(time[0], time[-1])
 
-    plt.tight_layout()
-    plt.show()
+    fig.tight_layout()
+    return fig
+
+
+def show(fig : plt.Figure):
+    plt.show(fig)
+
+def save(fig : plt.Figure, filename : str):
+    fig.savefig(filename)

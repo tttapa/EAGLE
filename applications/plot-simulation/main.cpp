@@ -1,3 +1,5 @@
+#include <pybind11/embed.h>
+
 #include "InputSignals.hpp"
 #include <ArgParser.hpp>
 #include <Config.hpp>
@@ -41,6 +43,10 @@ int main(int argc, char const *argv[]) {
     parser.parse(argc, argv);
     cout << ANSIColors::reset << endl;
 
+    /* -------------------- Start the Python interpreter -------------------- */
+
+    pybind11::scoped_interpreter guard {};
+
     /* ------ Load drone data and get models, controllers and observers ----- */
 
     Drone drone = {loadPath};
@@ -61,7 +67,7 @@ int main(int argc, char const *argv[]) {
     PerfTimer pt;
     auto result = drone.simulate(controller, ref, x0, Config::odeopt);
     result.resultCode.verbose();
-    cout << "Simulation took " << (pt.getDuration()) << " µs" << endl;
+    cout << "Simulation took " << pt.getDuration() << " µs" << endl;
 
     /* ------ Plot the simulation result ------------------------------------ */
 
@@ -72,10 +78,13 @@ int main(int argc, char const *argv[]) {
     // plt::save(outPath / "Simulation.svg");
     // plt::show();
 
-    if (plotResult)
-        plot(result);
-    if (plotResult)
-        plot(result);
+    if (plotResult || !outPath.empty()) {
+        auto fig = plot(result);
+        if (plotResult)
+            show(fig);
+        if (!outPath.empty())
+            save(fig, outPath / "Simulation.svg");
+    }
 
     cout << "Done." << endl;
 

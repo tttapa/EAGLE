@@ -45,18 +45,8 @@ static pybind11::module getPythonPlotModule() {
     static pybind11::module pm = getPythonPlotModuleInitial();
     return pm;
 }
-/// I'm lazy
-static pybind11::scoped_interpreter guard {};
 
-/**
- * @brief   Plot the result of a drone simulation.
- *
- * @note    Expects the Python interpreter to be active.
- */
-void plot(const DronePlottable &result) {
-    using pybind11::dict;
-    using namespace pybind11::literals;
-
+pybind11::object plot(const DronePlottable &result, float w, float h) {
     auto pm     = getPythonPlotModule();
     auto pyplot = pm.attr("plot");
 
@@ -64,7 +54,21 @@ void plot(const DronePlottable &result) {
     auto dtime  = result.sampledTime;
     auto states = dronePlottableToPythonDict(result);
 
-    pyplot(time, dtime, states);
+    return pyplot(time, dtime, states, w, h);
+}
+
+void show(pybind11::object fig) {
+    auto pm     = getPythonPlotModule();
+    auto pyshow = pm.attr("show");
+
+    pyshow(fig);
+} 
+
+void save(pybind11::object fig, std::filesystem::path filename) {
+    auto pm = getPythonPlotModule();
+    auto pysave = pm.attr("save");
+
+    pysave(fig, filename.c_str());
 }
 
 static pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {

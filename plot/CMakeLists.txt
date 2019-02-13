@@ -26,9 +26,9 @@ target_link_libraries(plot
         Drone::drone
         StepResponse::step-response
         DroneLogLoader::drone-log-loader 
+        pybind11::embed
     PRIVATE
         Util::util
-        pybind11::embed
         stdc++fs
 )
 
