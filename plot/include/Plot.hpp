@@ -16,6 +16,23 @@
  */
 pybind11::object plot(const DronePlottable &result, float w = 16, float h = 9);
 
+
+/**
+ * @brief   Show the given Matplotlib figure.
+ * 
+ * @note    Expects the Python interpreter to be active.
+ */
 void show(pybind11::object fig);
+
+/**
+ * @brief   Save the given Matplotlib figure.
+ * 
+ * @note    Expects the Python interpreter to be active.
+ * 
+ * @param   fig
+ *          The Matplotlib.pyplot.Figure figure to save
+ * @param   filename
+ *          The path and filename to save it to.
+ */
 
 void save(pybind11::object fig, std::filesystem::path filename);

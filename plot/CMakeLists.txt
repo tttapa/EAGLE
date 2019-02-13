@@ -3,6 +3,7 @@
 
 add_library(plot
     src/Plot.cpp
+    src/PlotHelpers.cpp
 )
 
 #Add an alias so that library can be used inside the build tree, e.g. when testing

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot(time, dtime, states, w, h):
+def plot(time, dtime, states : dict, w : float, h : float):
     fig, (
         #
         (ax_ref_ori,      ax_ref_pos),
