@@ -102,6 +102,9 @@ target_link_libraries(plot-simulation PRIVATE argparser
                                               config
                                               matrix)
 
+add_executable(hello-world "applications/hello-world/main.cpp")
+target_link_libraries(hello-world PRIVATE matrix)
+
 # # Tuner
 # file(GLOB_RECURSE TUNER "../tuner/*.cpp" "../tuner/*.c")
 # add_executable(tuner ${TUNER})
