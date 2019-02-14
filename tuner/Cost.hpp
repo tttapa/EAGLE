@@ -1,9 +1,9 @@
 #pragma once
 
 #include <CostWeights.hpp>
-#include <Drone/Drone.hpp>
+#include <Drone.hpp>
 #include <StepResponseAnalyzer.hpp>
-#include <Util/Degrees.hpp>
+#include <Degrees.hpp>
 
 namespace CostReferences {
 constexpr Quaternion qz                   = eul2quat({22.5_deg, 0, 0});

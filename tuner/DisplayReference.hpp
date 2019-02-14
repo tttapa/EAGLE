@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Drone/Drone.hpp>
+#include <Drone.hpp>
 
 class DisplayReference
     : public Drone::FixedClampAttitudeController::ReferenceFunction {

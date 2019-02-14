@@ -18,6 +18,7 @@
             "label": "Make & Plot Simulation",
             "command": "cd build && make -j$(nproc) plot-simulation && ./bin/plot-simulation --out /tmp",
             "problemMatcher": "$gcc",
+            
             "group": {
                 "kind": "build",
                 "isDefault": true

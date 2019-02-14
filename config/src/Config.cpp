@@ -4,11 +4,12 @@ namespace Config {
 
 /* ------ Matrix & Parameter data loading ----------------------------------- */
 const std::filesystem::path loadPath =
-    home / "PO-EAGLE/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/Output";
+    home / "PO-EAGLE/Groups/ANC/Cleanup-Pieter/Code-Generators/"
+           "ParamsAndMatrices/Output";
 
 /* ------ Image export dimensions ------------------------------------------- */
-const size_t px_x = 1920 * 1.5;
-const size_t px_y = round(px_x / sqrt(2)) - 360;
+const size_t px_x = 1920;
+const size_t px_y = 1080;
 
 /* ------ Attitude LQR & LQE ------------------------------------------------ */
 

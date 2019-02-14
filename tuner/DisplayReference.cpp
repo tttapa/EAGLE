@@ -1,5 +1,5 @@
 #include "DisplayReference.hpp"
-#include <Util/Degrees.hpp>
+#include <Degrees.hpp>
 
 DisplayReference::DisplayReference()
     : qz{eul2quat({10_deg, 0, 0})},  //

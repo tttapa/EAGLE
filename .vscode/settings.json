@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "Makefile.common": "makefile",
         "*.ipp": "cpp",
         "*.tcc": "cpp",
         "array": "cpp",
@@ -64,7 +65,9 @@
         "string_view": "cpp",
         "cassert": "cpp",
         "controllers.h": "c",
-        "attitude-controller.h": "c"
+        "attitude-controller.h": "c",
+        "valarray": "cpp",
+        "variant": "cpp"
     },
     "files.exclude": {
         "**/.git": true,

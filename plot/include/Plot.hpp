@@ -14,8 +14,8 @@
  * @param   result 
  *          The result of a simulation to plot.
  */
-pybind11::object plot(const DronePlottable &result, float w = 16, float h = 9);
-
+pybind11::object plot(const DronePlottable &result, float w = 1920, float h = 1080,
+                      int colors = 0, std::string title = "");
 
 /**
  * @brief   Show the given Matplotlib figure.
@@ -34,5 +34,14 @@ void show(pybind11::object fig);
  * @param   filename
  *          The path and filename to save it to.
  */
-
 void save(pybind11::object fig, std::filesystem::path filename);
+
+/** 
+ * @brief   Create a new figure.
+ */
+pybind11::object figure(float w = 1920, float h = 1080);
+
+/**
+ * @brief   Create a new figure and axes.
+ */
+pybind11::object axes(float w = 1920, float h = 1080);

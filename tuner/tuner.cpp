@@ -2,14 +2,14 @@
 #include "DisplayReference.hpp"
 #include "PrintBest.hpp"
 #include "Weights.hpp"
-#include <ArgParser/ArgParser.hpp>
+#include <ArgParser.hpp>
 #include <Config.hpp>
 #include <Plot.hpp>
 #include <PlotStepReponse.hpp>
-#include <Util/ANSIColors.hpp>
-#include <Util/AlmostEqual.hpp>
-#include <Util/Degrees.hpp>
-#include <Util/PerfTimer.hpp>
+#include <ANSIColors.hpp>
+#include <AlmostEqual.hpp>
+#include <Degrees.hpp>
+#include <PerfTimer.hpp>
 #include <cstdlib>  // strtoul
 #include <iostream>
 #include <parallel/algorithm>

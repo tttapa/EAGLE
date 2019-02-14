@@ -17,3 +17,4 @@ doc/html/
 *.gif
 *.pyc
 LastTest.log
+.vscode/tags
