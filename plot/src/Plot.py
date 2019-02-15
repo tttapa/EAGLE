@@ -119,8 +119,83 @@ def plot(time, dtime, states: dict, w: float, h: float, colorset: int, title: st
     return fig
 
 
-def show(fig: matplotlib.figure.Figure):
-    plt.show(fig)
+def plot_attitude(time, dtime, states: dict, w: float, h: float, colorset: int, title: str):
+    dpi = 90
+    fig, (
+        ax_ref_ori,
+        ax_ori,
+        ax_ang_vel,
+        ax_torque,
+        ax_torque_ctrl
+    ) = plt.subplots(nrows=5, ncols=1, figsize=(w/dpi, h/dpi), dpi=dpi)
+
+    colors = [
+        {'x': 'red', 'y': 'green', 'z': 'blue'},
+        {'x': 'tomato', 'y': 'lightgreen', 'z': 'steelblue'},
+    ]
+
+    c = colors[colorset]
+
+    # TODO: I don't know if the order of x, y, z for Euler angles is correct.
+
+    if title:
+        fig.suptitle(title)
+
+    # ROW 0
+    ax_ref_ori.plot(
+        dtime, states['reference_orientation']['x'], color=c['x'], label='x')
+    ax_ref_ori.plot(
+        dtime, states['reference_orientation']['y'], color=c['y'], label='y')
+    ax_ref_ori.plot(
+        dtime, states['reference_orientation']['z'], color=c['z'], label='z')
+    ax_ref_ori.set_title("Reference orientation")
+    ax_ref_ori.set_ylabel("Euler Angles [$\\mathrm{rad}$]")
+    ax_ref_ori.set_xlim(time[0], time[-1])
+    ax_ref_ori.legend()
+    #
+    # ROW 1
+    ax_ori.plot(time, states['orientation']['x'], color=c['x'])
+    ax_ori.plot(time, states['orientation']['y'], color=c['y'])
+    ax_ori.plot(time, states['orientation']['z'], color=c['z'])
+    ax_ori.set_title("Orientation")
+    ax_ori.set_ylabel("Euler Angles [$\\mathrm{rad}$]")
+    ax_ori.set_xlim(time[0], time[-1])
+    #
+    # ROW 2
+    ax_ang_vel.plot(time, states['angular_velocity']['x'], color=c['x'])
+    ax_ang_vel.plot(time, states['angular_velocity']['y'], color=c['y'])
+    ax_ang_vel.plot(time, states['angular_velocity']['z'], color=c['z'])
+    ax_ang_vel.set_title("Angular velocity")
+    ax_ang_vel.set_ylabel("Angular velocity [$\\mathrm{rad}/s$]")
+    ax_ang_vel.set_xlim(time[0], time[-1])
+    #
+    # ROW 3
+    ax_torque.plot(time, states['torque_motor_velocity']['x'], color=c['x'])
+    ax_torque.plot(time, states['torque_motor_velocity']['y'], color=c['y'])
+    ax_torque.plot(time, states['torque_motor_velocity']['z'], color=c['z'])
+    ax_torque.set_title("Torque motor velocity")
+    ax_torque.set_ylabel("Angular velocity [$?$]")
+    ax_torque.set_xlim(time[0], time[-1])
+    #
+    # ROW 4
+    ax_torque_ctrl.plot(dtime, states['torque_control']['x'], color=c['x'])
+    ax_torque_ctrl.plot(dtime, states['torque_control']['y'], color=c['y'])
+    ax_torque_ctrl.plot(dtime, states['torque_control']['z'], color=c['z'])
+    ax_torque_ctrl.set_title("Torque motor control")
+    ax_torque_ctrl.set_ylabel("Control signal [-]")
+    ax_torque_ctrl.set_xlabel("Time [$s$]")
+    ax_torque_ctrl.set_xlim(time[0], time[-1])
+    #
+    
+    fig.tight_layout()
+    return fig
+
+
+def show(fig: matplotlib.figure.Figure = None):
+    if fig is not None:
+        plt.show(fig)
+    else:
+        plt.show()
 
 
 def save(fig: matplotlib.figure.Figure, filename: str):
@@ -129,7 +204,7 @@ def save(fig: matplotlib.figure.Figure, filename: str):
 
 def plot_step_analyzer(axes: matplotlib.axes.Axes, result: dict, title: str, legends: list, colorset: int):
     colors = [
-        ('red', 'green', 'blue'), # TODO: add more colors
+        ('red', 'green', 'blue'),  # TODO: add more colors
         ('tomato', 'lightgreen', 'steelblue'),
     ]
     c = colors[colorset]
@@ -168,10 +243,13 @@ def plot_step_analyzer(axes: matplotlib.axes.Axes, result: dict, title: str, leg
 
 def figure(w: float, h: float):
     dpi = 90
-    print((w,h))
     return plt.figure(figsize=(w/dpi, h/dpi), dpi=dpi)
 
 
 def axes(w: float, h: float):
     fig = figure(w, h)
     return fig.add_subplot(1, 1, 1)
+
+
+def close(figure: matplotlib.figure.Figure):
+    plt.close(fig=figure)

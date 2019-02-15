@@ -1,15 +1,17 @@
+#include <pybind11/embed.h>
+
 #include "Cost.hpp"
 #include "DisplayReference.hpp"
 #include "PrintBest.hpp"
 #include "Weights.hpp"
-#include <ArgParser.hpp>
-#include <Config.hpp>
-#include <Plot.hpp>
-#include <PlotStepReponse.hpp>
 #include <ANSIColors.hpp>
 #include <AlmostEqual.hpp>
+#include <ArgParser.hpp>
+#include <Config.hpp>
 #include <Degrees.hpp>
 #include <PerfTimer.hpp>
+#include <Plot.hpp>
+#include <PlotStepResponse.hpp>
 #include <cstdlib>  // strtoul
 #include <iostream>
 #include <parallel/algorithm>
@@ -25,6 +27,9 @@ using namespace std;
 */
 
 int main(int argc, char const *argv[]) {
+
+    /* ------ Parse command line arguments ---------------------------------- */
+
     filesystem::path loadPath = Config::Tuner::loadPath;
     filesystem::path outPath  = "";
     size_t population         = Config::Tuner::population;
@@ -32,7 +37,7 @@ int main(int argc, char const *argv[]) {
     size_t survivors          = Config::Tuner::survivors;
     size_t px_x               = Config::px_x;
     size_t px_y               = Config::px_y;
-    bool show                 = true;
+    bool showPlot             = true;
 
     double steperrorfactor      = Config::Tuner::steperrorfactor;
     CostWeights stepcostweights = Config::Tuner::stepcostweights;
@@ -68,7 +73,7 @@ int main(int argc, char const *argv[]) {
         cout << "Setting the image height to: " << px_y << endl;
     });
     parser.add<0>("--no-show", [&](const char * /* argv */ []) {
-        show = false;
+        showPlot = false;
         cout << "Not showing the resulting plots" << endl;
     });
     cout << ANSIColors::blue;
@@ -77,6 +82,7 @@ int main(int argc, char const *argv[]) {
 
     assert(survivors > 0);
     assert(population >= survivors);  // TODO!
+
     if (population == survivors)
         cout << ANSIColors::yellow
              << "Warning: the entire population are survivors, so no mutations "
@@ -84,8 +90,14 @@ int main(int argc, char const *argv[]) {
              << ANSIColors::reset << endl
              << endl;
 
+    /* -------------------- Start the Python interpreter -------------------- */
+
+    pybind11::scoped_interpreter guard{};
+
+    /* ------ Load drone data and get models, controllers and observers ----- */
+
     cout << "Loading Drone ..." << endl;
-    Drone drone = loadPath;
+    Drone drone = {loadPath};
     cout << ANSIColors::greenb << "Successfully loaded Drone!"
          << ANSIColors::reset << endl
          << endl;
@@ -95,6 +107,8 @@ int main(int argc, char const *argv[]) {
     DroneState x0            = drone.getStableState();
     DroneAttitudeState attx0 = x0.getAttitude();
 
+    /* ------ Create a population and initialize the random distributions --- */
+
     vector<Weights> populationWeights;
     populationWeights.resize(population);
 
@@ -102,43 +116,55 @@ int main(int argc, char const *argv[]) {
     populationWeights[0].R_diag = Config::Tuner::R_diag_initial;
     populationWeights[0].renormalize();
 
-    // Random engine for mutations
-    static std::default_random_engine generator;
-    static std::uniform_int_distribution<size_t> distribution(0, survivors - 1);
+    // Random engine for selecting a random survivor to use in mutations
+    static std::default_random_engine randomGenerator;
+    static std::uniform_int_distribution<size_t>  //
+        randomSurvivorIndex(0, survivors - 1);
+
+    /* ------ Initialize the entire population with mutations of Specimen 0 - */
+#ifndef DEBUG
+#pragma omp parallel for
+#endif
+    for (size_t i = 1; i < population; ++i) {
+        populationWeights[i] = populationWeights[0];
+        populationWeights[i].mutate();
+        populationWeights[i].renormalize();
+    }
+
+    /* ------ Main loop of genetic algorithm -------------------------------- */
 
     cout << ANSIColors::blueb << "Starting Genetic Algorithm ..."
          << ANSIColors::reset << endl;
 
     for (size_t g = 0; g < generations; ++g) {
 
+        /* ------ Kill all inferior specimens, and replace them with mutations
+           ------ of two random survivors ----------------------------------- */
+
         PerfTimer mutateTimer;
-        if (g == 0)
-#ifndef DEBUG
-#pragma omp parallel for
-#endif
-            for (size_t i = 1; i < population; ++i) {
-                populationWeights[i] = populationWeights[0];
-                populationWeights[i].mutate();
-                populationWeights[i].renormalize();
-            }
-        else
+        if (g != 0) {  // If this is not the first generation
+
 #ifndef DEBUG
 #pragma omp parallel for
 #endif
             for (size_t i = survivors; i < population; ++i) {
-                size_t idx1 = distribution(generator);
-                size_t idx2 = distribution(generator);
+                size_t idx1 = randomSurvivorIndex(randomGenerator);
+                size_t idx2 = randomSurvivorIndex(randomGenerator);
                 populationWeights[i].crossOver(populationWeights[idx1],
                                                populationWeights[idx2]);
                 populationWeights[i].mutate();
                 populationWeights[i].renormalize();
             }
-        auto mutateTime = mutateTimer.getDuration<chrono::microseconds>();
-        cout << endl
-             << "Mutated " << population << " controllers in " << mutateTime
-             << " µs." << endl;
+            auto mutateTime = mutateTimer.getDuration<chrono::microseconds>();
+            cout << endl
+                 << "Mutated " << population << " controllers in " << mutateTime
+                 << " µs." << endl;
+        }
+
+        /* ------ Simulate all controllers and calculate the cost ----------- */
 
         PerfTimer simTimer;
+
 #ifndef DEBUG
 #pragma omp parallel for
 #endif
@@ -162,6 +188,8 @@ int main(int argc, char const *argv[]) {
         cout << "Simulated " << population << " controllers in " << simTime
              << " ms." << endl;
 
+        /* ------ Sort all specimens from low to high cost ------------------ */
+
         PerfTimer sortTimer;
 #ifndef DEBUG
         __gnu_parallel::sort(populationWeights.begin(),
@@ -177,66 +205,64 @@ int main(int argc, char const *argv[]) {
         printBest(cout, g, best);
         appendBestToFile(outPath / "tuner.output", g, best);
 
-        //
-
         /* ------ Simulate and plot the drone with the best controller so far */
-        DisplayReference reff;
 
-        Drone::FixedClampAttitudeController ctrl =
-            drone.getFixedClampAttitudeController(best.Q(), best.R());
-        auto result =
-            model.simulate(ctrl, reff, attx0, Config::Tuner::odeoptdisp);
-        result.resultCode.verbose();
+        if (!outPath.empty()) {
+            DisplayReference reff;
 
-        // plot and save
-        std::stringstream filename;
-        filename << "generation" << std::setw(4) << std::setfill('0') << (g + 1)
-                 << ".png";
-        std::filesystem::path outputfile = outPath / filename.str();
-        std::string gstr                 = std::to_string(g + 1);
+            Drone::FixedClampAttitudeController ctrl =
+                drone.getFixedClampAttitudeController(best.Q(), best.R());
+            auto result =
+                model.simulate(ctrl, reff, attx0, Config::Tuner::odeoptdisp);
+            result.resultCode.verbose();
 
-        plt::figure_size(px_x, px_y);
-        plotAttitudeTunerResult(result);
-        plt::tight_layout();
-        // plt::suptitle("Generation #" + gstr);
+            // Plot and save
+            std::stringstream filename;
+            filename << "generation" << std::setw(4) << std::setfill('0')
+                     << (g + 1) << ".png";
+            std::filesystem::path outputfile = outPath / filename.str();
+            std::string gstr                 = std::to_string(g + 1);
 
-        plt::save(outputfile);
-        if (g + 1 < generations || !show)
-            plt::close();
+            auto fig = plot(result);
+
+            save(fig, outputfile);
+            if (g + 1 < generations || !showPlot)
+                close(fig);
+        }
     }
     cout << ANSIColors::greenb << endl
          << "Done. ✔" << ANSIColors::reset << endl;
 
-    if (show && !Config::Tuner::plotAllAtOnce &&
+    if (showPlot && !Config::Tuner::plotAllAtOnce &&
         Config::Tuner::plotSimulationResult)
-        plt::show();
+        show();
 
     if (Config::Tuner::plotStepResponse) {
         auto &best = populationWeights[0];
         size_t i   = 0;
         for (const Quaternion &ref : CostReferences::references) {
-            plt::figure_size(px_x, px_y);
             stringstream ss;
             ss << '$' << asEulerAngles(quat2eul(ref), degreesTeX, 2) << '$';
+            auto ax  = axes(px_x, px_y);
+            auto fig = ax.attr("figure");
             plotStepResponseAttitude(drone, best.Q(), best.R(), steperrorfactor,
-                                     ref, Config::Tuner::odeopt, ss.str());
+                                     ref, Config::Tuner::odeopt, ax, ss.str());
             std::stringstream filename;
             filename << "stepresponse" << std::setw(4) << std::setfill('0')
                      << (++i) << ".png";
             std::filesystem::path outputfile = outPath / filename.str();
-            plt::tight_layout();
-            plt::save(outputfile);
-            if (!Config::Tuner::plotAllAtOnce && show)
-                plt::show();
-            else if (!show)
-                plt::close();
+            save(fig, outputfile);
+            if (!Config::Tuner::plotAllAtOnce && showPlot)
+                show(fig);
+            else if (!showPlot)
+                close(fig);
         }
     }
 
-    if (show && Config::Tuner::plotAllAtOnce &&
+    if (showPlot && Config::Tuner::plotAllAtOnce &&
         (Config::Tuner::plotStepResponse ||
          Config::Tuner::plotSimulationResult))
-        plt::show();
+        show();
 
     return EXIT_SUCCESS;
 }

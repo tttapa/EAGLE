@@ -1,8 +1,9 @@
 #pragma once
 
+#include <StepResponseAnalyzer.hpp>
+
 #include <CostWeights.hpp>
 #include <Drone.hpp>
-#include <StepResponseAnalyzer.hpp>
 #include <Degrees.hpp>
 
 namespace CostReferences {

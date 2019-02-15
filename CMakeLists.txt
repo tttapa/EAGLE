@@ -95,6 +95,8 @@ add_subdirectory("config")
 ###############################   APPLICATIONS   ###############################
 ################################################################################
 
+### Plot Simulation
+
 file(GLOB_RECURSE SRCS_plot_simulation "applications/plot-simulation/*.cpp")
 add_executable(plot-simulation ${SRCS_plot_simulation})
 target_link_libraries(plot-simulation PRIVATE argparser 
@@ -102,8 +104,18 @@ target_link_libraries(plot-simulation PRIVATE argparser
                                               config
                                               matrix)
 
-add_executable(hello-world "applications/hello-world/main.cpp")
-target_link_libraries(hello-world PRIVATE matrix)
+### Tuner
+
+find_package(OpenMP REQUIRED)
+
+file(GLOB_RECURSE SRCS_tuner "applications/tuner/*.cpp")
+add_executable(tuner ${SRCS_tuner})
+target_include_directories(tuner PRIVATE "applications/tuner/")
+target_link_libraries(tuner PRIVATE argparser 
+                                    plot
+                                    config
+                                    matrix
+                                    OpenMP::OpenMP_CXX)
 
 # # Tuner
 # file(GLOB_RECURSE TUNER "../tuner/*.cpp" "../tuner/*.c")

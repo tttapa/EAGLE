@@ -1,6 +1,6 @@
 #include "PrintBest.hpp"
 
-#include <Util/ANSIColors.hpp>
+#include <ANSIColors.hpp>
 
 void printBest(std::ostream &os, size_t generation, const Weights &best) {
     using namespace std;

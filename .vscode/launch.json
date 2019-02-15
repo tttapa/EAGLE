@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/hello-world",
+            "program": "${workspaceFolder}/build/bin/tuner",
             "args": [
                 "--load",
                 "$HOME/PO-EAGLE/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/Output",

@@ -1,10 +1,15 @@
 #include "TunerConfig.hpp"
+#include <Config.hpp>
+
+namespace Config {
 
 /* ------ Tuner settings ---------------------------------------------------- */
 namespace Tuner {
 
 /* ------ Matrix & Parameter data loading ----------------------------------- */
-const std::filesystem::path loadPath = Config::loadPath;
+const std::filesystem::path loadPath =
+    home / "PO-EAGLE/Groups/ANC/Cleanup-Pieter/Code-Generators/"
+           "ParamsAndMatrices/Output";
 
 const AdaptiveODEOptions odeopt = {
     .t_start = 0.0,
@@ -75,3 +80,5 @@ const bool plotStepResponse     = true;
 const bool plotAllAtOnce = true;
 
 }  // namespace Tuner
+
+}  // namespace Config

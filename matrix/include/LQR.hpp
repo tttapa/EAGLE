@@ -4,6 +4,10 @@
 #include <lapacke.h>
 #include <string>
 
+#ifdef I
+#undef I
+#endif
+
 template <size_t N>
 struct Schur_result {
     Matrix<N, N> S;

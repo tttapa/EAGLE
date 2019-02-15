@@ -5,6 +5,10 @@
 #include "Matrix.hpp"
 #include <lapacke.h>
 
+#ifdef I
+#undef I
+#endif
+
 template <size_t N>
 struct Balance_result_GEP {
     Matrix<N, N> balancing_matrix;

@@ -1,10 +1,20 @@
 #include "Drone.hpp"
+#ifdef I
+#error IIIIIIIIIIIIIIIIIII
+#endif
 #include "MotorControl.hpp"
+#ifdef I
+#error IIIIIIIIIIIIIIIIIII
+#endif
 #include <FileLoader.hpp>
+#ifdef I
+#error IIIIIIIIIIIIIIIIIII
+#endif
 
 using namespace std;
 
 void Drone::load(const filesystem::path &loadPath) {
+
     PerfTimer timer;
 
     /* Attitude */

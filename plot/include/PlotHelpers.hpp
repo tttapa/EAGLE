@@ -20,3 +20,13 @@ pybind11::module getPythonPlotModule();
  * @note    Expects the Python interpreter to be active.
  */
 pybind11::dict dronePlottableToPythonDict(const DronePlottable &result);
+
+/**
+ * @brief   Convert a DroneAttitudePlottable (a collection of an array of state
+ *          vectors, an array of control signal vectors and an array of 
+ *          reference vectors) to a Python dictionary (associative array).
+ * 
+ * @note    Expects the Python interpreter to be active.
+ */
+pybind11::dict
+droneAttitudePlottableToPythonDict(const DroneAttitudePlottable &result);
