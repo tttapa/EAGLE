@@ -101,8 +101,7 @@ file(GLOB_RECURSE SRCS_plot_simulation "applications/plot-simulation/*.cpp")
 add_executable(plot-simulation ${SRCS_plot_simulation})
 target_link_libraries(plot-simulation PRIVATE argparser 
                                               plot
-                                              config
-                                              matrix)
+                                              config)
 
 ### Tuner
 
@@ -114,31 +113,9 @@ target_include_directories(tuner PRIVATE "applications/tuner/")
 target_link_libraries(tuner PRIVATE argparser 
                                     plot
                                     config
-                                    matrix
-                                    OpenMP::OpenMP_CXX)
-
-# # Tuner
-# file(GLOB_RECURSE TUNER "../tuner/*.cpp" "../tuner/*.c")
-# add_executable(tuner ${TUNER})
-# find_package(OpenMP REQUIRED)
-# 
-# IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-#     add_definitions(-DDEBUG)
-# ELSE(CMAKE_BUILD_TYPE MATCHES DEBUG)
-#     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-#     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-# ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-# target_include_directories(tuner PRIVATE ${PYTHON_INCLUDE_DIRS})
-# target_link_libraries(tuner
-#                       config
-#                       source
-#                       ${PYTHON_LIBRARIES}
-#                       lapacke.a
-#                       lapack
-#                       -static-libgcc 
-#                       -static-libstdc++
-#                       stdc++fs)
+                                    OpenMP::OpenMP_CXX
+                                    -static-libgcc 
+                                    -static-libstdc++)
 
 ################################################################################
 ##############################   CUSTOM TARGETS   ##############################
@@ -147,11 +124,3 @@ target_link_libraries(tuner PRIVATE argparser
 # Add Doxygen target
 add_custom_target(documentation rm -rf html && doxygen
                   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/../doc/")
-
-# # Add MATLAB Code Gen target 
-# add_custom_target(codegen matlab -nodisplay -nosplash -nodesktop -nojvm -r "\"run('Codegen.m');exit;\""
-#                   WORKING_DIRECTORY "$ENV{HOME}/Documents/KUL/2018-2019/P_O/EAGLE/EAGLE1/EAGLE-students-2018/Groups/ANC/MATLAB/Codegen/Codegen/")
-# 
-# # Add MATLAB Parameter export target 
-# add_custom_target(parameters matlab -nodisplay -nosplash -nodesktop -nojvm -r "\"run('ExportParamsAndMatrices.m');exit;\""
-#                   WORKING_DIRECTORY "$ENV{HOME}/Documents/KUL/2018-2019/P_O/EAGLE/EAGLE1/EAGLE-students-2018/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/")
