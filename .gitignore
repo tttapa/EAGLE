@@ -17,3 +17,4 @@ doc/html/
 *.gif
 *.pyc
 LastTest.log
+tasks.json
