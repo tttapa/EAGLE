@@ -1,10 +1,10 @@
-Start testing: Feb 13 19:02 CET
+Start testing: Feb 19 19:16 CET
 ----------------------------------------------------------
 1/68 Testing: Array.initializeAndRetrieve
 1/68 Test: Array.initializeAndRetrieve
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.initializeAndRetrieve" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.initializeAndRetrieve" start time: Feb 13 19:02 CET
+"Array.initializeAndRetrieve" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -23,7 +23,7 @@ Note: Google Test filter = Array.initializeAndRetrieve
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.initializeAndRetrieve" end time: Feb 13 19:02 CET
+"Array.initializeAndRetrieve" end time: Feb 19 19:16 CET
 "Array.initializeAndRetrieve" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -31,7 +31,7 @@ Test Passed.
 2/68 Test: Array.initializeAndRetrieveConst
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.initializeAndRetrieveConst" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.initializeAndRetrieveConst" start time: Feb 13 19:02 CET
+"Array.initializeAndRetrieveConst" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -50,7 +50,7 @@ Note: Google Test filter = Array.initializeAndRetrieveConst
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.initializeAndRetrieveConst" end time: Feb 13 19:02 CET
+"Array.initializeAndRetrieveConst" end time: Feb 19 19:16 CET
 "Array.initializeAndRetrieveConst" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -58,7 +58,7 @@ Test Passed.
 3/68 Test: Array.write
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.write" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.write" start time: Feb 13 19:02 CET
+"Array.write" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -77,7 +77,7 @@ Note: Google Test filter = Array.write
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.write" end time: Feb 13 19:02 CET
+"Array.write" end time: Feb 19 19:16 CET
 "Array.write" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -85,7 +85,7 @@ Test Passed.
 4/68 Test: Array.rangeFor
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.rangeFor" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.rangeFor" start time: Feb 13 19:02 CET
+"Array.rangeFor" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -104,7 +104,7 @@ Note: Google Test filter = Array.rangeFor
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.rangeFor" end time: Feb 13 19:02 CET
+"Array.rangeFor" end time: Feb 19 19:16 CET
 "Array.rangeFor" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -112,7 +112,7 @@ Test Passed.
 5/68 Test: Array.rangeForConst
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.rangeForConst" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.rangeForConst" start time: Feb 13 19:02 CET
+"Array.rangeForConst" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -128,10 +128,10 @@ Note: Google Test filter = Array.rangeForConst
 [==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.rangeForConst" end time: Feb 13 19:02 CET
+"Array.rangeForConst" end time: Feb 19 19:16 CET
 "Array.rangeForConst" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -139,7 +139,7 @@ Test Passed.
 6/68 Test: Array.equality
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.equality" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.equality" start time: Feb 13 19:02 CET
+"Array.equality" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -152,13 +152,13 @@ Note: Google Test filter = Array.equality
 [----------] 1 test from Array (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (1 ms total)
+[==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.equality" end time: Feb 13 19:02 CET
+"Array.equality" end time: Feb 19 19:16 CET
 "Array.equality" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -166,7 +166,7 @@ Test Passed.
 7/68 Test: Array.equalityOne
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.equalityOne" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.equalityOne" start time: Feb 13 19:02 CET
+"Array.equalityOne" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -182,10 +182,10 @@ Note: Google Test filter = Array.equalityOne
 [==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.equalityOne" end time: Feb 13 19:02 CET
+"Array.equalityOne" end time: Feb 19 19:16 CET
 "Array.equalityOne" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -193,7 +193,7 @@ Test Passed.
 8/68 Test: Array.operatorT
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.operatorT" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.operatorT" start time: Feb 13 19:02 CET
+"Array.operatorT" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -212,7 +212,7 @@ Note: Google Test filter = Array.operatorT
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.operatorT" end time: Feb 13 19:02 CET
+"Array.operatorT" end time: Feb 19 19:16 CET
 "Array.operatorT" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -220,7 +220,7 @@ Test Passed.
 9/68 Test: Array.compareLt
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.compareLt" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.compareLt" start time: Feb 13 19:02 CET
+"Array.compareLt" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -230,16 +230,16 @@ Note: Google Test filter = Array.compareLt
 [----------] 1 test from Array
 [ RUN      ] Array.compareLt
 [       OK ] Array.compareLt (0 ms)
-[----------] 1 test from Array (1 ms total)
+[----------] 1 test from Array (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (1 ms total)
+[==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.compareLt" end time: Feb 13 19:02 CET
+"Array.compareLt" end time: Feb 19 19:16 CET
 "Array.compareLt" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -247,7 +247,7 @@ Test Passed.
 10/68 Test: Array.compareLe
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.compareLe" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.compareLe" start time: Feb 13 19:02 CET
+"Array.compareLe" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -266,7 +266,7 @@ Note: Google Test filter = Array.compareLe
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.compareLe" end time: Feb 13 19:02 CET
+"Array.compareLe" end time: Feb 19 19:16 CET
 "Array.compareLe" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -274,7 +274,7 @@ Test Passed.
 11/68 Test: Array.compareGt
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.compareGt" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.compareGt" start time: Feb 13 19:02 CET
+"Array.compareGt" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -293,7 +293,7 @@ Note: Google Test filter = Array.compareGt
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.compareGt" end time: Feb 13 19:02 CET
+"Array.compareGt" end time: Feb 19 19:16 CET
 "Array.compareGt" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -301,7 +301,7 @@ Test Passed.
 12/68 Test: Array.compareGe
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.compareGe" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.compareGe" start time: Feb 13 19:02 CET
+"Array.compareGe" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -311,16 +311,16 @@ Note: Google Test filter = Array.compareGe
 [----------] 1 test from Array
 [ RUN      ] Array.compareGe
 [       OK ] Array.compareGe (0 ms)
-[----------] 1 test from Array (1 ms total)
+[----------] 1 test from Array (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (1 ms total)
+[==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.compareGe" end time: Feb 13 19:02 CET
+"Array.compareGe" end time: Feb 19 19:16 CET
 "Array.compareGe" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -328,7 +328,7 @@ Test Passed.
 13/68 Test: Array.assignSingleElement
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.assignSingleElement" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.assignSingleElement" start time: Feb 13 19:02 CET
+"Array.assignSingleElement" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -347,7 +347,7 @@ Note: Google Test filter = Array.assignSingleElement
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.assignSingleElement" end time: Feb 13 19:02 CET
+"Array.assignSingleElement" end time: Feb 19 19:16 CET
 "Array.assignSingleElement" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -355,7 +355,7 @@ Test Passed.
 14/68 Test: Array.fromCArray
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.fromCArray" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.fromCArray" start time: Feb 13 19:02 CET
+"Array.fromCArray" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -374,7 +374,7 @@ Note: Google Test filter = Array.fromCArray
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.fromCArray" end time: Feb 13 19:02 CET
+"Array.fromCArray" end time: Feb 19 19:16 CET
 "Array.fromCArray" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -382,7 +382,7 @@ Test Passed.
 15/68 Test: Array.fromCppArray
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.fromCppArray" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.fromCppArray" start time: Feb 13 19:02 CET
+"Array.fromCppArray" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -401,7 +401,7 @@ Note: Google Test filter = Array.fromCppArray
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.fromCppArray" end time: Feb 13 19:02 CET
+"Array.fromCppArray" end time: Feb 19 19:16 CET
 "Array.fromCppArray" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -409,7 +409,7 @@ Test Passed.
 16/68 Test: Array.abs
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.abs" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.abs" start time: Feb 13 19:02 CET
+"Array.abs" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -428,7 +428,7 @@ Note: Google Test filter = Array.abs
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.abs" end time: Feb 13 19:02 CET
+"Array.abs" end time: Feb 19 19:16 CET
 "Array.abs" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -436,7 +436,7 @@ Test Passed.
 17/68 Test: Array.isfinite
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.isfinite" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.isfinite" start time: Feb 13 19:02 CET
+"Array.isfinite" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -455,7 +455,7 @@ Note: Google Test filter = Array.isfinite
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.isfinite" end time: Feb 13 19:02 CET
+"Array.isfinite" end time: Feb 19 19:16 CET
 "Array.isfinite" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -463,7 +463,7 @@ Test Passed.
 18/68 Test: Array.map
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Array.map" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Array.map" start time: Feb 13 19:02 CET
+"Array.map" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -476,13 +476,13 @@ Note: Google Test filter = Array.map
 [----------] 1 test from Array (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (1 ms total)
+[==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Array.map" end time: Feb 13 19:02 CET
+"Array.map" end time: Feb 19 19:16 CET
 "Array.map" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -490,7 +490,7 @@ Test Passed.
 19/68 Test: generateArray.simple
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=generateArray.simple" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"generateArray.simple" start time: Feb 13 19:02 CET
+"generateArray.simple" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -509,7 +509,7 @@ Note: Google Test filter = generateArray.simple
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"generateArray.simple" end time: Feb 13 19:02 CET
+"generateArray.simple" end time: Feb 19 19:16 CET
 "generateArray.simple" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -517,7 +517,7 @@ Test Passed.
 20/68 Test: fillArray.simple
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=fillArray.simple" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"fillArray.simple" start time: Feb 13 19:02 CET
+"fillArray.simple" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -536,7 +536,7 @@ Note: Google Test filter = fillArray.simple
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"fillArray.simple" end time: Feb 13 19:02 CET
+"fillArray.simple" end time: Feb 19 19:16 CET
 "fillArray.simple" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -544,7 +544,7 @@ Test Passed.
 21/68 Test: DLQE.DLQE
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=DLQE.DLQE" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"DLQE.DLQE" start time: Feb 13 19:02 CET
+"DLQE.DLQE" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -553,17 +553,17 @@ Note: Google Test filter = DLQE.DLQE
 [----------] Global test environment set-up.
 [----------] 1 test from DLQE
 [ RUN      ] DLQE.DLQE
-[       OK ] DLQE.DLQE (0 ms)
-[----------] 1 test from DLQE (0 ms total)
+[       OK ] DLQE.DLQE (1 ms)
+[----------] 1 test from DLQE (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (0 ms total)
+[==========] 1 test from 1 test suite ran. (1 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"DLQE.DLQE" end time: Feb 13 19:02 CET
+"DLQE.DLQE" end time: Feb 19 19:16 CET
 "DLQE.DLQE" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -571,7 +571,7 @@ Test Passed.
 22/68 Test: LQR.LQR
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=LQR.LQR" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"LQR.LQR" start time: Feb 13 19:02 CET
+"LQR.LQR" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -580,17 +580,17 @@ Note: Google Test filter = LQR.LQR
 [----------] Global test environment set-up.
 [----------] 1 test from LQR
 [ RUN      ] LQR.LQR
-[       OK ] LQR.LQR (0 ms)
-[----------] 1 test from LQR (0 ms total)
+[       OK ] LQR.LQR (1 ms)
+[----------] 1 test from LQR (1 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (0 ms total)
+[==========] 1 test from 1 test suite ran. (1 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"LQR.LQR" end time: Feb 13 19:02 CET
+"LQR.LQR" end time: Feb 19 19:16 CET
 "LQR.LQR" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -598,7 +598,7 @@ Test Passed.
 23/68 Test: DLQR.DLQR
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=DLQR.DLQR" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"DLQR.DLQR" start time: Feb 13 19:02 CET
+"DLQR.DLQR" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -617,7 +617,7 @@ Note: Google Test filter = DLQR.DLQR
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"DLQR.DLQR" end time: Feb 13 19:02 CET
+"DLQR.DLQR" end time: Feb 19 19:16 CET
 "DLQR.DLQR" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -625,7 +625,7 @@ Test Passed.
 24/68 Test: LeastSquares.solveLeastSquaresSquare
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=LeastSquares.solveLeastSquaresSquare" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"LeastSquares.solveLeastSquaresSquare" start time: Feb 13 19:02 CET
+"LeastSquares.solveLeastSquaresSquare" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -638,13 +638,13 @@ Note: Google Test filter = LeastSquares.solveLeastSquaresSquare
 [----------] 1 test from LeastSquares (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (1 ms total)
+[==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"LeastSquares.solveLeastSquaresSquare" end time: Feb 13 19:02 CET
+"LeastSquares.solveLeastSquaresSquare" end time: Feb 19 19:16 CET
 "LeastSquares.solveLeastSquaresSquare" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -652,7 +652,7 @@ Test Passed.
 25/68 Test: Matrix.equals
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.equals" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.equals" start time: Feb 13 19:02 CET
+"Matrix.equals" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -671,7 +671,7 @@ Note: Google Test filter = Matrix.equals
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.equals" end time: Feb 13 19:02 CET
+"Matrix.equals" end time: Feb 19 19:16 CET
 "Matrix.equals" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -679,7 +679,7 @@ Test Passed.
 26/68 Test: Matrix.notEquals
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.notEquals" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.notEquals" start time: Feb 13 19:02 CET
+"Matrix.notEquals" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -698,7 +698,7 @@ Note: Google Test filter = Matrix.notEquals
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.notEquals" end time: Feb 13 19:02 CET
+"Matrix.notEquals" end time: Feb 19 19:16 CET
 "Matrix.notEquals" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -706,7 +706,7 @@ Test Passed.
 27/68 Test: Matrix.operatorTMatrix
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.operatorTMatrix" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.operatorTMatrix" start time: Feb 13 19:02 CET
+"Matrix.operatorTMatrix" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -725,7 +725,7 @@ Note: Google Test filter = Matrix.operatorTMatrix
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.operatorTMatrix" end time: Feb 13 19:02 CET
+"Matrix.operatorTMatrix" end time: Feb 19 19:16 CET
 "Matrix.operatorTMatrix" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -733,7 +733,7 @@ Test Passed.
 28/68 Test: Matrix.operatorTMatrixConst
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.operatorTMatrixConst" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.operatorTMatrixConst" start time: Feb 13 19:02 CET
+"Matrix.operatorTMatrixConst" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -746,13 +746,13 @@ Note: Google Test filter = Matrix.operatorTMatrixConst
 [----------] 1 test from Matrix (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (0 ms total)
+[==========] 1 test from 1 test suite ran. (1 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.operatorTMatrixConst" end time: Feb 13 19:02 CET
+"Matrix.operatorTMatrixConst" end time: Feb 19 19:16 CET
 "Matrix.operatorTMatrixConst" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -760,7 +760,7 @@ Test Passed.
 29/68 Test: Matrix.multiply
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.multiply" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.multiply" start time: Feb 13 19:02 CET
+"Matrix.multiply" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -779,7 +779,7 @@ Note: Google Test filter = Matrix.multiply
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.multiply" end time: Feb 13 19:02 CET
+"Matrix.multiply" end time: Feb 19 19:16 CET
 "Matrix.multiply" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -787,7 +787,7 @@ Test Passed.
 30/68 Test: Matrix.scalarMultiply
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.scalarMultiply" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.scalarMultiply" start time: Feb 13 19:02 CET
+"Matrix.scalarMultiply" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -806,7 +806,7 @@ Note: Google Test filter = Matrix.scalarMultiply
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.scalarMultiply" end time: Feb 13 19:02 CET
+"Matrix.scalarMultiply" end time: Feb 19 19:16 CET
 "Matrix.scalarMultiply" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -814,7 +814,7 @@ Test Passed.
 31/68 Test: Matrix.Tdiag
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.Tdiag" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.Tdiag" start time: Feb 13 19:02 CET
+"Matrix.Tdiag" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -833,7 +833,7 @@ Note: Google Test filter = Matrix.Tdiag
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.Tdiag" end time: Feb 13 19:02 CET
+"Matrix.Tdiag" end time: Feb 19 19:16 CET
 "Matrix.Tdiag" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -841,7 +841,7 @@ Test Passed.
 32/68 Test: Matrix.diag
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.diag" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.diag" start time: Feb 13 19:02 CET
+"Matrix.diag" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -860,7 +860,7 @@ Note: Google Test filter = Matrix.diag
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.diag" end time: Feb 13 19:02 CET
+"Matrix.diag" end time: Feb 19 19:16 CET
 "Matrix.diag" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -868,7 +868,7 @@ Test Passed.
 33/68 Test: Matrix.add
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.add" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.add" start time: Feb 13 19:02 CET
+"Matrix.add" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -887,7 +887,7 @@ Note: Google Test filter = Matrix.add
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.add" end time: Feb 13 19:02 CET
+"Matrix.add" end time: Feb 19 19:16 CET
 "Matrix.add" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -895,7 +895,7 @@ Test Passed.
 34/68 Test: Matrix.subtract
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.subtract" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.subtract" start time: Feb 13 19:02 CET
+"Matrix.subtract" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -914,7 +914,7 @@ Note: Google Test filter = Matrix.subtract
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.subtract" end time: Feb 13 19:02 CET
+"Matrix.subtract" end time: Feb 19 19:16 CET
 "Matrix.subtract" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -922,7 +922,7 @@ Test Passed.
 35/68 Test: Matrix.transpose
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.transpose" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.transpose" start time: Feb 13 19:02 CET
+"Matrix.transpose" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -941,7 +941,7 @@ Note: Google Test filter = Matrix.transpose
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.transpose" end time: Feb 13 19:02 CET
+"Matrix.transpose" end time: Feb 19 19:16 CET
 "Matrix.transpose" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -949,7 +949,7 @@ Test Passed.
 36/68 Test: Matrix.assignBlock
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.assignBlock" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.assignBlock" start time: Feb 13 19:02 CET
+"Matrix.assignBlock" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -968,7 +968,7 @@ Note: Google Test filter = Matrix.assignBlock
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.assignBlock" end time: Feb 13 19:02 CET
+"Matrix.assignBlock" end time: Feb 19 19:16 CET
 "Matrix.assignBlock" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -976,7 +976,7 @@ Test Passed.
 37/68 Test: Matrix.getBlock
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.getBlock" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.getBlock" start time: Feb 13 19:02 CET
+"Matrix.getBlock" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -995,7 +995,7 @@ Note: Google Test filter = Matrix.getBlock
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.getBlock" end time: Feb 13 19:02 CET
+"Matrix.getBlock" end time: Feb 19 19:16 CET
 "Matrix.getBlock" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1003,7 +1003,7 @@ Test Passed.
 38/68 Test: Matrix.hcat
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.hcat" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.hcat" start time: Feb 13 19:02 CET
+"Matrix.hcat" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1022,7 +1022,7 @@ Note: Google Test filter = Matrix.hcat
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.hcat" end time: Feb 13 19:02 CET
+"Matrix.hcat" end time: Feb 19 19:16 CET
 "Matrix.hcat" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1030,7 +1030,7 @@ Test Passed.
 39/68 Test: Matrix.hcat3
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.hcat3" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.hcat3" start time: Feb 13 19:02 CET
+"Matrix.hcat3" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1049,7 +1049,7 @@ Note: Google Test filter = Matrix.hcat3
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.hcat3" end time: Feb 13 19:02 CET
+"Matrix.hcat3" end time: Feb 19 19:16 CET
 "Matrix.hcat3" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1057,7 +1057,7 @@ Test Passed.
 40/68 Test: Matrix.vcat3
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.vcat3" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.vcat3" start time: Feb 13 19:02 CET
+"Matrix.vcat3" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1076,7 +1076,7 @@ Note: Google Test filter = Matrix.vcat3
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.vcat3" end time: Feb 13 19:02 CET
+"Matrix.vcat3" end time: Feb 19 19:16 CET
 "Matrix.vcat3" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1084,7 +1084,7 @@ Test Passed.
 41/68 Test: Matrix.vcathcat
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.vcathcat" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.vcathcat" start time: Feb 13 19:02 CET
+"Matrix.vcathcat" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1103,7 +1103,7 @@ Note: Google Test filter = Matrix.vcathcat
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.vcathcat" end time: Feb 13 19:02 CET
+"Matrix.vcathcat" end time: Feb 19 19:16 CET
 "Matrix.vcathcat" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1111,7 +1111,7 @@ Test Passed.
 42/68 Test: Matrix.abs
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.abs" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.abs" start time: Feb 13 19:02 CET
+"Matrix.abs" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1124,13 +1124,13 @@ Note: Google Test filter = Matrix.abs
 [----------] 1 test from Matrix (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (1 ms total)
+[==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.abs" end time: Feb 13 19:02 CET
+"Matrix.abs" end time: Feb 19 19:16 CET
 "Matrix.abs" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1138,7 +1138,7 @@ Test Passed.
 43/68 Test: Matrix.isfinite
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.isfinite" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.isfinite" start time: Feb 13 19:02 CET
+"Matrix.isfinite" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1157,7 +1157,7 @@ Note: Google Test filter = Matrix.isfinite
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.isfinite" end time: Feb 13 19:02 CET
+"Matrix.isfinite" end time: Feb 19 19:16 CET
 "Matrix.isfinite" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1165,7 +1165,7 @@ Test Passed.
 44/68 Test: Matrix.map
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.map" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.map" start time: Feb 13 19:02 CET
+"Matrix.map" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1184,7 +1184,7 @@ Note: Google Test filter = Matrix.map
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.map" end time: Feb 13 19:02 CET
+"Matrix.map" end time: Feb 19 19:16 CET
 "Matrix.map" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1192,7 +1192,7 @@ Test Passed.
 45/68 Test: Matrix.copyToCArray
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.copyToCArray" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.copyToCArray" start time: Feb 13 19:02 CET
+"Matrix.copyToCArray" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1211,7 +1211,7 @@ Note: Google Test filter = Matrix.copyToCArray
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.copyToCArray" end time: Feb 13 19:02 CET
+"Matrix.copyToCArray" end time: Feb 19 19:16 CET
 "Matrix.copyToCArray" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1219,7 +1219,7 @@ Test Passed.
 46/68 Test: Matrix.copyFromCArray
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.copyFromCArray" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.copyFromCArray" start time: Feb 13 19:02 CET
+"Matrix.copyFromCArray" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1238,7 +1238,7 @@ Note: Google Test filter = Matrix.copyFromCArray
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.copyFromCArray" end time: Feb 13 19:02 CET
+"Matrix.copyFromCArray" end time: Feb 19 19:16 CET
 "Matrix.copyFromCArray" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1246,7 +1246,7 @@ Test Passed.
 47/68 Test: Matrix.innerProduct
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=Matrix.innerProduct" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"Matrix.innerProduct" start time: Feb 13 19:02 CET
+"Matrix.innerProduct" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1265,7 +1265,7 @@ Note: Google Test filter = Matrix.innerProduct
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Matrix.innerProduct" end time: Feb 13 19:02 CET
+"Matrix.innerProduct" end time: Feb 19 19:16 CET
 "Matrix.innerProduct" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1273,7 +1273,7 @@ Test Passed.
 48/68 Test: QR.QR
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/matrix_test" "--gtest_filter=QR.QR" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/matrix/test
-"QR.QR" start time: Feb 13 19:02 CET
+"QR.QR" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1292,7 +1292,7 @@ Note: Google Test filter = QR.QR
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"QR.QR" end time: Feb 13 19:02 CET
+"QR.QR" end time: Feb 19 19:16 CET
 "QR.QR" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1300,7 +1300,7 @@ Test Passed.
 49/68 Test: squareError.squareError
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/util_test" "--gtest_filter=squareError.squareError" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/util/test
-"squareError.squareError" start time: Feb 13 19:02 CET
+"squareError.squareError" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1319,7 +1319,7 @@ Note: Google Test filter = squareError.squareError
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"squareError.squareError" end time: Feb 13 19:02 CET
+"squareError.squareError" end time: Feb 19 19:16 CET
 "squareError.squareError" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1327,7 +1327,7 @@ Test Passed.
 50/68 Test: ArgParser.ArgParser
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/argparser_test" "--gtest_filter=ArgParser.ArgParser" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/argparser/test
-"ArgParser.ArgParser" start time: Feb 13 19:02 CET
+"ArgParser.ArgParser" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1346,7 +1346,7 @@ Note: Google Test filter = ArgParser.ArgParser
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ArgParser.ArgParser" end time: Feb 13 19:02 CET
+"ArgParser.ArgParser" end time: Feb 19 19:16 CET
 "ArgParser.ArgParser" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1354,7 +1354,7 @@ Test Passed.
 51/68 Test: ArgParser.notEnoughArguments
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/argparser_test" "--gtest_filter=ArgParser.notEnoughArguments" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/argparser/test
-"ArgParser.notEnoughArguments" start time: Feb 13 19:02 CET
+"ArgParser.notEnoughArguments" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1373,7 +1373,7 @@ Note: Google Test filter = ArgParser.notEnoughArguments
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ArgParser.notEnoughArguments" end time: Feb 13 19:02 CET
+"ArgParser.notEnoughArguments" end time: Feb 19 19:16 CET
 "ArgParser.notEnoughArguments" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1381,7 +1381,7 @@ Test Passed.
 52/68 Test: Quaternion.quatmultiply
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/quaternion_test" "--gtest_filter=Quaternion.quatmultiply" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/quaternion/test
-"Quaternion.quatmultiply" start time: Feb 13 19:02 CET
+"Quaternion.quatmultiply" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1400,7 +1400,7 @@ Note: Google Test filter = Quaternion.quatmultiply
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.quatmultiply" end time: Feb 13 19:02 CET
+"Quaternion.quatmultiply" end time: Feb 19 19:16 CET
 "Quaternion.quatmultiply" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1408,7 +1408,7 @@ Test Passed.
 53/68 Test: Quaternion.quatrotate
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/quaternion_test" "--gtest_filter=Quaternion.quatrotate" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/quaternion/test
-"Quaternion.quatrotate" start time: Feb 13 19:02 CET
+"Quaternion.quatrotate" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1431,7 +1431,7 @@ Note: Google Test filter = Quaternion.quatrotate
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.quatrotate" end time: Feb 13 19:02 CET
+"Quaternion.quatrotate" end time: Feb 19 19:16 CET
 "Quaternion.quatrotate" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1439,7 +1439,7 @@ Test Passed.
 54/68 Test: Quaternion.conjugate
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/quaternion_test" "--gtest_filter=Quaternion.conjugate" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/quaternion/test
-"Quaternion.conjugate" start time: Feb 13 19:02 CET
+"Quaternion.conjugate" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1458,7 +1458,7 @@ Note: Google Test filter = Quaternion.conjugate
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.conjugate" end time: Feb 13 19:02 CET
+"Quaternion.conjugate" end time: Feb 19 19:16 CET
 "Quaternion.conjugate" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1466,7 +1466,7 @@ Test Passed.
 55/68 Test: Quaternion.eul2quat
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/quaternion_test" "--gtest_filter=Quaternion.eul2quat" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/quaternion/test
-"Quaternion.eul2quat" start time: Feb 13 19:02 CET
+"Quaternion.eul2quat" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1485,7 +1485,7 @@ Note: Google Test filter = Quaternion.eul2quat
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.eul2quat" end time: Feb 13 19:02 CET
+"Quaternion.eul2quat" end time: Feb 19 19:16 CET
 "Quaternion.eul2quat" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1493,7 +1493,7 @@ Test Passed.
 56/68 Test: Quaternion.quat2eul
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/quaternion_test" "--gtest_filter=Quaternion.quat2eul" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/quaternion/test
-"Quaternion.quat2eul" start time: Feb 13 19:02 CET
+"Quaternion.quat2eul" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1512,7 +1512,7 @@ Note: Google Test filter = Quaternion.quat2eul
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"Quaternion.quat2eul" end time: Feb 13 19:02 CET
+"Quaternion.quat2eul" end time: Feb 19 19:16 CET
 "Quaternion.quat2eul" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1520,7 +1520,7 @@ Test Passed.
 57/68 Test: ReducedQuaternion.convertAndBack
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/quaternion_test" "--gtest_filter=ReducedQuaternion.convertAndBack" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/quaternion/test
-"ReducedQuaternion.convertAndBack" start time: Feb 13 19:02 CET
+"ReducedQuaternion.convertAndBack" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1539,7 +1539,7 @@ Note: Google Test filter = ReducedQuaternion.convertAndBack
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ReducedQuaternion.convertAndBack" end time: Feb 13 19:02 CET
+"ReducedQuaternion.convertAndBack" end time: Feb 19 19:16 CET
 "ReducedQuaternion.convertAndBack" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1547,7 +1547,7 @@ Test Passed.
 58/68 Test: FileLoader.LoadMatrix
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/fileloader_test" "--gtest_filter=FileLoader.LoadMatrix" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/fileloader/test
-"FileLoader.LoadMatrix" start time: Feb 13 19:02 CET
+"FileLoader.LoadMatrix" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1556,17 +1556,17 @@ Note: Google Test filter = FileLoader.LoadMatrix
 [----------] Global test environment set-up.
 [----------] 1 test from FileLoader
 [ RUN      ] FileLoader.LoadMatrix
-[       OK ] FileLoader.LoadMatrix (1 ms)
-[----------] 1 test from FileLoader (1 ms total)
+[       OK ] FileLoader.LoadMatrix (0 ms)
+[----------] 1 test from FileLoader (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (1 ms total)
+[==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"FileLoader.LoadMatrix" end time: Feb 13 19:02 CET
+"FileLoader.LoadMatrix" end time: Feb 19 19:16 CET
 "FileLoader.LoadMatrix" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1574,7 +1574,7 @@ Test Passed.
 59/68 Test: FileLoader.LoadMatrixWrongRows
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/fileloader_test" "--gtest_filter=FileLoader.LoadMatrixWrongRows" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/fileloader/test
-"FileLoader.LoadMatrixWrongRows" start time: Feb 13 19:02 CET
+"FileLoader.LoadMatrixWrongRows" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1593,7 +1593,7 @@ Note: Google Test filter = FileLoader.LoadMatrixWrongRows
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"FileLoader.LoadMatrixWrongRows" end time: Feb 13 19:02 CET
+"FileLoader.LoadMatrixWrongRows" end time: Feb 19 19:16 CET
 "FileLoader.LoadMatrixWrongRows" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1601,7 +1601,7 @@ Test Passed.
 60/68 Test: FileLoader.LoadMatrixWrongCols
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/fileloader_test" "--gtest_filter=FileLoader.LoadMatrixWrongCols" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/fileloader/test
-"FileLoader.LoadMatrixWrongCols" start time: Feb 13 19:02 CET
+"FileLoader.LoadMatrixWrongCols" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1620,7 +1620,7 @@ Note: Google Test filter = FileLoader.LoadMatrixWrongCols
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"FileLoader.LoadMatrixWrongCols" end time: Feb 13 19:02 CET
+"FileLoader.LoadMatrixWrongCols" end time: Feb 19 19:16 CET
 "FileLoader.LoadMatrixWrongCols" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1628,7 +1628,7 @@ Test Passed.
 61/68 Test: FileLoader.LoadDouble
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/fileloader_test" "--gtest_filter=FileLoader.LoadDouble" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/fileloader/test
-"FileLoader.LoadDouble" start time: Feb 13 19:02 CET
+"FileLoader.LoadDouble" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1647,7 +1647,7 @@ Note: Google Test filter = FileLoader.LoadDouble
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"FileLoader.LoadDouble" end time: Feb 13 19:02 CET
+"FileLoader.LoadDouble" end time: Feb 19 19:16 CET
 "FileLoader.LoadDouble" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1655,7 +1655,7 @@ Test Passed.
 62/68 Test: DoPri.euler
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/ode_test" "--gtest_filter=DoPri.euler" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/ode/test
-"DoPri.euler" start time: Feb 13 19:02 CET
+"DoPri.euler" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1677,7 +1677,7 @@ error = 3.1086244689504383e-15
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"DoPri.euler" end time: Feb 13 19:02 CET
+"DoPri.euler" end time: Feb 19 19:16 CET
 "DoPri.euler" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1685,7 +1685,7 @@ Test Passed.
 63/68 Test: DoPri.eulerVector
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/ode_test" "--gtest_filter=DoPri.eulerVector" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/ode/test
-"DoPri.eulerVector" start time: Feb 13 19:02 CET
+"DoPri.eulerVector" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1695,17 +1695,17 @@ Note: Google Test filter = DoPri.eulerVector
 [----------] 1 test from DoPri
 [ RUN      ] DoPri.eulerVector
 e = 2.71828182845905
-[       OK ] DoPri.eulerVector (1 ms)
-[----------] 1 test from DoPri (1 ms total)
+[       OK ] DoPri.eulerVector (0 ms)
+[----------] 1 test from DoPri (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (1 ms total)
+[==========] 1 test from 1 test suite ran. (0 ms total)
 [  PASSED  ] 1 test.
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"DoPri.eulerVector" end time: Feb 13 19:02 CET
+"DoPri.eulerVector" end time: Feb 19 19:16 CET
 "DoPri.eulerVector" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1713,7 +1713,7 @@ Test Passed.
 64/68 Test: ODEEval.interpolate
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/ode_test" "--gtest_filter=ODEEval.interpolate" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/ode/test
-"ODEEval.interpolate" start time: Feb 13 19:02 CET
+"ODEEval.interpolate" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1732,7 +1732,7 @@ Note: Google Test filter = ODEEval.interpolate
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.interpolate" end time: Feb 13 19:02 CET
+"ODEEval.interpolate" end time: Feb 19 19:16 CET
 "ODEEval.interpolate" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1740,7 +1740,7 @@ Test Passed.
 65/68 Test: ODEEval.sampleODEResult
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/ode_test" "--gtest_filter=ODEEval.sampleODEResult" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/ode/test
-"ODEEval.sampleODEResult" start time: Feb 13 19:02 CET
+"ODEEval.sampleODEResult" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1759,7 +1759,7 @@ Note: Google Test filter = ODEEval.sampleODEResult
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.sampleODEResult" end time: Feb 13 19:02 CET
+"ODEEval.sampleODEResult" end time: Feb 19 19:16 CET
 "ODEEval.sampleODEResult" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1767,7 +1767,7 @@ Test Passed.
 66/68 Test: ODEEval.sampleODEResultJustBeforeEnd
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/ode_test" "--gtest_filter=ODEEval.sampleODEResultJustBeforeEnd" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/ode/test
-"ODEEval.sampleODEResultJustBeforeEnd" start time: Feb 13 19:02 CET
+"ODEEval.sampleODEResultJustBeforeEnd" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1786,7 +1786,7 @@ Note: Google Test filter = ODEEval.sampleODEResultJustBeforeEnd
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.sampleODEResultJustBeforeEnd" end time: Feb 13 19:02 CET
+"ODEEval.sampleODEResultJustBeforeEnd" end time: Feb 19 19:16 CET
 "ODEEval.sampleODEResultJustBeforeEnd" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1794,7 +1794,7 @@ Test Passed.
 67/68 Test: ODEEval.sampleODEResultJustAfterEnd
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/ode_test" "--gtest_filter=ODEEval.sampleODEResultJustAfterEnd" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/ode/test
-"ODEEval.sampleODEResultJustAfterEnd" start time: Feb 13 19:02 CET
+"ODEEval.sampleODEResultJustAfterEnd" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1813,7 +1813,7 @@ Note: Google Test filter = ODEEval.sampleODEResultJustAfterEnd
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.sampleODEResultJustAfterEnd" end time: Feb 13 19:02 CET
+"ODEEval.sampleODEResultJustAfterEnd" end time: Feb 19 19:16 CET
 "ODEEval.sampleODEResultJustAfterEnd" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1821,7 +1821,7 @@ Test Passed.
 68/68 Test: ODEEval.sampleODEResultOutOfBounds
 Command: "/media/btamm12/UbuntuHDD/GitHub/EAGLE/build/bin/ode_test" "--gtest_filter=ODEEval.sampleODEResultOutOfBounds" "--gtest_also_run_disabled_tests"
 Directory: /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/ode/test
-"ODEEval.sampleODEResultOutOfBounds" start time: Feb 13 19:02 CET
+"ODEEval.sampleODEResultOutOfBounds" start time: Feb 19 19:16 CET
 Output:
 ----------------------------------------------------------
 Running main() from /media/btamm12/UbuntuHDD/GitHub/EAGLE/build/googletest/googletest-src/googletest/src/gtest_main.cc
@@ -1840,8 +1840,8 @@ Note: Google Test filter = ODEEval.sampleODEResultOutOfBounds
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"ODEEval.sampleODEResultOutOfBounds" end time: Feb 13 19:02 CET
+"ODEEval.sampleODEResultOutOfBounds" end time: Feb 19 19:16 CET
 "ODEEval.sampleODEResultOutOfBounds" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Feb 13 19:02 CET
+End testing: Feb 19 19:16 CET

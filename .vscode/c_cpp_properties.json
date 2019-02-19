@@ -12,7 +12,15 @@
             "includePath": [
                 "${default}",
                 "${workspaceFolder}/**",
-                "/usr/include/python3.5m"
+                "/usr/include/python3.5m",
+                "${workspaceFolder}/drone/include",
+                "/usr/include/python3.6m",
+                "${workspaceFolder}/step-response/src",
+                "${workspaceFolder}/build/googletest/googletest-src/googletest/include",
+                "${workspaceFolder}/config/include",
+                "${workspaceFolder}/matrix/include",
+                "${workspaceFolder}/ode/include",
+                "${workspaceFolder}/applications/tuner"
             ]
         }
     ],
