@@ -33,6 +33,7 @@ dormandPrince(IteratorTimeBegin timeresult, IteratorXBegin xresult,
     ODEResultCode resultCode = ODEResultCodes::SUCCESS;
 
     for (size_t i = 0; i < opt.maxiter; ++i) {
+#if 0
         if (!isfinite(x)) {
             std::cerr << "Error: x is not finite" << std::endl;
             throw std::runtime_error{"Error: x is not finite"};
@@ -41,6 +42,9 @@ dormandPrince(IteratorTimeBegin timeresult, IteratorXBegin xresult,
             std::cerr << "Error: t is not finite" << std::endl;
             throw std::runtime_error{"Error: t is not finite"};
         }
+#endif  // TODO: this is slow, and not really necessary, because K1 is checked 
+        //       later
+
         // Calculate all seven slopes
         T K1 = f(t, x);
         T K2 = f(t + c2 * h, x + h * (a21 * K1));
@@ -59,7 +63,7 @@ dormandPrince(IteratorTimeBegin timeresult, IteratorXBegin xresult,
 
         if (!isfinite(K1)) {
             std::cerr << "Error: K1 is not finite" << std::endl;
-            throw std::runtime_error{"Error: K1 is not finite"};
+            throw std::runtime_error("Error: K1 is not finite");
         }
 
         double s = pow(h * opt.epsilon / 2.0 / error, 1.0 / 5.0);

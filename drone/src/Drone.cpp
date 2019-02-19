@@ -1,15 +1,6 @@
 #include "Drone.hpp"
-#ifdef I
-#error IIIIIIIIIIIIIIIIIII
-#endif
 #include "MotorControl.hpp"
-#ifdef I
-#error IIIIIIIIIIIIIIIIIII
-#endif
 #include <FileLoader.hpp>
-#ifdef I
-#error IIIIIIIIIIIIIIIIIII
-#endif
 
 using namespace std;
 
@@ -90,6 +81,7 @@ void Drone::load(const filesystem::path &loadPath) {
 }
 
 Drone::VecX_t Drone::operator()(const VecX_t &x, const VecU_t &u) {
+    // Convert the state and input vectors to types with getters and setters
     DroneState xx   = {x};
     DroneControl uu = {u};
     DroneState x_dot;
@@ -111,12 +103,11 @@ Drone::VecX_t Drone::operator()(const VecX_t &x, const VecU_t &u) {
     double n_thrust = xx.getThrustMotorSpeed();
     double u_thrust = uu.getThrustControl();
 
-    double F_local_z =
-        ct * rho * pow(Dp, 4) * Nm *
-        (pow(n_thrust + nh, 2) + pow(n[0], 2) + pow(n[1], 2) + pow(n[2], 2));
+    double F_local_z = ct * rho * sq(sq(Dp)) * Nm *
+                       (sq(n_thrust + nh) + sq(n[0]) + sq(n[1]) + sq(n[2]));
     ColVector<3> F_local = {0, 0, F_local_z};
     // Quatconjugate: Linksdraaiend assenstelsel
-    ColVector<3> F_world = quatrotate(quatconjugate(q), F_local); 
+    ColVector<3> F_world = quatrotate(quatconjugate(q), F_local);
     ColVector<3> a_world = F_world / m;
     ColVector<3> a_grav  = {0, 0, -g};
     ColVector<3> a       = a_world + a_grav;
@@ -156,11 +147,11 @@ Drone::AttitudeModel::AttitudeModel(const Drone &drone)
 // TODO: dry?
 Drone::AttitudeModel::VecX_t Drone::AttitudeModel::operator()(const VecX_t &x,
                                                               const VecU_t &u) {
+    // Convert the state and input vectors to types with getters and setters
     DroneAttitudeState xx = {x};
     DroneControl uu       = {u, {uh}};
     DroneAttitudeState x_dot;
 
-    // Attitude
     Quaternion q       = xx.getOrientation();
     ColVector<3> omega = xx.getAngularVelocity();
     ColVector<3> n     = xx.getMotorSpeed();
@@ -186,23 +177,31 @@ Drone::AttitudeModel::VecY_t Drone::AttitudeModel::getOutput(const VecX_t &x,
 Drone::Controller::VecU_t Drone::Controller::
 operator()(const Drone::Controller::VecX_t &x,
            const Drone::Controller::VecR_t &r) {
-    DroneState xx  = {x};
-    DroneOutput rr = {r};
+    DroneState xx     = {x};
+    DroneReference rr = {r};
     DroneControl uu;
 
     if (subsampleCounter == 0) {
-        u_alt =
-            uh + clampThrust((*altCtrl)(xx.getAltitude(), rr.getAltitude()));
+        auto u_alt_raw =
+            altitudeController->getOutput(xx.getAltitude(), rr.getAltitude());
+        u_alt            = uh + clampThrust(u_alt_raw);
         subsampleCounter = subsampleAlt;
     }
     --subsampleCounter;
 
-    auto u_att = (*attCtrl)(xx.getAttitude(), rr.getAttitude());
-    u_att      = clampAttitude(u_att, u_alt);
+    auto u_att =
+        attitudeController->getOutput(xx.getAttitude(), rr.getAttitude());
+    u_att = clampAttitude(u_att, u_alt);
     uu.setAttitudeControl(u_att);
     uu.setThrustControl(u_alt);
     checkControlSignal(uu);
     return uu;
+}
+
+void Drone::Controller::reset() {
+    subsampleCounter = 0;
+    attitudeController->reset();
+    altitudeController->reset();
 }
 
 ColVector<1> Drone::Controller::clampThrust(ColVector<1> u_thrust) {

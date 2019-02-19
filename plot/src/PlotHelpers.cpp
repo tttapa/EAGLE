@@ -35,20 +35,20 @@ pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {
         "reference_orientation"_a =
             dict{
                 "x"_a = Drone::extractSignal(
-                    result.reference, &DroneOutput::getOrientationEuler, 0),
+                    result.reference, &DroneReference::getOrientationEuler, 0),
                 "y"_a = Drone::extractSignal(
-                    result.reference, &DroneOutput::getOrientationEuler, 1),
+                    result.reference, &DroneReference::getOrientationEuler, 1),
                 "z"_a = Drone::extractSignal(
-                    result.reference, &DroneOutput::getOrientationEuler, 2),
+                    result.reference, &DroneReference::getOrientationEuler, 2),
             },
         "reference_position"_a =
             dict{
                 "x"_a = Drone::extractSignal(result.reference,
-                                             &DroneOutput::getPosition, 0),
+                                             &DroneReference::getPosition, 0),
                 "y"_a = Drone::extractSignal(result.reference,
-                                             &DroneOutput::getPosition, 1),
+                                             &DroneReference::getPosition, 1),
                 "z"_a = Drone::extractSignal(result.reference,
-                                             &DroneOutput::getPosition, 2),
+                                             &DroneReference::getPosition, 2),
             },
 
         "orientation"_a =
@@ -129,11 +129,11 @@ droneAttitudePlottableToPythonDict(const DroneAttitudePlottable &result) {
         "reference_orientation"_a =
             dict{
                 "x"_a = Drone::extractSignal(
-                    result.reference, &DroneOutput::getOrientationEuler, 0),
+                    result.reference, &DroneReference::getOrientationEuler, 0),
                 "y"_a = Drone::extractSignal(
-                    result.reference, &DroneOutput::getOrientationEuler, 1),
+                    result.reference, &DroneReference::getOrientationEuler, 1),
                 "z"_a = Drone::extractSignal(
-                    result.reference, &DroneOutput::getOrientationEuler, 2),
+                    result.reference, &DroneReference::getOrientationEuler, 2),
             },
 
         "orientation"_a =

@@ -35,7 +35,7 @@ struct TestReferenceFunction : public TimeFunctionT<ColVector<Ny>> {
         if (t >= m * 34 && t < m * 37)
             q = quatmultiply(q, quatconjugate(qy));
 
-        DroneOutput rr;
+        DroneReference rr;
         rr.setOrientation(q);
         rr.setPosition({0, 0, 1.0 * (t >= m * 24)});
         return rr;

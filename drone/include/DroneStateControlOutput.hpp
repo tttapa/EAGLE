@@ -141,6 +141,8 @@ class DroneOutput {
     constexpr operator ColVector<10>() const { return y; }
 };
 
+using DroneReference = DroneOutput;
+
 class DroneAttitudeOutput {
     ColVector<7> y = {};
 
