@@ -1,8 +1,9 @@
 #pragma once
 
-#include <Drone/Def.hpp>
-#include <Matrix/Randn.hpp>
+#include <Def.hpp>
+#include <Randn.hpp>
 #include <Config.hpp>
+#include <TunerConfig.hpp>
 
 constexpr static size_t Nq = Nx_att - 1;
 constexpr static size_t Nr = Nu_att;

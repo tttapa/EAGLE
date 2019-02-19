@@ -22,6 +22,16 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "shell",
+            "label": "Make & Tuner",
+            "command": "cd build && make -j$(nproc) tuner && ./bin/tuner --out /tmp",
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

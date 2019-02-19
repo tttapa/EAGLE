@@ -18,3 +18,4 @@ doc/html/
 *.pyc
 LastTest.log
 tasks.json
+.vscode/tags

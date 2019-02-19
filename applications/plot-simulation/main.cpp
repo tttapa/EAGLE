@@ -5,21 +5,23 @@
 #include <Config.hpp>
 #include <Degrees.hpp>
 #include <Plot.hpp>
+#include <PlotStepResponse.hpp>
 #include <iostream>
 
 using namespace std;
 
 int main(int argc, char const *argv[]) {
+
     /* ------ Parse command line arguments ---------------------------------- */
 
     filesystem::path loadPath = Config::loadPath;
     filesystem::path outPath  = "";
-    size_t px_x               = Config::px_x;
-    size_t px_y               = Config::px_y;
+    size_t w                  = Config::px_x;
+    size_t h                  = Config::px_y;
     bool plotResult           = true;
 
     ArgParser parser;
-    parser.add("--out", "-o", [&](const char *argv[]) {  // TODO
+    parser.add("--out", "-o", [&](const char *argv[]) {
         outPath = argv[1];
         cout << "Setting output path to: " << argv[1] << endl;
     });
@@ -31,13 +33,13 @@ int main(int argc, char const *argv[]) {
         loadPath = argv[1];
         cout << "Setting load path to: " << argv[1] << endl;
     });
-    parser.add("--width", "-w", [&](const char *argv[]) {  // TODO
-        px_x = strtoul(argv[1], nullptr, 10);
-        cout << "Setting the image width to: " << px_x << endl;
+    parser.add("--width", "-w", [&](const char *argv[]) {
+        w = strtoul(argv[1], nullptr, 10);
+        cout << "Setting the image width to: " << w << endl;
     });
-    parser.add("--height", "-h", [&](const char *argv[]) {  // TODO
-        px_y = strtoul(argv[1], nullptr, 10);
-        cout << "Setting the image height to: " << px_y << endl;
+    parser.add("--height", "-h", [&](const char *argv[]) {
+        h = strtoul(argv[1], nullptr, 10);
+        cout << "Setting the image height to: " << h << endl;
     });
     cout << ANSIColors::blue;
     parser.parse(argc, argv);
@@ -45,7 +47,7 @@ int main(int argc, char const *argv[]) {
 
     /* -------------------- Start the Python interpreter -------------------- */
 
-    pybind11::scoped_interpreter guard {};
+    pybind11::scoped_interpreter guard{};
 
     /* ------ Load drone data and get models, controllers and observers ----- */
 
@@ -71,20 +73,28 @@ int main(int argc, char const *argv[]) {
 
     /* ------ Plot the simulation result ------------------------------------ */
 
-    // TODO
-    // plt::figure_size(px_x, px_y);
-    // plotDrone(result);
-    // plt::axhline(drone.uh, "--", "r");
-    // plt::save(outPath / "Simulation.svg");
-    // plt::show();
-
     if (plotResult || !outPath.empty()) {
-        auto fig = plot(result);
-        if (plotResult)
-            show(fig);
+        // Plot and/or save the simulation result
+        auto fig = plot(result, w, h, 1, "Simulation");
         if (!outPath.empty())
             save(fig, outPath / "Simulation.svg");
+        if (plotResult)
+            show(fig);
+
+        // Plot and/or save the step response
+        Quaternion q_ref = eul2quat({20_deg, 10_deg, 0});
+        auto ax = axes(w, h);
+        plotStepResponseAttitude(drone, Config::Attitude::Q,
+                                 Config::Attitude::R, 0.025, q_ref,
+                                 Config::odeopt, ax, "Step Response");
+        fig = ax.attr("figure");
+        if (!outPath.empty())
+            save(fig, outPath / "Step-Response.svg");
+        if (plotResult)
+            show(fig);
     }
+
+    /* ------ Done ---------------------------------------------------------- */
 
     cout << "Done." << endl;
 

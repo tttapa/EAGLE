@@ -24,29 +24,17 @@ class StepResponseAnalyzer {
     }
 
     struct Result {
-        /**
-         * The last value that was fed to the analyzer
-         */
+        /// The last value that was fed to the analyzer
         ColVector<N> finalvalue;
-        /** 
-         * The last error value
-         */
+        /// The last error value
         ColVector<N> finalerror;
-        /** 
-         * The size of the step: `abs(x_ref - x_0)`
-         */
+        /// The size of the step: `abs(x_ref - x_0)`
         ColVector<N> absdelta;
-        /** 
-         * The time point where the curve first entered the settling interval
-         */
+        /// The time point where the curve first entered the settling interval
         ColVector<N> risetime;
-        /** 
-         * The extremum of the error after crossing the reference
-         */
+        /// The extremum of the error after crossing the reference
         ColVector<N> overshoot;
-        /** 
-         * The time point where the curve settled within the settling interval
-         */
+        /// The time point where the curve settled within the settling interval
         ColVector<N> settletime;
     };
 
@@ -67,8 +55,8 @@ class StepResponseAnalyzer {
     const ColVector<N> x_adif;  // dif = abs(x_ref - x_0)
     const ColVector<N> x_thr;   // threshold = factor * x_adif
 
-    // Contains +1.0 if the reference is greater than or equal to the initial
-    // value, and -1.0 if the reference is less than the initial value
+    /// Contains +1.0 if the reference is greater than or equal to the initial
+    /// value, and -1.0 if the reference is less than the initial value
     const ColVector<N> refdir;
     ColVector<N> dir;
     ColVector<N> x_prev;
@@ -99,36 +87,6 @@ class StepResponseAnalyzer {
     }
 
     bool calculate(double t, const ColVector<N> &x);
-};
-
-#include <Plot.hpp>
-#include <string>
-#include <vector>
-
-template <size_t N>
-class StepResponseAnalyzerPlotter : public StepResponseAnalyzer<N> {
-  public:
-    constexpr StepResponseAnalyzerPlotter(const ColVector<N> &x_ref,
-                                          double factor,
-                                          const ColVector<N> &x_0,
-                                          bool continueToEnd = true)
-        : StepResponseAnalyzer<N>{x_ref, factor, x_0},  //
-          continueToEnd{continueToEnd} {}
-
-    void plot(IndexRange idx                          = {0, N},
-              const std::vector<std::string> &legends = {}, ColorSet colors = 0,
-              Format format = 0, const std::string &title = "") const;
-
-    bool operator()(double t, const ColVector<N> &x) override {
-        t_v.push_back(t);
-        x_v.push_back(x);
-        return this->calculate(t, x) | continueToEnd;
-    }
-
-  private:
-    bool continueToEnd;
-    std::vector<double> t_v       = {};
-    std::vector<ColVector<N>> x_v = {};
 };
 
 #include "StepResponseAnalyzer.ipp"

@@ -17,7 +17,8 @@ static pybind11::module getPythonPlotModuleInitial() {
     pybind11::exec(R"(
         import sys
         sys.path.append(path)
-    )", pybind11::globals(), locals);
+    )",
+                   pybind11::globals(), locals);
     pybind11::module pm = pybind11::module::import("Plot");
     return pm;
 }
@@ -116,6 +117,66 @@ pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {
             dict{
                 "z"_a = Drone::extractSignal(
                     result.control, &DroneControl::getThrustControl, 0),
+            },
+    };
+}
+
+pybind11::dict
+droneAttitudePlottableToPythonDict(const DroneAttitudePlottable &result) {
+    using namespace pybind11::literals;
+    using pybind11::dict;
+    return dict{
+        "reference_orientation"_a =
+            dict{
+                "x"_a = Drone::extractSignal(
+                    result.reference, &DroneOutput::getOrientationEuler, 0),
+                "y"_a = Drone::extractSignal(
+                    result.reference, &DroneOutput::getOrientationEuler, 1),
+                "z"_a = Drone::extractSignal(
+                    result.reference, &DroneOutput::getOrientationEuler, 2),
+            },
+
+        "orientation"_a =
+            dict{
+                "x"_a = Drone::extractSignal(
+                    result.states, &DroneAttitudeState::getOrientationEuler, 0),
+                "y"_a = Drone::extractSignal(
+                    result.states, &DroneAttitudeState::getOrientationEuler, 1),
+                "z"_a = Drone::extractSignal(
+                    result.states, &DroneAttitudeState::getOrientationEuler, 2),
+            },
+
+        "angular_velocity"_a =
+            dict{
+                "x"_a = Drone::extractSignal(
+                    result.states, &DroneAttitudeState::getAngularVelocity, 0),
+                "y"_a = Drone::extractSignal(
+                    result.states, &DroneAttitudeState::getAngularVelocity, 1),
+                "z"_a = Drone::extractSignal(
+                    result.states, &DroneAttitudeState::getAngularVelocity, 2),
+            },
+
+        "torque_motor_velocity"_a =
+            dict{
+                "x"_a = Drone::extractSignal(
+                    result.states, &DroneAttitudeState::getMotorSpeed, 0),
+                "y"_a = Drone::extractSignal(
+                    result.states, &DroneAttitudeState::getMotorSpeed, 1),
+                "z"_a = Drone::extractSignal(
+                    result.states, &DroneAttitudeState::getMotorSpeed, 2),
+            },
+
+        "torque_control"_a =
+            dict{
+                "x"_a = Drone::extractSignal(
+                    result.control, &DroneAttitudeControl::getAttitudeControl,
+                    0),
+                "y"_a = Drone::extractSignal(
+                    result.control, &DroneAttitudeControl::getAttitudeControl,
+                    1),
+                "z"_a = Drone::extractSignal(
+                    result.control, &DroneAttitudeControl::getAttitudeControl,
+                    2),
             },
     };
 }

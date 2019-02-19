@@ -1,7 +1,7 @@
-#pragma once
+#include <PlotStepResponse.hpp>
 
-#include <Drone/Drone.hpp>
-#include <StepResponseAnalyzer.hpp>
+#include <Drone.hpp>
+#include <StepResponseAnalyzerPlotter.hpp>
 #include <iostream>
 
 void plotStepResponseAttitude(const Drone &drone,
@@ -9,10 +9,9 @@ void plotStepResponseAttitude(const Drone &drone,
                               const Matrix<Nu_att, Nu_att> &R,
                               double steperrorfactor, const Quaternion &q_ref,
                               const AdaptiveODEOptions &opt,
-                              const std::string &title,
-                              ColorSet colorset               = 0,
-                              Format format = 0,
-                              const std::string &legendSuffix = "") {
+                              pybind11::object axes, const std::string &title,
+                              const std::string &legendSuffix, int colorset) {
+
     using std::cout;
     using std::endl;
 
@@ -27,8 +26,6 @@ void plotStepResponseAttitude(const Drone &drone,
     const DroneAttitudeState attx0  = x0.getAttitude();
     const DroneAttitudeOutput atty0 = attmodel.getOutput(attx0, {0});
     const Quaternion q0             = atty0.getOrientation();
-
-    const std::string &lstr = legendSuffix;
 
     StepResponseAnalyzerPlotter<4> stepAnalyzerPlt = {q_ref, steperrorfactor,
                                                       q0, false};
@@ -52,10 +49,8 @@ void plotStepResponseAttitude(const Drone &drone,
          << "Settle time: \t" << asrowvector(settletimes) << endl
          << ANSIColors::reset;
 
-    stepAnalyzerPlt.plot({1, 4}, {"q1" + lstr, "q2" + lstr, "q3" + lstr},
-                         colorset,
-                         format,
-                         title);
-    plt::ylabel("Unit Quaternion components [-]");
-    plt::xlabel("time [$s$]");
+    stepAnalyzerPlt.plot(axes, {1, 4}, title,
+                         {"$q_1$" + legendSuffix, "$q_2$" + legendSuffix,
+                          "$q_3$" + legendSuffix},
+                         colorset);
 }

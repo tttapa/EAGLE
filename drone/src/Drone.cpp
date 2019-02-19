@@ -1,10 +1,20 @@
 #include "Drone.hpp"
+#ifdef I
+#error IIIIIIIIIIIIIIIIIII
+#endif
 #include "MotorControl.hpp"
+#ifdef I
+#error IIIIIIIIIIIIIIIIIII
+#endif
 #include <FileLoader.hpp>
+#ifdef I
+#error IIIIIIIIIIIIIIIIIII
+#endif
 
 using namespace std;
 
 void Drone::load(const filesystem::path &loadPath) {
+
     PerfTimer timer;
 
     /* Attitude */
@@ -105,7 +115,8 @@ Drone::VecX_t Drone::operator()(const VecX_t &x, const VecU_t &u) {
         ct * rho * pow(Dp, 4) * Nm *
         (pow(n_thrust + nh, 2) + pow(n[0], 2) + pow(n[1], 2) + pow(n[2], 2));
     ColVector<3> F_local = {0, 0, F_local_z};
-    ColVector<3> F_world = quatrotate(quatconjugate(q), F_local);  // TODO
+    // Quatconjugate: Linksdraaiend assenstelsel
+    ColVector<3> F_world = quatrotate(quatconjugate(q), F_local); 
     ColVector<3> a_world = F_world / m;
     ColVector<3> a_grav  = {0, 0, -g};
     ColVector<3> a       = a_world + a_grav;

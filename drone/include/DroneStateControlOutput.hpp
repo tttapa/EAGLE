@@ -166,3 +166,15 @@ class DroneAttitudeOutput {
 
     constexpr operator ColVector<7>() const { return y; }
 };
+
+class DroneAttitudeControl {
+    ColVector<3> u = {};
+
+  public:
+    constexpr DroneAttitudeControl() = default;
+    constexpr DroneAttitudeControl(const ColVector<3> &u) : u{u} {}
+
+    constexpr ColVector<3> getAttitudeControl() const { return u; }
+    constexpr void setAttitudeControl(const ColVector<3> &u_att) { u = u_att; }
+    constexpr operator ColVector<3>() const { return u; }
+};

@@ -126,38 +126,3 @@ double RealTimeCostCalculator<N>::getCost(double notRisenCost,
     return cost;
 }
 */
-
-template <size_t N>
-void StepResponseAnalyzerPlotter<N>::plot(
-    IndexRange idx, const std::vector<std::string> &legends,
-    ColorSet colors, Format format, const std::string &title) const {
-
-    if (t_v.empty() || x_v.empty())
-        return;
-
-    const auto result      = this->getResult();
-    const auto &overshoot  = result.overshoot;
-    const auto &risetime   = result.risetime;
-    const auto &settletime = result.settletime;
-    const auto &x_ref      = this->x_ref;
-    const auto &x_thr      = this->x_thr;
-
-    ColorFormatSet fmt = format.repeat(colors.size());
-    plotVectors(t_v, x_v, idx, legends, fmt, colors, title);
-
-    for (size_t k = 0; k < (idx.end - idx.start); ++k) {
-        size_t i          = k + idx.start;
-        std::string color = k < colors.size() ? colors[k] : ""; // TODO: hardcoded 3
-        if (x_ref[i] != 0.0) {
-            plt::axhline(x_ref[i], "--", color);
-            plt::axhline(x_ref[i] - x_thr[i], "-.", color);
-            plt::axhline(x_ref[i] + x_thr[i], "-.", color);
-            plt::axhline(x_ref[i] + overshoot[i], ":", color);
-        }
-        if (risetime[i] > 0.0)
-            plt::axvline(risetime[i], "--", color);
-        if (settletime[i] > 0.0)
-            plt::axvline(settletime[i], "-.", color);
-    }
-    plt::xlim(t_v[0], t_v.back());
-}

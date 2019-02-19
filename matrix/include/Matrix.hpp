@@ -40,6 +40,16 @@ T (&toCppArray(TMatrix<T, R, C> &matrix))
     return *reinterpret_cast<T(*)[R * C]>(&matrix.data[0].data);
 }
 
+template <class T, size_t R>
+std::array<T, R> &toStdArray(TColVector<T, R> &vector) {
+    return *reinterpret_cast<std::array<T, R>*>(&vector.data[0].data);
+}
+
+template <class T, size_t R>
+const std::array<T, R> &toStdArray(const TColVector<T, R> &vector) {
+    return *reinterpret_cast<const std::array<T, R>*>(&vector.data[0].data);
+}
+
 template <class T, size_t R, size_t C>
 const T (&toCppArray(const TMatrix<T, R, C> &matrix))[R * C] {
     return *reinterpret_cast<const T(*)[R * C]>(&matrix.data[0].data);
@@ -555,7 +565,7 @@ Matrix<R, C> round(const Matrix<R, C> &m, size_t digits) {
     for (auto &row : result)
         for (auto &el : row) {
             el = round(el * pow(10, digits)) / pow(10, digits);
-            if (el == 0.0) // fix -0.0
+            if (el == 0.0)  // fix -0.0
                 el = 0.0;
         }
     return result;
