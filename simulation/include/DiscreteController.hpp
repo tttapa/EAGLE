@@ -31,6 +31,11 @@ class DiscreteController {
      */
     virtual VecU_t operator()(const VecX_t &x, const VecR_t &r) = 0;
 
+    VecU_t getOutput(const VecX_t &x, const VecR_t &r) { return (*this)(x, r); }
+
+    /**
+     * @brief   Reset the internal states.
+     */
     virtual void reset() {}
 
     const double Ts;
