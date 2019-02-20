@@ -50,7 +50,7 @@ void mutate(Chromosome<N> &chrom, double factor) {
  */
 template <size_t N>
 std::string toString(Chromosome<N> &chrom) {
-    std::stringstream result;
+    std::ostringstream result;
     result << '[';
     for (size_t i = 0; i < N; i++) {
         if (i > 0)
