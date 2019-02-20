@@ -12,8 +12,10 @@ int main(int argc, const char *argv[]) {
     const Chromosome<6> parent1 = {10.0, 11.0, 12.0, 13.0, 14.0, 15.0};
     const Chromosome<6> parent2 = {20.0, 21.0, 22.0, 23.0, 24.0, 25.0};
     Chromosome<6> child1, child2;
+    Chromosome<6> child3, child4;
     crossOver(parent1, parent2, child1, child2);
-    
+    crossOver(parent1, parent2, child3, child4);
+
     // Print results
     cout << "parent1: [";
     for (int i = 0; i < 6; i++)
@@ -36,14 +38,14 @@ int main(int argc, const char *argv[]) {
     cout << "]\r\n";
 
 
-    // Mutate children with factor 5
-    mutate(child1, 5.0);
-    mutate(child2, 5.0);
+    // Mutate children with factor 0.1
+    //mutate(child1, 0.1);
+    //mutate(child2, 0.1);
 
 
     // Print children with toString()
-    cout << "child1: " << toString(child1) << "\r\n";
-    cout << "child1: " << toString(child2) << "\r\n";
+    cout << "child3: " << toString(child3) << "\r\n";
+    cout << "child4: " << toString(child4) << "\r\n";
 
     return EXIT_SUCCESS;
 }
