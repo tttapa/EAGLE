@@ -15,7 +15,7 @@ template <size_t N>
 void crossOver(const Chromosome<N> &parent1, const Chromosome<N> &parent2,
                Chromosome<N> &child1, Chromosome<N> &child2) {
     static std::default_random_engine generator;
-    static std::uniform_int_distribution<size_t> distr(0, N);
+    std::uniform_int_distribution<size_t> distr(0, N);
     size_t idx = distr(generator);
 
     for (size_t i = 0; i < idx; i++) {
