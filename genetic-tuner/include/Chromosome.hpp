@@ -1,5 +1,8 @@
 #pragma once
 
+#include <Randn.hpp>
+#include <sstream>
+
 /** Chromosome is a double array of size N. */
 template <size_t N>
 using Chromosome = ColVector<N>;
@@ -47,11 +50,13 @@ void mutate(Chromosome<N> &chrom, double factor) {
  */
 template <size_t N>
 std::string toString(Chromosome<N> &chrom) {
-    std::string result = "[";
-    for (int i = 0; i < N; i++) {
-        if (i > 0) result += ",";
-        result += chrom[i];
+    std::stringstream result;
+    result << '[';
+    for (size_t i = 0; i < N; i++) {
+        if (i > 0)
+            result << ',';
+        result << chrom[i];
     }
-    result += "]";
-    return result;
+    result << ']';
+    return result.str();
 }

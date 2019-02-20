@@ -5,6 +5,8 @@
 using namespace std;
 
 int main(int argc, const char *argv[]) {
+    (void) argc;
+    (void) argv;
 
     // Cross over two parents
     const Chromosome<6> parent1 = {10.0, 11.0, 12.0, 13.0, 14.0, 15.0};

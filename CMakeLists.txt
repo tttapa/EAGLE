@@ -123,6 +123,7 @@ target_link_libraries(tuner PRIVATE argparser
 
 file(GLOB_RECURSE SRCS_genetics "applications/genetics/*.cpp")
 add_executable(genetics ${SRCS_genetics})
+target_link_libraries(genetics PRIVATE genetic-tuner)
 
 
 ################################################################################
