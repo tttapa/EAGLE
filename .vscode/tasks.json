@@ -32,6 +32,16 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "shell",
+            "label": "Make & Genetics",
+            "command": "cd build && make -j$(nproc) genetics && ./bin/genetics --out /tmp",
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

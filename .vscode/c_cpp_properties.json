@@ -20,7 +20,8 @@
                 "${workspaceFolder}/config/include",
                 "${workspaceFolder}/matrix/include",
                 "${workspaceFolder}/ode/include",
-                "${workspaceFolder}/applications/tuner"
+                "${workspaceFolder}/applications/tuner",
+                "${workspaceFolder}/genetic-tuner/include"
             ]
         }
     ],

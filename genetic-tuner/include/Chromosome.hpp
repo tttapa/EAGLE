@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Randn.hpp>
-
 /** Chromosome is a double array of size N. */
 template <size_t N>
 using Chromosome = ColVector<N>;
@@ -31,13 +29,8 @@ void crossOver(const Chromosome<N> &parent1, const Chromosome<N> &parent2,
  * Mutate the given chromosome by adding an extra dChrom to the chromosome,
  * where dChrom[i] = factor*randn*chrom[i].
  */
-// Als je parameters "by value" gebruikt, moet je er geen const aan toevoegen,
-// want `factor` is sowieso een kopie, en de functie kan dus geen effect hebben
-// in de calling scope.
-// De const kan wel belang hebben in de scope van de functie, waar `factor` dan 
-// niet kan veranderen. Dit wordt meestal niet expliciet met const aangeduid.
 template <size_t N>
-void mutate(Chromosome<N> &chrom, const double factor) {
+void mutate(Chromosome<N> &chrom, double factor) {
 
     // Standard normal distribution
     static std::default_random_engine generator;
@@ -47,4 +40,18 @@ void mutate(Chromosome<N> &chrom, const double factor) {
         double random = distribution(generator);
         chrom[i] += factor * random * chrom[i];
     }
+}
+
+/**
+ * Create string representation of the given chromosome.
+ */
+template <size_t N>
+std::string toString(Chromosome<N> &chrom) {
+    std::string result = "[";
+    for (int i = 0; i < N; i++) {
+        if (i > 0) result += ",";
+        result += chrom[i];
+    }
+    result += "]";
+    return result;
 }

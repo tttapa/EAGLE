@@ -19,6 +19,8 @@ target_include_directories(plot
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+# Bas: this works "cmake -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3 ."
+#set(PYBIND11_PYTHON_VERSION 3.6)   # doesn't make a difference
 find_package(pybind11 REQUIRED)
 
 # target_compile_features(plot PRIVATE cxx_std_17)

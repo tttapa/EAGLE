@@ -1,0 +1,7 @@
+Chromosome.hpp/mutate():
+
+// Als je parameters "by value" gebruikt, moet je er geen const aan toevoegen,
+// want `factor` is sowieso een kopie, en de functie kan dus geen effect hebben
+// in de calling scope.
+// De const kan wel belang hebben in de scope van de functie, waar `factor` dan 
+// niet kan veranderen. Dit wordt meestal niet expliciet met const aangeduid.
