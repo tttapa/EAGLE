@@ -19,3 +19,4 @@ doc/html/
 LastTest.log
 tasks.json
 .vscode/tags
+build/Testing/Temporary/LastTest.log
