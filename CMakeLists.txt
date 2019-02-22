@@ -91,6 +91,7 @@ add_subdirectory("plot")
 add_subdirectory("csv")
 add_subdirectory("config")
 add_subdirectory("genetic-tuner")
+add_subdirectory("tilt-correction")
 
 ################################################################################
 ###############################   APPLICATIONS   ###############################

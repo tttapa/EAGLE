@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>  // M_PI
+
 // Convert degrees to radians
 constexpr long double operator""_deg(long double deg) {
     return deg * M_PI / 180.0;

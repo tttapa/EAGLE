@@ -42,12 +42,12 @@ T (&toCppArray(TMatrix<T, R, C> &matrix))
 
 template <class T, size_t R>
 std::array<T, R> &toStdArray(TColVector<T, R> &vector) {
-    return *reinterpret_cast<std::array<T, R>*>(&vector.data[0].data);
+    return *reinterpret_cast<std::array<T, R> *>(&vector.data[0].data);
 }
 
 template <class T, size_t R>
 const std::array<T, R> &toStdArray(const TColVector<T, R> &vector) {
-    return *reinterpret_cast<const std::array<T, R>*>(&vector.data[0].data);
+    return *reinterpret_cast<const std::array<T, R> *>(&vector.data[0].data);
 }
 
 template <class T, size_t R, size_t C>
@@ -308,6 +308,21 @@ constexpr double norm(const Array<T, N> &vector) {
     return sqrt(normsq(vector));
 }
 
+template <class T, size_t N>
+constexpr TColVector<T, N> normalize(const TColVector<T, N> &vector) {
+    return vector / norm(vector);
+}
+
+template <class T, size_t N>
+constexpr TRowVector<T, N> normalize(const TRowVector<T, N> &vector) {
+    return vector / norm(vector);
+}
+
+template <class T, size_t N>
+constexpr Array<T, N> normalize(const Array<T, N> &vector) {
+    return vector / norm(vector);
+}
+
 namespace MatrixPrinting {
 constexpr size_t precision = 17;
 constexpr size_t width     = precision + 6;
@@ -528,6 +543,22 @@ getBlock(const TMatrix<T, R, C> &matrix) {
     return result;
 }
 
+template <class T, size_t C1>
+constexpr TRowVector<T, C1 + 1> hcat(T l, const TRowVector<T, C1> &r) {
+    TRowVector<T, C1 + 1> result         = {};
+    result[0][0]                         = l;
+    assignBlock<0, 1, 1, C1 + 1>(result) = r;
+    return result;
+}
+
+template <class T, size_t C1>
+constexpr TRowVector<T, C1 + 1> hcat(const TRowVector<T, C1> &l, T r) {
+    TRowVector<T, C1 + 1> result     = {};
+    assignBlock<0, 1, 0, C1>(result) = l;
+    result[0][C1]                    = r;
+    return result;
+}
+
 template <class T, size_t R, size_t C1, size_t C2>
 constexpr TMatrix<T, R, C1 + C2> hcat(const TMatrix<T, R, C1> &l,
                                       const TMatrix<T, R, C2> &r) {
@@ -541,6 +572,22 @@ template <class T, size_t R, size_t C, class... Args>
 constexpr auto hcat(const TMatrix<T, R, C> &l, Args... args)
     -> decltype(hcat(l, hcat(args...))) {
     return hcat(l, hcat(args...));
+}
+
+template <class T, size_t R1>
+constexpr TColVector<T, R1 + 1> vcat(const TColVector<T, R1> &t, T b) {
+    TColVector<T, R1 + 1> result     = {};
+    assignBlock<0, R1, 0, 1>(result) = t;
+    result[R1][0]                    = b;
+    return result;
+}
+
+template <class T, size_t R1>
+constexpr TColVector<T, R1 + 1> vcat(T t, const TColVector<T, R1> &b) {
+    TColVector<T, R1 + 1> result         = {};
+    result[0][0]                         = t;
+    assignBlock<1, R1 + 1, 0, 1>(result) = b;
+    return result;
 }
 
 template <class T, size_t R1, size_t R2, size_t C>
