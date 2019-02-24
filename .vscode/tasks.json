@@ -16,7 +16,7 @@
         {
             "type": "shell",
             "label": "Make & Plot Simulation",
-            "command": "cd build && make -j$(nproc) plot-simulation && ./bin/plot-simulation --out /tmp --load /media/btamm12/UbuntuHDD/GitLab/EAGLE-students-2018/Groups/ANC/Cleanup-Pieter/Code-Generators/ParamsAndMatrices/Output",
+            "command": "cd build && make -j$(nproc) plot-simulation && ./bin/plot-simulation --out /tmp",
             "problemMatcher": "$gcc",
             "group": {
                 "kind": "build",

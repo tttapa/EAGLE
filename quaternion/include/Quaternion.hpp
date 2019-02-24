@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Matrix.hpp>
+#include <Square.hpp>
 
 using Quaternion = ColVector<4>;
 
@@ -64,8 +65,6 @@ constexpr EulerAngles quat2eul(const Quaternion &q) {
 
     return {psi, theta, phi};
 }
-
-static constexpr double sq(double r) { return r * r; }
 
 template <size_t C>
 constexpr Matrix<3, C> quatrotate(const Quaternion &q, const Matrix<3, C> &v) {
