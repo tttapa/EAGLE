@@ -78,6 +78,7 @@ SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} \
 find_package(CControllers)
 
 add_subdirectory("matrix")
+add_subdirectory("py-matrix")
 add_subdirectory("util")
 add_subdirectory("argparser")
 add_subdirectory("quaternion")
