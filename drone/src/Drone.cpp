@@ -1,84 +1,7 @@
 #include "Drone.hpp"
 #include "MotorControl.hpp"
-#include <FileLoader.hpp>
 
 using namespace std;
-
-void Drone::load(const filesystem::path &loadPath) {
-
-    PerfTimer timer;
-
-    /* Attitude */
-
-    Aa_att = loadMatrix<Nx_att, Nx_att>(loadPath / "attitude" / "Aa");
-    Ba_att = loadMatrix<Nx_att, Nu_att>(loadPath / "attitude" / "Ba");
-    Ca_att = loadMatrix<Ny_att, Nx_att>(loadPath / "attitude" / "Ca");
-    Da_att = loadMatrix<Ny_att, Nu_att>(loadPath / "attitude" / "Da");
-
-    Ad_att = loadMatrix<Nx_att, Nx_att>(loadPath / "attitude" / "Ad");
-    Bd_att = loadMatrix<Nx_att, Nu_att>(loadPath / "attitude" / "Bd");
-    Cd_att = loadMatrix<Ny_att, Nx_att>(loadPath / "attitude" / "Cd");
-    Dd_att = loadMatrix<Ny_att, Nu_att>(loadPath / "attitude" / "Dd");
-
-    G_att = calculateG(Ad_att, Bd_att, Cd_att, Dd_att);
-
-    Ad_att_r = getBlock<1, Nx_att, 1, Nx_att>(Ad_att);
-    Bd_att_r = getBlock<1, Nx_att, 0, Nu_att>(Bd_att);
-    Cd_att_r = getBlock<1, Ny_att, 1, Nx_att>(Cd_att);
-
-    Ts_att = loadDouble(loadPath / "attitude" / "Ts");
-
-    gamma_n = loadMatrix<3, 3>(loadPath / "attitude" / "gamma_n");
-    gamma_u = loadMatrix<3, 3>(loadPath / "attitude" / "gamma_u");
-
-    /* Altitude */
-
-    Aa_alt = loadMatrix<Nx_alt, Nx_alt>(loadPath / "altitude" / "Aa");
-    Ba_alt = loadMatrix<Nx_alt, Nu_alt>(loadPath / "altitude" / "Ba");
-    Ca_alt = loadMatrix<Ny_alt, Nx_alt>(loadPath / "altitude" / "Ca");
-    Da_alt = loadMatrix<Ny_alt, Nu_alt>(loadPath / "altitude" / "Da");
-
-    Ad_alt = loadMatrix<Nx_alt, Nx_alt>(loadPath / "altitude" / "Ad");
-    Bd_alt = loadMatrix<Nx_alt, Nu_alt>(loadPath / "altitude" / "Bd");
-    Cd_alt = loadMatrix<Ny_alt, Nx_alt>(loadPath / "altitude" / "Cd");
-    Dd_alt = loadMatrix<Ny_alt, Nu_alt>(loadPath / "altitude" / "Dd");
-
-    G_alt = calculateG(Ad_alt, Bd_alt, Cd_alt, Dd_alt);
-
-    Ts_alt = loadDouble(loadPath / "altitude" / "Ts");
-
-    /* General */
-
-    Id     = loadMatrix<3, 3>(loadPath / "I");
-    Id_inv = loadMatrix<3, 3>(loadPath / "I_inv");
-    k1     = loadDouble(loadPath / "k1");
-    k2     = loadDouble(loadPath / "k2");
-
-    m  = loadDouble(loadPath / "m");
-    ct = loadDouble(loadPath / "ct");
-    Dp = loadDouble(loadPath / "Dp");
-
-    auto duration = timer.getDuration<chrono::microseconds>();
-    cout << "Loaded Drone data files in " << duration << " µs." << endl;
-
-    nh = sqrt((m * g) / (ct * rho * pow(Dp, 4) * Nm));
-    uh = nh / k1;
-
-    // TODO
-
-    double Fzh = ct * rho * pow(Dp, 4) * pow(nh, 2) * Nm;
-    double Fg  = -g * m;
-
-    cout << "nh  = " << nh << endl;
-    cout << "uh  = " << uh << endl;
-    cout << "Fzh = " << Fzh << endl;
-    cout << "Fg  = " << Fg << endl;
-    cout << "Ts_alt  = " << setprecision(17) << Ts_alt << endl;
-
-    cout << "Ts_alt / Ts_att = " << (Ts_alt / Ts_att) << endl;
-
-    assert(isAlmostEqual(Id_inv, inv(Id), 1e-12));
-}
 
 Drone::VecX_t Drone::operator()(const VecX_t &x, const VecU_t &u) {
     // Convert the state and input vectors to types with getters and setters
@@ -94,27 +17,27 @@ Drone::VecX_t Drone::operator()(const VecX_t &x, const VecU_t &u) {
 
     Quaternion q_omega = vcat(zeros<1, 1>(), omega);
     x_dot.setOrientation(0.5 * quatmultiply(q, q_omega));
-    x_dot.setAngularVelocity(gamma_n * n + gamma_u * u_att -
-                             Id_inv * cross(omega, Id * omega));
-    x_dot.setMotorSpeed(k2 * (k1 * u_att - n));
+    x_dot.setAngularVelocity(p.gamma_n * n + p.gamma_u * u_att -
+                             p.Id_inv * cross(omega, p.Id * omega));
+    x_dot.setMotorSpeed(p.k2 * (p.k1 * u_att - n));
 
     // Navigation/Altitude
     ColVector<3> v  = xx.getVelocity();
     double n_thrust = xx.getThrustMotorSpeed();
     double u_thrust = uu.getThrustControl();
 
-    double F_local_z = ct * rho * sq(sq(Dp)) * Nm *
-                       (sq(n_thrust + nh) + sq(n[0]) + sq(n[1]) + sq(n[2]));
+    double F_local_z = p.ct * p.rho * sq(sq(p.Dp)) * p.Nm *
+                       (sq(n_thrust + p.nh) + sq(n[0]) + sq(n[1]) + sq(n[2]));
     ColVector<3> F_local = {0, 0, F_local_z};
     // Quatconjugate: Linksdraaiend assenstelsel
     ColVector<3> F_world = quatrotate(quatconjugate(q), F_local);
-    ColVector<3> a_world = F_world / m;
-    ColVector<3> a_grav  = {0, 0, -g};
+    ColVector<3> a_world = F_world / p.m;
+    ColVector<3> a_grav  = {0, 0, -p.g};
     ColVector<3> a       = a_world + a_grav;
 
     x_dot.setVelocity(a);
     x_dot.setPosition(v);
-    x_dot.setThrustMotorSpeed(k2 * (k1 * (u_thrust - uh) - n_thrust));
+    x_dot.setThrustMotorSpeed(p.k2 * (p.k1 * (u_thrust - p.uh) - n_thrust));
 
     return x_dot;
 }
@@ -123,7 +46,7 @@ Drone::VecY_t Drone::getOutput(const VecX_t &x, const VecU_t &u) {
     DroneState xx   = {x};
     DroneControl uu = {u};
     ColVector<Ny_att> y_att =
-        Ca_att * xx.getAttitude() + Da_att * uu.getAttitudeControl();
+        p.Ca_att * xx.getAttitude() + p.Da_att * uu.getAttitudeControl();
     ColVector<Ny_nav + Ny_alt> y_nav = xx.getPosition();
     return DroneOutput{y_att, y_nav};
 }
@@ -139,7 +62,7 @@ DroneState Drone::getStableState() const {
     return xx;
 }
 
-Drone::AttitudeModel::AttitudeModel(const Drone &drone)
+Drone::AttitudeModel::AttitudeModel(const DroneParamsAndMatrices &drone)
     : gamma_n{drone.gamma_n}, gamma_u{drone.gamma_u}, Id{drone.Id},
       Id_inv{drone.Id_inv}, k1{drone.k1}, k2{drone.k2}, uh{drone.uh},
       Ca_att{drone.Ca_att}, Da_att{drone.Da_att} {}
