@@ -1,7 +1,5 @@
-# Create library target and specify the implementation files to compile.
-add_library(py-matrix
-    src/PyMatrix.cpp
-)
+# Create header-only library target.
+add_library(py-matrix INTERFACE)
 
 # Add an alias so that library can be used inside the build tree, e.g. when 
 # testing
@@ -18,15 +16,13 @@ find_package(pybind11 REQUIRED)
 #   to compile the implementation files of the library, users of the library
 #   should not include them.
 target_include_directories(py-matrix
-    PUBLIC
+    INTERFACE
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 # Tell CMake to compile this library with C++17 features enabled
-target_compile_features(py-matrix PUBLIC cxx_std_17)
+target_compile_features(py-matrix INTERFACE cxx_std_17)
 
 # Link the library with its dependencies.
 #   This manages both the include directories of the dependencies, as well as  
@@ -34,7 +30,7 @@ target_compile_features(py-matrix PUBLIC cxx_std_17)
 #   Libraries that are used in the public header files should be public,
 #   libraries that are only used in the implementation files should be private.
 target_link_libraries(py-matrix
-    PUBLIC 
+    INTERFACE 
         matrix
         pybind11::embed
 )
