@@ -4,7 +4,7 @@ add_executable(py-matrix-test test-PyMatrix.cpp)
 # Link the test executable with the Google Test main entry point and the library
 # under test
 target_link_libraries(py-matrix-test 
-    gtest_main
+    gtest
     PyMatrix::py-matrix
 )
 

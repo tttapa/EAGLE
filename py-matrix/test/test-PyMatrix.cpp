@@ -3,15 +3,50 @@
 
 #include <PyMatrix.hpp>
 
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  pybind11::scoped_interpreter interpreter = {};
+  return RUN_ALL_TESTS();
+}
+
 TEST(PyMatrix, Cpp2Python) {
-    Matrix<5, 3> m                      = {{
+    Matrix<5, 3> m = {{
         {11, 12, 13},
         {21, 22, 23},
         {31, 32, 33},
         {41, 42, 43},
         {51, 52, 53},
     }};
-    pybind11::scoped_interpreter intrpr = {};
+
+    using namespace pybind11::literals;
+
+    auto locals = pybind11::dict{"m"_a = m};
+    pybind11::exec(R"(
+        import numpy as np
+        print(m)
+        expected = np.array((
+            (11, 12, 13),
+            (21, 22, 23),
+            (31, 32, 33),
+            (41, 42, 43),
+            (51, 52, 53)
+        ))
+        equal = np.array_equal(m, expected)
+        print (equal)
+        )",
+                   pybind11::globals(), locals);
+
+    ASSERT_TRUE(locals["equal"].cast<bool>());
+}
+
+TEST(PyMatrix, Cpp2PythonInt) {
+    TMatrix<int, 5, 3> m = {{
+        {11, 12, 13},
+        {21, 22, 23},
+        {31, 32, 33},
+        {41, 42, 43},
+        {51, 52, 53},
+    }};
 
     using namespace pybind11::literals;
 
@@ -36,7 +71,6 @@ TEST(PyMatrix, Cpp2Python) {
 
 TEST(PyMatrix, Python2Cpp) {
     using namespace pybind11::literals;
-    pybind11::scoped_interpreter intrpr = {};
 
     auto locals = pybind11::dict{};
     pybind11::exec(R"(
@@ -63,9 +97,36 @@ TEST(PyMatrix, Python2Cpp) {
     ASSERT_EQ(result, expected);
 }
 
+TEST(PyMatrix, Python2CppInt) {
+    using namespace pybind11::literals;
+
+    auto locals = pybind11::dict{};
+    pybind11::exec(R"(
+        import numpy as np
+        matrix = np.array((
+            (11, 12, 13),
+            (21, 22, 23),
+            (31, 32, 33),
+            (41, 42, 43),
+            (51, 52, 53)
+        ))
+        )",
+                   pybind11::globals(), locals);
+
+    TMatrix<int, 5, 3> result   = locals["matrix"].cast<TMatrix<int, 5, 3>>();
+    TMatrix<int, 5, 3> expected = {{
+        {11, 12, 13},
+        {21, 22, 23},
+        {31, 32, 33},
+        {41, 42, 43},
+        {51, 52, 53},
+    }};
+
+    ASSERT_EQ(result, expected);
+}
+
 TEST(PyMatrix, Python2CppWrongDimensionsRow) {
     using namespace pybind11::literals;
-    pybind11::scoped_interpreter intrpr = {};
 
     auto locals = pybind11::dict{};
     pybind11::exec(R"(
@@ -89,7 +150,6 @@ TEST(PyMatrix, Python2CppWrongDimensionsRow) {
 
 TEST(PyMatrix, Python2CppWrongDimensionsCol) {
     using namespace pybind11::literals;
-    pybind11::scoped_interpreter intrpr = {};
 
     auto locals = pybind11::dict{};
     pybind11::exec(R"(

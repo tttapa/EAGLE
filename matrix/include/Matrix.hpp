@@ -24,11 +24,13 @@ using TRowVector = TMatrix<T, 1, C>;
 template <size_t C>
 using RowVector = TRowVector<double, C>;
 
+/// Get a raw pointer to the internal buffer of the matrix
 template <class T, size_t R, size_t C>
 T *toArrayPointer(TMatrix<T, R, C> &matrix) {
     return &matrix[0][0];
 }
 
+/// Get a raw const pointer to the internal buffer of the matrix
 template <class T, size_t R, size_t C>
 const T *toArrayPointer(const TMatrix<T, R, C> &matrix) {
     return &matrix[0][0];
