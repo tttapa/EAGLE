@@ -23,6 +23,7 @@ target_include_directories(quaternion
 target_link_libraries(quaternion 
     PUBLIC 
         Matrix::matrix 
+        Util::util
 )
 
 add_subdirectory(test) 

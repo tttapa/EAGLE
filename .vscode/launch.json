@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/tuner",
+            "program": "${workspaceFolder}/build/bin/py-matrix-test",
             "args": [
                 "--load",
                 "$HOME/PO-EAGLE/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/Output",

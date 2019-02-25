@@ -13,25 +13,20 @@
 #include <AlmostEqual.hpp>
 #include <PerfTimer.hpp>
 
-#include <cassert>
 #include <filesystem>
 #include <iostream>
 
 #include "C-code-wrappers/CKalmanObserver.hpp"
 #include "C-code-wrappers/CLQRController.hpp"
 
+#include "DroneParamsAndMatrices.hpp"
+
 struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
 #pragma region Constructors.....................................................
 
     /// Create a drone, loading the parameters from a given path.
-    Drone(const std::filesystem::path &loadPath) { load(loadPath); }
-
-    /** 
-     * @brief   Loads all system matrices and parameters from the respective 
-     *          files in the given folder. 
-     */
-    void load(const std::filesystem::path &loadPath);
+    Drone(const std::filesystem::path &loadPath) { p.load(loadPath); }
 
 #pragma region Continuous Model.................................................
 
@@ -149,7 +144,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     /// The continuous model of the attitude of the drone
     struct AttitudeModel : public ContinuousModel<Nx_att, Nu_att, Ny_att> {
-        AttitudeModel(const Drone &drone);
+        AttitudeModel(const DroneParamsAndMatrices &drone);
 
         VecX_t operator()(const VecX_t &x, const VecU_t &u) override;
         VecY_t getOutput(const VecX_t &x, const VecU_t &u) override;
@@ -166,7 +161,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     };
 
     /// Get the continuous model of the attitude of this drone
-    AttitudeModel getAttitudeModel() const { return {*this}; }
+    AttitudeModel getAttitudeModel() const { return {p}; }
 
     /// The continuous model of the altitude controller of the drone
     /// @todo   Implement
@@ -181,7 +176,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     Matrix<Nu_att, Nx_att - 1>
     getAttitudeControllerMatrixK(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                                  const Matrix<Nu_att, Nu_att> &R) const {
-        return -dlqr(Ad_att_r, Bd_att_r, Q, R).K;
+        return -dlqr(p.Ad_att_r, p.Bd_att_r, Q, R).K;
     }
 
     /** 
@@ -192,7 +187,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      */
     Attitude::LQRController
     getAttitudeController(const Matrix<Nu_att, Nx_att - 1> &K_red) const {
-        return {G_att, K_red, Ts_att};
+        return {p.G_att, K_red, p.Ts_att};
     }
 
     /** 
@@ -206,7 +201,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     getAttitudeController(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                           const Matrix<Nu_att, Nu_att> &R) const {
         auto K_red = getAttitudeControllerMatrixK(Q, R);
-        return {G_att, K_red, Ts_att};
+        return {p.G_att, K_red, p.Ts_att};
     }
 
     /** 
@@ -248,26 +243,26 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     FixedClampAttitudeController
     getFixedClampAttitudeController(const Matrix<Nx_att - 1, Nx_att - 1> &Q,
                                     const Matrix<Nu_att, Nu_att> &R) const {
-        return {getAttitudeController(Q, R), uh};
+        return {getAttitudeController(Q, R), p.uh};
     }
 
     FixedClampAttitudeController getFixedClampAttitudeController(
         const Matrix<Nu_att, Nx_att - 1> &K_red) const {
-        return {getAttitudeController(K_red), uh};
+        return {getAttitudeController(K_red), p.uh};
     }
 
     FixedClampCAttitudeController getFixedClampCAttitudeController() const {
-        return {Attitude::CLQRController{Ts_att}, uh};
+        return {Attitude::CLQRController{p.Ts_att}, p.uh};
     }
 
     // Altitude
 
     Altitude::LQRController getAltitudeController(const Matrix<1, 4> &K_pi,
                                                   double maxIntegralInfluence) {
-        return {G_alt, Cd_alt, K_pi, Ts_alt, maxIntegralInfluence};
+        return {p.G_alt, p.Cd_alt, K_pi, p.Ts_alt, maxIntegralInfluence};
     }
 
-    Altitude::CLQRController getCAltitudeController() { return {Ts_alt}; }
+    Altitude::CLQRController getCAltitudeController() { return {p.Ts_alt}; }
 
     class Controller : public DiscreteController<Nx, Nu, Ny> {
       public:
@@ -320,13 +315,13 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
                 getAttitudeController(Q_att, R_att)),
             std::make_unique<Altitude::LQRController>(
                 getAltitudeController(K_pi_alt, maxIntegralInfluence)),
-            uh,
+            p.uh,
         };
     }
 
     Controller getCController() {
-        return {std::make_unique<Attitude::CLQRController>(Ts_att),
-                std::make_unique<Altitude::CLQRController>(Ts_alt), uh};
+        return {std::make_unique<Attitude::CLQRController>(p.Ts_att),
+                std::make_unique<Altitude::CLQRController>(p.Ts_alt), p.uh};
     }
 
 #pragma region Observers........................................................
@@ -337,7 +332,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     Matrix<Nx_att - 1, Ny_att - 1>
     getAttitudeObserverMatrixL(const RowVector<Nu_att> &varDynamics,
                                const RowVector<Ny_att - 1> &varSensors) const {
-        return dlqe(Ad_att_r, Bd_att_r, Cd_att_r, diag(varDynamics),
+        return dlqe(p.Ad_att_r, p.Bd_att_r, p.Cd_att_r, diag(varDynamics),
                     diag(varSensors))
             .L;
     }
@@ -349,7 +344,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     getAttitudeObserver(const RowVector<Nu_att> &varDynamics,
                         const RowVector<Ny_att - 1> &varSensors) const {
         auto L_red = getAttitudeObserverMatrixL(varDynamics, varSensors);
-        return {Ad_att_r, Bd_att_r, Cd_att, L_red, Ts_att};
+        return {p.Ad_att_r, p.Bd_att_r, p.Cd_att, L_red, p.Ts_att};
     }
 
     /** 
@@ -358,7 +353,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     Matrix<Nx_att - 1, Ny_att - 1> getAttitudeObserverMatrixL(
         const RowVector<Nu_att + Nx_att - 1> &varDynamics,
         const RowVector<Ny_att - 1> &varSensors) const {
-        return dlqe(Ad_att_r, hcat(eye<9>(), Bd_att_r), Cd_att_r,
+        return dlqe(p.Ad_att_r, hcat(eye<9>(), p.Bd_att_r), p.Cd_att_r,
                     diag(varDynamics), diag(varSensors))
             .L;
     }
@@ -370,7 +365,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     getAttitudeObserver(const RowVector<Nu_att + Nx_att - 1> &varDynamics,
                         const RowVector<Ny_att - 1> &varSensors) const {
         auto L_red = getAttitudeObserverMatrixL(varDynamics, varSensors);
-        return {Ad_att_r, Bd_att_r, Cd_att, L_red, Ts_att};
+        return {p.Ad_att_r, p.Bd_att_r, p.Cd_att, L_red, p.Ts_att};
     }
 
     /** 
@@ -379,7 +374,8 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     Matrix<Nx_alt, Ny_alt>
     getAltitudeObserverMatrixL(const RowVector<Nu_alt> &varDynamics,
                                const RowVector<Ny_alt> &varSensors) const {
-        return dlqe(Ad_alt, Bd_alt, Cd_alt, diag(varDynamics), diag(varSensors))
+        return dlqe(p.Ad_alt, p.Bd_alt, p.Cd_alt, diag(varDynamics),
+                    diag(varSensors))
             .L;
     }
 
@@ -390,7 +386,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     getAltitudeObserver(const RowVector<Nu_alt> &varDynamics,
                         const RowVector<Ny_alt> &varSensors) const {
         auto L = getAltitudeObserverMatrixL(varDynamics, varSensors);
-        return {Ad_alt, Bd_alt, Cd_alt, L, Ts_alt};
+        return {p.Ad_alt, p.Bd_alt, p.Cd_alt, L, p.Ts_alt};
     }
 
     class Observer : public DiscreteObserver<Nx, Nu, Ny> {
@@ -432,180 +428,10 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     }
 
     Observer getCObserver() {
-        return {std::make_unique<Attitude::CKalmanObserver>(Ts_att),
-                std::make_unique<Altitude::CKalmanObserver>(Ts_alt)};
+        return {std::make_unique<Attitude::CKalmanObserver>(p.Ts_att),
+                std::make_unique<Altitude::CKalmanObserver>(p.Ts_alt)};
     }
 
-#pragma region System matrices Attitude.........................................
     // private: TODO
-    /** 
-     * ```
-     *  Aa_att =  [  ·   ·   ·   ·   ·   ·   ·   ·   ·   ·  ]
-     *            [  ·   ·   ·   ·  ┌─────────┐  ·   ·   ·  ]
-     *            [  ·   ·   ·   ·  │  0.5 I3 │  ·   ·   ·  ]
-     *            [  ·   ·   ·   ·  └─────────┘  ·   ·   ·  ]
-     *            [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
-     *            [  ·   ·   ·   ·   ·   ·   ·  │   Γ_n   │ ]
-     *            [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ]
-     *            [  ·   ·   ·   ·   ·   ·   ·  ┌─────────┐ ]
-     *            [  ·   ·   ·   ·   ·   ·   ·  │ -k2 I3  │ ]
-     *            [  ·   ·   ·   ·   ·   ·   ·  └─────────┘ ] 
-     * ``` */
-    Matrix<Nx_att, Nx_att> Aa_att = {};
-
-    /** 
-     * Discrete A 
-     */
-    Matrix<Nx_att, Nx_att> Ad_att = {};
-
-    /** 
-     * Discrete, reduced A 
-     */
-    Matrix<Nx_att - 1, Nx_att - 1> Ad_att_r = {};
-
-    /** 
-     * ```
-     *  Ba_att =  [  ·   ·   ·  ]
-     *            [  ·   ·   ·  ]
-     *            [  ·   ·   ·  ]
-     *            [  ·   ·   ·  ]
-     *            [ ┌─────────┐ ]
-     *            [ │   Γ_u   │ ]
-     *            [ └─────────┘ ]
-     *            [ ┌─────────┐ ]
-     *            [ │ k1k2 I3 │ ]
-     *            [ └─────────┘ ] 
-     * ``` */
-    Matrix<Nx_att, Nu_att> Ba_att = {};
-
-    /** 
-     * Discrete B
-     */
-    Matrix<Nx_att, Nu_att> Bd_att = {};
-
-    /** 
-     * Discrete, reduced B
-     */
-    Matrix<Nx_att - 1, Nu_att> Bd_att_r = {};
-
-    /**
-     * ```
-     *  Ca_att =  [ 1  ·  ·  ·  ·  ·  ·  ·  ·  · ]
-     *            [ ·  1  ·  ·  ·  ·  ·  ·  ·  · ]
-     *            [ ·  ·  1  ·  ·  ·  ·  ·  ·  · ]
-     *            [ ·  ·  ·  1  ·  ·  ·  ·  ·  · ]
-     *            [ ·  ·  ·  ·  1  ·  ·  ·  ·  · ]
-     *            [ ·  ·  ·  ·  ·  1  ·  ·  ·  · ]
-     *            [ ·  ·  ·  ·  ·  ·  1  ·  ·  · ] 
-     * ``` */
-    Matrix<Ny_att, Nx_att> Ca_att = {};
-
-    /**
-     * Discrete C
-     */
-    Matrix<Ny_att, Nx_att> Cd_att = {};
-
-    /**
-     * Discrete, reduced C
-     */
-    Matrix<Ny_att - 1, Nx_att - 1> Cd_att_r = {};
-
-    /** 
-     * ```
-     *  Da_att =  [ ·  ·  · ]
-     *            [ ·  ·  · ]
-     *            [ ·  ·  · ]
-     *            [ ·  ·  · ]
-     *            [ ·  ·  · ]
-     *            [ ·  ·  · ]
-     *            [ ·  ·  · ] 
-     * ``` */
-    Matrix<Ny_att, Nu_att> Da_att = {};
-
-    /**
-     * Discrete D
-     */
-    Matrix<Ny_att, Nu_att> Dd_att = {};
-
-    /** 
-     * Equilibrium G
-     */
-    Matrix<Nx_att + Nu_att, Ny_att> G_att;
-
-#pragma region System matrices Altitude.........................................
-
-    /** 
-     * ```
-     *  Aa_alt =  [ -k2  ·   ·   ]
-     *            [  ·   ·   1   ]
-     *            [  a   ·   ·   ]
-     * ``` */
-    Matrix<Nx_alt, Nx_alt> Aa_alt = {};
-
-    /** 
-     * Discrete A 
-     */
-    Matrix<Nx_alt, Nx_alt> Ad_alt = {};
-
-    /** 
-     * ```
-     *  Ba_alt =  [ k1 k2 ]
-     *            [   ·   ]
-     *            [   ·   ]
-     * ``` */
-    Matrix<Nx_alt, Nu_alt> Ba_alt = {};
-
-    /** 
-     * Discrete B
-     */
-    Matrix<Nx_alt, Nu_alt> Bd_alt = {};
-
-    /**
-     * ```
-     *  Ca_alt =  [ ·  1  ·  ]
-     * ``` */
-    Matrix<Ny_alt, Nx_alt> Ca_alt = {};
-
-    /**
-     * Discrete C
-     */
-    Matrix<Ny_alt, Nx_alt> Cd_alt = {};
-
-    /** 
-     * ```
-     *  Da_alt =  [ · ]
-     * ``` */
-    Matrix<Ny_alt, Nu_alt> Da_alt = {};
-
-    /**
-     * Discrete D
-     */
-    Matrix<Ny_alt, Nu_alt> Dd_alt = {};
-
-    /** 
-     * Equilibrium G
-     */
-    Matrix<Nx_alt + Nu_alt, Ny_alt> G_alt;
-
-#pragma region System parameters................................................
-
-    double Ts_att;
-    double Ts_alt;
-
-    Matrix<3, 3> gamma_n;
-    Matrix<3, 3> gamma_u;
-    Matrix<3, 3> Id;
-    Matrix<3, 3> Id_inv;
-    double k1;
-    double k2;
-
-    const int Nm     = 4;      ///< -            number of motors
-    const double g   = 9.81;   ///< m/s2         gravitational acceleration
-    const double rho = 1.225;  ///< kg/m3        air density (nominal, at 15C,
-                               ///               sea level)
-    double m;                  ///< kg           total mass
-    double ct;                 ///< -            thrust coefficient
-    double Dp;                 ///< m            propeller diameter
-    double nh;                 ///< rps          hover propeller speed
-    double uh;                 ///< -            hover control
+    DroneParamsAndMatrices p;
 };

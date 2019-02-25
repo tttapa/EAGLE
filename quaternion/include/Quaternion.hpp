@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Matrix.hpp>
+#include <Square.hpp>
 
 using Quaternion = ColVector<4>;
 
@@ -28,18 +29,19 @@ constexpr Quaternion quatDifference(const Quaternion &p, const Quaternion &q) {
     return quatmultiply(p, quatconjugate(q));
 }
 
+/// Yaw (Z), Roll (Y'), Pitch (X")
 using EulerAngles = ColVector<3>;
 
 constexpr Quaternion eul2quat(const EulerAngles &eulerAngles) {
     using std::cos;
     using std::sin;
-    double phi   = eulerAngles[2];
-    double theta = eulerAngles[1];
-    double psi   = eulerAngles[0];
+    double roll  = eulerAngles[2];
+    double pitch = eulerAngles[1];
+    double yaw   = eulerAngles[0];
 
-    double a = phi / 2;
-    double b = theta / 2;
-    double c = psi / 2;
+    double a = roll / 2;
+    double b = pitch / 2;
+    double c = yaw / 2;
 
     return {{
         {cos(a) * cos(b) * cos(c) + sin(a) * sin(b) * sin(c)},
@@ -63,8 +65,6 @@ constexpr EulerAngles quat2eul(const Quaternion &q) {
 
     return {psi, theta, phi};
 }
-
-static constexpr double sq(double r) { return r * r; }
 
 template <size_t C>
 constexpr Matrix<3, C> quatrotate(const Quaternion &q, const Matrix<3, C> &v) {

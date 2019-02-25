@@ -58,7 +58,7 @@ SET (CMAKE_CXX_COMPILER "g++-8")
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
--O3 -g3 \
+-O0 -g3 \
 -Wall -Wextra -Werror \
 -Wsuggest-override \
 -Wno-register \
@@ -78,6 +78,7 @@ SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} \
 find_package(CControllers)
 
 add_subdirectory("matrix")
+add_subdirectory("py-matrix")
 add_subdirectory("util")
 add_subdirectory("argparser")
 add_subdirectory("quaternion")
@@ -91,6 +92,7 @@ add_subdirectory("plot")
 add_subdirectory("csv")
 add_subdirectory("config")
 add_subdirectory("genetic-tuner")
+add_subdirectory("tilt-correction")
 
 ################################################################################
 ###############################   APPLICATIONS   ###############################

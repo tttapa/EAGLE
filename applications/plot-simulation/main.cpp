@@ -82,11 +82,14 @@ int main(int argc, char const *argv[]) {
             show(fig);
 
         // Plot and/or save the step response
-        Quaternion q_ref = eul2quat({20_deg, 10_deg, 0});
+        EulerAngles e_ref = {0_deg, 30_deg, 30_deg};
+        Quaternion q_ref = eul2quat(e_ref);
+        ostringstream title;
+        title << "Step Response $" << asEulerAngles(e_ref, degreesTeX) << "$";
         auto ax = axes(w, h);
         plotStepResponseAttitude(drone, Config::Attitude::Q,
                                  Config::Attitude::R, 0.025, q_ref,
-                                 Config::odeopt, ax, "Step Response");
+                                 Config::odeopt, ax, title.str());
         fig = ax.attr("figure");
         if (!outPath.empty())
             save(fig, outPath / "Step-Response.svg");

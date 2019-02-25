@@ -225,6 +225,22 @@ TEST(Matrix, hcat) {
     ASSERT_EQ(result, expected);
 }
 
+TEST(Matrix, hcatRowVectorDoubleR) {
+    RowVector<2> l        = {{1, 2}};
+    double r              = 3;
+    RowVector<3> result   = hcat(l, r);
+    RowVector<3> expected = {{1, 2, 3}};
+    ASSERT_EQ(result, expected);
+}
+
+TEST(Matrix, hcatRowVectorDoubleL) {
+    double l              = 1;
+    RowVector<2> r        = {{2, 3}};
+    RowVector<3> result   = hcat(l, r);
+    RowVector<3> expected = {{1, 2, 3}};
+    ASSERT_EQ(result, expected);
+}
+
 TEST(Matrix, hcat3) {
     TMatrix<int, 2, 2> l        = {{
         {11, 12},
@@ -243,6 +259,22 @@ TEST(Matrix, hcat3) {
         {11, 12, 13, 14, 15, 16, 17},
         {21, 22, 23, 24, 25, 26, 27},
     }};
+    ASSERT_EQ(result, expected);
+}
+
+TEST(Matrix, hcatColVectorDoubleR) {
+    ColVector<2> t        = {{1, 2}};
+    double b              = 3;
+    ColVector<3> result   = vcat(t, b);
+    ColVector<3> expected = {{1, 2, 3}};
+    ASSERT_EQ(result, expected);
+}
+
+TEST(Matrix, hcatColVectorDoubleL) {
+    double t              = 1;
+    ColVector<2> b        = {{2, 3}};
+    ColVector<3> result   = vcat(t, b);
+    ColVector<3> expected = {{1, 2, 3}};
     ASSERT_EQ(result, expected);
 }
 

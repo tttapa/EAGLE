@@ -19,9 +19,7 @@ Matrix<R, C> loadMatrix(const std::string &name) {
     auto size = in.tellg();
     if (size < 2) {
         std::stringstream sstr;
-        sstr << "Error: file size too small "
-                "("
-             << filename << ")";
+        sstr << "Error: file size too small (" << filename << ")";
         throw std::runtime_error(sstr.str());
     }
     uint8_t r, c;
@@ -32,12 +30,9 @@ Matrix<R, C> loadMatrix(const std::string &name) {
     if (r != R) {
         std::stringstream sstr;
         sstr << "Error: number of rows in file doesn't match expected "
-                "number of rows. "
-                "("
-             << filename
-             << ") "
-                "Expected: "
-             << R << ", File: " << +r;
+                "number of rows. ("
+             << filename << ") "
+             << "Expected: " << R << ", File: " << +r;
         throw std::runtime_error(sstr.str());
     }
     if (c != C) {
