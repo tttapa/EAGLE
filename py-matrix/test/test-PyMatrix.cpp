@@ -58,7 +58,7 @@ TEST(PyMatrix, Cpp2PythonInt) {
             (41, 42, 43),
             (51, 52, 53)
         ))
-        success = np.array_equal(m, expected) and m.dtype == np.int32
+        success = np.array_equal(m, expected) and m.dtype == np.intc
         )",
                    pybind11::globals(), locals);
 
