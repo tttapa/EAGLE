@@ -8,6 +8,7 @@
 
 using namespace std;
 
+#if 1
 void DroneParamsAndMatrices::load(const filesystem::path &loadPath) {
 
     PerfTimer timer;
@@ -83,3 +84,5 @@ void DroneParamsAndMatrices::load(const filesystem::path &loadPath) {
 
     assert(isAlmostEqual(Id_inv, inv(Id), 1e-12));
 }
+
+#endif 

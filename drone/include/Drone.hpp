@@ -26,7 +26,10 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 #pragma region Constructors.....................................................
 
     /// Create a drone, loading the parameters from a given path.
-    Drone(const std::filesystem::path &loadPath) { p.load(loadPath); }
+    Drone(const std::filesystem::path &loadPath) {
+        p.load(loadPath);
+        printCpp(std::cout, p.Aa_att);
+    }
 
 #pragma region Continuous Model.................................................
 
@@ -36,7 +39,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      * 
      * @f$
      *  \boldsymbol{\dot{q}} = \frac{1}{2} \boldsymbol{q} \otimes 
-     *      \begin{pmatrix} 0 \\ \vec{\omega} \end{pmatrix}
+     *      \begin{pmatrix} 0 \\ \ve    c{\omega} \end{pmatrix}
      * @f$  
      * 
      * @f$

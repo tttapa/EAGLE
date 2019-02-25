@@ -1,7 +1,6 @@
 #pragma once
 
 #include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
 
 #include <iostream>  // cerr
 
@@ -38,8 +37,8 @@ struct type_caster<TMatrix<T, R, C>> {
             return false;
 
         // Check that the number of rows and columns match
-        Array<ssize_t, 2> shape   = {{buf.shape()[0], buf.shape()[1]}};
-        Array<ssize_t, 2> toShape = {{R, C}};
+        std::array<ssize_t, 2> shape   = {{buf.shape()[0], buf.shape()[1]}};
+        std::array<ssize_t, 2> toShape = {{R, C}};
         if (shape != toShape) {
             std::cerr << "Shapes do not match: Python: (" << shape[0] << ", "
                       << shape[1] << "), C++: (" << toShape[0] << ", "

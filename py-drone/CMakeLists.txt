@@ -1,9 +1,12 @@
 # Create header-only library target.
-add_library(py-matrix INTERFACE)
+add_library(py-drone INTERFACE)
+
+# Tell CMake to compile this library with C++17 features enabled
+target_compile_features(py-drone INTERFACE cxx_std_17)
 
 # Add an alias so that library can be used inside the build tree, e.g. when 
 # testing
-add_library(PyMatrix::py-matrix ALIAS py-matrix)
+add_library(PyDrone::py-drone ALIAS py-drone)
 
 find_package(pybind11 REQUIRED)
 
@@ -15,24 +18,20 @@ find_package(pybind11 REQUIRED)
 #   This particular library is header-only, so there are only INTERFACE
 #   include directories. (Having PRIVATE properties would make no sense, because
 #   the header-only library has nothing to compile.)
-target_include_directories(py-matrix
+target_include_directories(py-drone
     INTERFACE
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
-
-# Tell CMake to compile this library with C++17 features enabled
-target_compile_features(py-matrix INTERFACE cxx_std_17)
-
 # Link the library with its dependencies.
 #   This manages both the include directories of the dependencies, as well as  
 #   the actual linking of the other libraries.
 #   This particular library is header-only, so there are only INTERFACE 
 #   link options.   
-target_link_libraries(py-matrix
+target_link_libraries(py-drone
     INTERFACE 
-        matrix
-        pybind11::pybind11
+        py-matrix
+        drone
 )
 
 # Run CMake again in the `test` folder, to discover the CMakeLists.txt file that

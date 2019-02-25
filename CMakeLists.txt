@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 
+# SET (CMAKE_C_COMPILER "clang")
+# SET (CMAKE_CXX_COMPILER "clang++")
+SET (CMAKE_C_COMPILER "gcc-8")
+SET (CMAKE_CXX_COMPILER "g++-8")
+
+project(eagle)
+
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # TODO
@@ -49,16 +57,11 @@ enable_testing()
 #############################   COMPILER OPTIONS   #############################
 ################################################################################
 
-# SET (CMAKE_C_COMPILER "clang")
-# SET (CMAKE_CXX_COMPILER "clang++")
-SET (CMAKE_C_COMPILER "gcc-8")
-SET (CMAKE_CXX_COMPILER "g++-8")
-
 # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) # LTO
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
--O0 -g3 \
+-O3 -g3 \
 -Wall -Wextra -Werror \
 -Wsuggest-override \
 -Wno-register \
@@ -93,6 +96,7 @@ add_subdirectory("csv")
 add_subdirectory("config")
 add_subdirectory("genetic-tuner")
 add_subdirectory("tilt-correction")
+add_subdirectory("py-drone")
 
 ################################################################################
 ###############################   APPLICATIONS   ###############################
