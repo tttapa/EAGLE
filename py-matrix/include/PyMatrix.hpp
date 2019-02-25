@@ -3,6 +3,8 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include <iostream>
+
 #include <Matrix.hpp>
 
 // type caster: Matrix <-> NumPy-array
@@ -32,13 +34,16 @@ struct type_caster<TMatrix<T, R, C>> {
         if (dims != 2)
             return false;
 
-        std::vector<size_t> shape(buf.ndim());
+        Array<ssize_t, 2> shape   = {{buf.shape()[0], buf.shape()[1]}};
+        Array<ssize_t, 2> toShape = {{R, C}};
+        if (shape != toShape) {
+            std::cerr << "Shapes do not match: Python: (" << shape[0] << ", "
+                      << shape[1] << "), C++: (" << toShape[0] << ", "
+                      << toShape[1] << ")\r\n";
+            return false;
+        }
 
-        for (int i = 0; i < buf.ndim(); i++)
-            shape[i] = buf.shape()[i];
-
-        std::copy(toArrayPointer(value), toArrayPointer(value) + R * C,
-                  buf.data());
+        std::copy(buf.data(), buf.data() + R * C, toArrayPointer(value));
 
         return true;
     }
@@ -53,7 +58,7 @@ struct type_caster<TMatrix<T, R, C>> {
         (void) parent;
 
         std::vector<size_t> dim     = {R, C};
-        std::vector<size_t> strides = {sizeof(T) * R, sizeof(T)};
+        std::vector<size_t> strides = {sizeof(T) * C, sizeof(T)};
         py::array a                 = {dim, strides, toArrayPointer(src)};
 
         return a.release();

@@ -58,7 +58,7 @@ SET (CMAKE_CXX_COMPILER "g++-8")
 
 # Compiler flags for C++
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} \
--O3 -g3 \
+-O0 -g3 \
 -Wall -Wextra -Werror \
 -Wsuggest-override \
 -Wno-register \
