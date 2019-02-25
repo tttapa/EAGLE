@@ -64,7 +64,7 @@ struct type_caster<TMatrix<T, R, C>> {
         pybind11::array a             = {shape, strides, toArrayPointer(src)};
 
         // Release the Python object from `a`, otherwise, the reference count
-        // will be decreased when `a` goes out of scope, and the Python GC 
+        // will be decreased when `a` goes out of scope, and the Python GC
         // will destroy the new object
         return a.release();
     }

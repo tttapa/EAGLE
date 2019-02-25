@@ -12,7 +12,6 @@ target_include_directories(matrix
     INTERFACE
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 # target_compile_features(matrix PRIVATE cxx_std_17)

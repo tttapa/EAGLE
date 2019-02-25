@@ -55,5 +55,6 @@ struct Weights {
             d *= factor;
         for (double &d : R_diag)
             d *= factor;
+        R_diag[0] = 1.0;
     }
 };

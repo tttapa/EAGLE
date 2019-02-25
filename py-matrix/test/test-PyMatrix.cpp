@@ -23,7 +23,6 @@ TEST(PyMatrix, Cpp2Python) {
     auto locals = pybind11::dict{"m"_a = m};
     pybind11::exec(R"(
         import numpy as np
-        print(m)
         expected = np.array((
             (11, 12, 13),
             (21, 22, 23),
@@ -31,12 +30,11 @@ TEST(PyMatrix, Cpp2Python) {
             (41, 42, 43),
             (51, 52, 53)
         ))
-        equal = np.array_equal(m, expected)
-        print (equal)
+        success = np.array_equal(m, expected) and m.dtype == np.double
         )",
                    pybind11::globals(), locals);
 
-    ASSERT_TRUE(locals["equal"].cast<bool>());
+    ASSERT_TRUE(locals["success"].cast<bool>());
 }
 
 TEST(PyMatrix, Cpp2PythonInt) {
@@ -53,7 +51,6 @@ TEST(PyMatrix, Cpp2PythonInt) {
     auto locals = pybind11::dict{"m"_a = m};
     pybind11::exec(R"(
         import numpy as np
-        print(m)
         expected = np.array((
             (11, 12, 13),
             (21, 22, 23),
@@ -61,12 +58,11 @@ TEST(PyMatrix, Cpp2PythonInt) {
             (41, 42, 43),
             (51, 52, 53)
         ))
-        equal = np.array_equal(m, expected)
-        print (equal)
+        success = np.array_equal(m, expected) and m.dtype == np.int32
         )",
                    pybind11::globals(), locals);
 
-    ASSERT_TRUE(locals["equal"].cast<bool>());
+    ASSERT_TRUE(locals["success"].cast<bool>());
 }
 
 TEST(PyMatrix, Python2Cpp) {
@@ -166,6 +162,31 @@ TEST(PyMatrix, Python2CppWrongDimensionsCol) {
 
     try {
         locals["matrix"].cast<Matrix<5, 3>>();
+        FAIL();
+    } catch (std::runtime_error &e) {
+        SUCCEED();
+    }
+}
+
+TEST(PyMatrix, Python2CppWrongType) {
+    using namespace pybind11::literals;
+
+    auto locals = pybind11::dict{};
+    pybind11::exec(R"(
+        import numpy as np
+        matrix = np.array((
+            (11, 12, 13, 14),
+            (21, 22, 23, 24),
+            (31, 32, 33, 34),
+            (41, 42, 43, 44),
+            (51, 52, 53, 54)
+        ))
+        )",
+                   pybind11::globals(), locals);
+
+    try {
+        struct Foo {};
+        locals["matrix"].cast<TMatrix<Foo, 5, 4>>();
         FAIL();
     } catch (std::runtime_error &e) {
         SUCCEED();

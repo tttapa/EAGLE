@@ -12,9 +12,9 @@ find_package(pybind11 REQUIRED)
 #   files.
 #   The include files in the `include` folder are part of the public API of the
 #   library, users of the library need to be able to include them in their code. 
-#   Any header files in the `src` directory are private, they are only required 
-#   to compile the implementation files of the library, users of the library
-#   should not include them.
+#   This particular library is header-only, so there are only INTERFACE
+#   include directories. (Having PRIVATE properties would make no sense, because
+#   the header-only library has nothing to compile.)
 target_include_directories(py-matrix
     INTERFACE
         $<INSTALL_INTERFACE:include>
@@ -27,8 +27,8 @@ target_compile_features(py-matrix INTERFACE cxx_std_17)
 # Link the library with its dependencies.
 #   This manages both the include directories of the dependencies, as well as  
 #   the actual linking of the other libraries.
-#   Libraries that are used in the public header files should be public,
-#   libraries that are only used in the implementation files should be private.
+#   This particular library is header-only, so there are only INTERFACE 
+#   link options.   
 target_link_libraries(py-matrix
     INTERFACE 
         matrix
@@ -37,4 +37,4 @@ target_link_libraries(py-matrix
 
 # Run CMake again in the `test` folder, to discover the CMakeLists.txt file that
 # adds the tests.
-add_subdirectory(test) 
+add_subdirectory(test)
