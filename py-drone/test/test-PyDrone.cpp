@@ -89,3 +89,33 @@ TEST(PyDrone, loadPython) {
     }};
     ASSERT_EQ(x.Aa_att, expectedAa_att);
 }
+
+TEST(PyDrone, DroneStateSettersPython) {
+    using namespace pybind11::literals;
+    auto module = py::module::import("PyDrone");
+    auto locals = pybind11::dict{"pydrone"_a = module};
+    pybind11::exec(R"(
+        import numpy as np
+        s = pydrone.DroneState()
+        s.setAttitude(np.array((1, 2, 3, 4, 5, 6, 7, 8, 9, 10)))
+    )",
+                   pybind11::globals(), locals);
+    DroneState s                   = locals["s"].cast<DroneState>();
+    ColVector<10> expectedAttitude = {{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}};
+    EXPECT_EQ(s.getAttitude(), expectedAttitude);
+}
+
+TEST(PyDrone, DroneStateGettersPython) {
+    using namespace pybind11::literals;
+    DroneState s;
+    s.setAttitude({{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}});
+    auto module = py::module::import("PyDrone");
+    auto locals = pybind11::dict{"s"_a = s};
+    pybind11::exec(R"(
+        import numpy as np
+        expected = np.array(((1, 2, 3, 4, 5, 6, 7, 8, 9, 10),)).transpose()
+        success = np.array_equal(s.getAttitude(), expected)
+    )",
+                   pybind11::globals(), locals);
+    EXPECT_TRUE(locals["success"].cast<bool>());
+}

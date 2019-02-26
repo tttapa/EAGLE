@@ -18,32 +18,53 @@ struct type_caster<TMatrix<T, R, C>> {
     PYBIND11_TYPE_CASTER(MT, _("TMatrix<T, R, C>"));
 
     /// Conversion Python → C++
-    bool load(pybind11::handle src, bool convert) {
-        namespace py = pybind11;
+    bool load(handle src, bool convert) {
 
-        if (!convert && !py::array_t<T>::check_(src))
+        if (!convert && !array_t<T>::check_(src))
             return false;
 
         // Ensure that the source object is a NumPy array of the correct type
         // (and if not, try to convert it)
-        constexpr auto flags = py::array::c_style | py::array::forcecast;
-        auto buf             = py::array_t<T, flags>::ensure(src);
+        constexpr auto flags = array::c_style | array::forcecast;
+        auto buf             = array_t<T, flags>::ensure(src);
         if (!buf)
             return false;
 
-        // Check that it is a two-dimensional NumPy array
         auto dims = buf.ndim();
-        if (dims != 2)
+        if (dims != 1 && dims != 2) {
+            std::cerr << "One- or two-dimensional array expected, not " << dims
+                      << "\r\n";
             return false;
+        }
+        if ((R > 1 && C > 1) || dims == 2) {
+            // Check that it is a two-dimensional NumPy array
+            if (dims != 2) {
+                std::cerr << "Two-dimensional array expected, not " << dims
+                          << "\r\n";
+                return false;
+            }
 
-        // Check that the number of rows and columns match
-        std::array<ssize_t, 2> shape   = {{buf.shape()[0], buf.shape()[1]}};
-        std::array<ssize_t, 2> toShape = {{R, C}};
-        if (shape != toShape) {
-            std::cerr << "Shapes do not match: Python: (" << shape[0] << ", "
-                      << shape[1] << "), C++: (" << toShape[0] << ", "
-                      << toShape[1] << ")\r\n";
-            return false;
+            // Check that the number of rows and columns match
+            std::array<ssize_t, 2> shape   = {{buf.shape()[0], buf.shape()[1]}};
+            std::array<ssize_t, 2> toShape = {{R, C}};
+            if (shape != toShape) {
+                std::cerr << "Shapes do not match: Python: (" << shape[0]
+                          << ", " << shape[1] << "), C++: (" << toShape[0]
+                          << ", " << toShape[1] << ")\r\n";
+                return false;
+            }
+        } else if (R == 1) {  // && dims == 1 → Row vector
+            if (C != buf.shape()[0]) {
+                std::cerr << "Dimensions do not match: Python ("
+                          << buf.shape()[0] << "), C++: (" << C << ")\r\n";
+                return false;
+            }
+        } else if (C == 1) {  // && dims == 1 → Column vector
+            if (R != buf.shape()[0]) {
+                std::cerr << "Dimensions do not match: Python ("
+                          << buf.shape()[0] << "), C++: (" << R << ")\r\n";
+                return false;
+            }
         }
 
         // Copy the buffer to the TMatrix
@@ -67,7 +88,7 @@ struct type_caster<TMatrix<T, R, C>> {
         // will destroy the new object
         return a.release();
     }
-};
+};  // namespace detail
 
 }  // namespace detail
 }  // namespace pybind11

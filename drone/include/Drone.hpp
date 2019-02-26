@@ -26,10 +26,9 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 #pragma region Constructors.....................................................
 
     /// Create a drone, loading the parameters from a given path.
-    Drone(const std::filesystem::path &loadPath) {
-        p.load(loadPath);
-        printCpp(std::cout, p.Aa_att);
-    }
+    Drone(const std::filesystem::path &loadPath) { p.load(loadPath); }
+    Drone(const DroneParamsAndMatrices &p) : p{p} {}
+    Drone() = default;
 
 #pragma region Continuous Model.................................................
 
