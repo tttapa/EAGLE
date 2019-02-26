@@ -4,6 +4,8 @@
 #include <lapacke.h>
 #include <string>
 
+// Lapacke includes complex, so it defines I, which causes problems with other
+// dependencies
 #ifdef I
 #undef I
 #endif

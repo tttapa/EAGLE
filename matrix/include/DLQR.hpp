@@ -5,6 +5,8 @@
 #include "Matrix.hpp"
 #include <lapacke.h>
 
+// Lapacke includes complex, so it defines I, which causes problems with other
+// dependencies
 #ifdef I
 #undef I
 #endif
@@ -47,12 +49,14 @@ Balance_result_GEP<N> balance(const Matrix<N, N> &A, const Matrix<N, N> &B) {
     info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, job, 'L', n, ilo, ihi, plscale,
                           prscale, n, p_balancing_mat, n);
     if (info != 0)
-        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") + std::to_string(info));
+        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") +
+                                 std::to_string(info));
 
     info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, job, 'R', n, ilo, ihi, plscale,
                           prscale, n, p_balancing_mat2, n);
     if (info != 0)
-        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") + std::to_string(info));
+        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") +
+                                 std::to_string(info));
     return result;
 }
 
@@ -98,13 +102,15 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
     info = LAPACKE_dgghrd(LAPACK_ROW_MAJOR, comp_q, comp_z, nn, ilo, ihi, paa,
                           nn, pbb, nn, pqq, nn, pzz, nn);
     if (info != 0)
-        throw std::runtime_error(std::string("LAPACKE_dgghrd: info = ") + std::to_string(info));
+        throw std::runtime_error(std::string("LAPACKE_dgghrd: info = ") +
+                                 std::to_string(info));
 
     // Hessenberg
     info = LAPACKE_dgghrd(LAPACK_ROW_MAJOR, comp_q, comp_z, nn, ilo, ihi, paa,
                           nn, pbb, nn, pqq, nn, pzz, nn);
     if (info != 0)
-        throw std::runtime_error(std::string("LAPACKE_dgghrd: info = ") + std::to_string(info));
+        throw std::runtime_error(std::string("LAPACKE_dgghrd: info = ") +
+                                 std::to_string(info));
 
     constexpr char qz_job = 'S';
     // Schur
@@ -118,12 +124,14 @@ Matrix<Nx, Nx> qz_Z(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nx> &B) {
     info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, bal_job, 'L', nn, ilo, ihi, lscale,
                           rscale, nn, pqq, nn);
     if (info != 0)
-        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") + std::to_string(info));
+        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") +
+                                 std::to_string(info));
 
     info = LAPACKE_dggbak(LAPACK_ROW_MAJOR, bal_job, 'R', nn, ilo, ihi, lscale,
                           rscale, nn, pzz, nn);
     if (info != 0)
-        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") + std::to_string(info));
+        throw std::runtime_error(std::string("LAPACKE_dggbak: info = ") +
+                                 std::to_string(info));
 
     lapack_logical select[Nx];
 

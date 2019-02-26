@@ -217,8 +217,8 @@ struct Array {
         return result;
     }
 
-    static constexpr size_t length = N;
-    using type                     = T;
+    static constexpr size_t length() { return N; }
+    using type = T;
 };
 
 template <class T, size_t N>

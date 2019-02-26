@@ -1,12 +1,6 @@
 #pragma once
 
-#ifdef I
-#error IIIIIIIIIIIIIIIIIII
-#endif
 #include <DronePlot.hpp>
-#ifdef I
-#error IIIIIIIIIIIIIIIIIII
-#endif
 #include <pybind11/pytypes.h>
 
 /**

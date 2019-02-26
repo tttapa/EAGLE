@@ -110,7 +110,7 @@ struct PrintAsEulerAngles : public Printable {
         const char *sep = ", ";
         os << '(';
         formatAngle(os, double(e[0]));
-        for (size_t i = 1; i < EulerAngles::length; ++i) {
+        for (size_t i = 1; i < EulerAngles::length(); ++i) {
             os << sep;
             formatAngle(os, e[i]);
         }
