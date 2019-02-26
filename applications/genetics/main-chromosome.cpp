@@ -37,15 +37,22 @@ int main(int argc, const char *argv[]) {
         cout << child2[i] << ',';
     cout << "]\r\n";
 
-
-    // Mutate children with factor 0.1
-    //mutate(child1, 0.1);
-    //mutate(child2, 0.1);
-
-
     // Print children with toString()
     cout << "child3: " << toString(child3) << "\r\n";
     cout << "child4: " << toString(child4) << "\r\n";
+
+    // Mutate children with factor 0.1
+    mutate(child1, 0.1);
+    mutate(child2, 0.1);
+    mutate(child3, 0.1);
+    mutate(child4, 0.1);
+
+    // Print children with toString()
+    cout << "child1: " << toString(child1) << "\r\n";
+    cout << "child2: " << toString(child2) << "\r\n";
+    cout << "child3: " << toString(child3) << "\r\n";
+    cout << "child4: " << toString(child4) << "\r\n";
+
 
     return EXIT_SUCCESS;
 }
