@@ -22,7 +22,7 @@ target_include_directories(argparser
 
 target_link_libraries(argparser 
     PRIVATE 
-        Util::util 
+        Utilities::utilities 
 )
 
 add_subdirectory(test)

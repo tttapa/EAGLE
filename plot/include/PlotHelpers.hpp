@@ -5,8 +5,15 @@
 #include <DronePlot.hpp>
 
 /**
- * @brief   Load the Plot.py Python script and its functions, or return the
- *          module that was loaded already.
+ * @brief   Load the Plot.py Python script and its functions.
+ *          The module will be available in Python as a global variable `plot`.
+ * 
+ * @note    Expects the Python interpreter to be active.
+ */
+void loadPythonPlotModule();
+
+/**
+ * @brief   Load the Plot.py Python script and its functions, and return it.
  * 
  * @note    Expects the Python interpreter to be active.
  */

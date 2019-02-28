@@ -23,6 +23,8 @@ target_include_directories(plot
 #set(PYBIND11_PYTHON_VERSION 3.6)   # doesn't make a difference
 find_package(pybind11 REQUIRED)
 
+# find_package(Threads REQUIRED) # TODO
+
 # target_compile_features(plot PRIVATE cxx_std_17)
 # target_compile_options(plot PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Werror -pedantic>)
 target_link_libraries(plot
@@ -31,8 +33,11 @@ target_link_libraries(plot
         StepResponse::step-response
         DroneLogLoader::drone-log-loader 
         pybind11::embed
+        # Threads::Threads # TODO
+        # dl # TODO
+        # util # TODO
     PRIVATE
-        Util::util
+        Utilities::utilities
         stdc++fs
 )
 

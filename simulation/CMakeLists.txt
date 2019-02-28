@@ -18,7 +18,7 @@ target_include_directories(simulation
 target_link_libraries(simulation
     INTERFACE
         ODE::ode
-        Util::util
+        Utilities::utilities
         Matrix::matrix
 )
 

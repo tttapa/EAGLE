@@ -82,7 +82,7 @@ find_package(CControllers)
 
 add_subdirectory("matrix")
 add_subdirectory("py-matrix")
-add_subdirectory("util")
+add_subdirectory("utilities")
 add_subdirectory("argparser")
 add_subdirectory("quaternion")
 add_subdirectory("fileloader")
@@ -102,34 +102,7 @@ add_subdirectory("py-drone")
 ###############################   APPLICATIONS   ###############################
 ################################################################################
 
-### Plot Simulation
-
-file(GLOB_RECURSE SRCS_plot_simulation "applications/plot-simulation/*.cpp")
-add_executable(plot-simulation ${SRCS_plot_simulation})
-target_link_libraries(plot-simulation PRIVATE argparser 
-                                              plot
-                                              config)
-
-### Tuner
-
-find_package(OpenMP REQUIRED)
-
-file(GLOB_RECURSE SRCS_tuner "applications/tuner/*.cpp")
-add_executable(tuner ${SRCS_tuner})
-target_include_directories(tuner PRIVATE "applications/tuner/")
-target_link_libraries(tuner PRIVATE argparser 
-                                    plot
-                                    config
-                                    OpenMP::OpenMP_CXX
-                                    -static-libgcc 
-                                    -static-libstdc++)
-
-
-### Genetics
-
-file(GLOB_RECURSE SRCS_genetics "applications/genetics/*.cpp")
-add_executable(genetics ${SRCS_genetics})
-target_link_libraries(genetics PRIVATE genetic-tuner)
+add_subdirectory("applications")
 
 
 ################################################################################

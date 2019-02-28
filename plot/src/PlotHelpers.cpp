@@ -23,9 +23,17 @@ static pybind11::module getPythonPlotModuleInitial() {
     return pm;
 }
 
+void loadPythonPlotModule() {
+    static bool loaded = false;
+    if (loaded)
+        return;
+    pybind11::globals()["plot"] = getPythonPlotModuleInitial();
+    loaded                      = true;
+}
+
 pybind11::module getPythonPlotModule() {
-    static pybind11::module pm = getPythonPlotModuleInitial();
-    return pm;
+    loadPythonPlotModule();
+    return pybind11::globals()["plot"].cast<pybind11::module>();
 }
 
 pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {

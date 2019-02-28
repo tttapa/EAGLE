@@ -18,7 +18,7 @@ target_include_directories(csv
 target_link_libraries(csv
     INTERFACE
         ODE::ode
-        Util::util
+        Utilities::utilities
         stdc++fs
 )
 

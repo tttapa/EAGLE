@@ -1,11 +1,11 @@
 # Create target and set properties
-add_library(util INTERFACE)
+add_library(utilities INTERFACE)
 
 # Add an alias so that library can be used inside the build tree, e.g. when testing
-add_library(Util::util ALIAS util)
+add_library(Utilities::utilities ALIAS utilities)
 
 #Set target properties
-target_include_directories(util
+target_include_directories(utilities
     INTERFACE
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -13,9 +13,9 @@ target_include_directories(util
     #     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# target_compile_features(util PRIVATE cxx_std_17)
+# target_compile_features(utilities PRIVATE cxx_std_17)
 
-# target_link_libraries(util
+# target_link_libraries(utilities
 #     PRIVATE
 #         Matrix::matrix
 # )

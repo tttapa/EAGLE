@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/py-drone-test",
+            "program": "${workspaceFolder}/build/bin/py-plot-simulation",
             "args": [
                 "--load",
                 "$HOME/PO-EAGLE/Groups/ANC/MATLAB/Codegen/ParamsAndMatrices/Output",

@@ -16,7 +16,7 @@ target_compile_features(ode INTERFACE cxx_std_17)
 target_link_libraries(ode
     INTERFACE
         Matrix::matrix
-        Util::util
+        Utilities::utilities
 )
 
 add_subdirectory(test)
