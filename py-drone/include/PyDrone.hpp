@@ -2,9 +2,24 @@
 
 #include <Drone.hpp>
 #include <Matrix.hpp>
+#include <Plot.hpp>
 #include <PyMatrix.hpp>
 #include <iostream>  // cerr
 #include <pybind11/embed.h>
+
+class __attribute__((visibility("hidden"))) PythonDroneReferenceFunction
+    : public Drone::ReferenceFunction {
+  public:
+    PythonDroneReferenceFunction(pybind11::object callable)
+        : callable(callable) {}
+
+    Drone::VecR_t operator()(double t) override {
+        return callable(t).cast<Drone::VecR_t>();
+    }
+
+  private:
+    pybind11::object callable;
+};
 
 PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
     pybind11::class_<DroneParamsAndMatrices>(pydronemodule,
@@ -98,11 +113,81 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
         .def("asColVector",
              [](const DroneState &d) { return ColVector<17>(d); });
 
+    pybind11::class_<DroneReference>(pydronemodule, "DroneReference")
+        .def(pybind11::init<>())
+        .def(pybind11::init<const ColVector<10> &>())
+        // getters
+        .def("getAttitude", &DroneReference::getAttitude)
+        .def("getOrientation", &DroneReference::getOrientation)
+        .def("getAngularVelocity", &DroneReference::getAttitude)
+        .def("getPosition", &DroneReference::getPosition)
+        .def("getAltitude", &DroneReference::getAltitude)
+        // setters
+        .def("setOrientation", &DroneReference::setOrientation)
+        .def("setPosition", &DroneReference::setPosition)
+        // cast to vector
+        .def("asColVector",
+             [](const DroneReference &d) { return ColVector<10>(d); });
+
+    pybind11::class_<Drone::ControllerSimulationResult>(
+        pydronemodule, "DroneControllerSimulationResult")
+        .def(pybind11::init<>())
+        .def_readonly("time", &Drone::ControllerSimulationResult::time)
+        .def_readonly("solution", &Drone::ControllerSimulationResult::solution)
+        .def_readonly("resultCode",
+                      &Drone::ControllerSimulationResult::resultCode)
+        .def_readonly("iterations",
+                      &Drone::ControllerSimulationResult::iterations)
+        .def_readonly("sampledTime",
+                      &Drone::ControllerSimulationResult::sampledTime)
+        .def_readonly("control", &Drone::ControllerSimulationResult::control)
+        .def_readonly("reference",
+                      &Drone::ControllerSimulationResult::reference);
+
+    pybind11::class_<Drone::Controller>(pydronemodule, "DroneController")
+        .def("__call__", &Drone::Controller::operator())
+        .def("reset", &Drone::Controller::reset);
+
+    pybind11::class_<PythonDroneReferenceFunction>(pydronemodule,
+                                                   "DroneReferenceFunction")
+        .def(pybind11::init<pybind11::object>())
+        .def("__call__", &PythonDroneReferenceFunction::operator());
+
+    pybind11::class_<AdaptiveODEOptions>(pydronemodule, "AdaptiveODEOptions")
+        .def(pybind11::init<>())
+        .def_readwrite("t_start", &AdaptiveODEOptions::t_start)
+        .def_readwrite("t_end", &AdaptiveODEOptions::t_end)
+        .def_readwrite("epsilon", &AdaptiveODEOptions::epsilon)
+        .def_readwrite("h_start", &AdaptiveODEOptions::h_start)
+        .def_readwrite("h_min", &AdaptiveODEOptions::h_min)
+        .def_readwrite("maxiter", &AdaptiveODEOptions::maxiter);
+
     pybind11::class_<Drone>(pydronemodule, "Drone")
         .def(pybind11::init<const std::filesystem::path &>())
         .def(pybind11::init<const DroneParamsAndMatrices &>())
         .def(pybind11::init<>())
         .def("__call__", &Drone::operator())
+        .def("__call__", [](Drone &d, const DroneState &x,
+                            const ColVector<4> &u) { return d(x, u); })
         .def("getOutput", &Drone::getOutput)
-        .def("getStableState", &Drone::getStableState);
+        .def("getStableState", &Drone::getStableState)
+        .def("getController", &Drone::getController)
+        .def("simulate", [](Drone &drone, Drone::Controller &controller,
+                            PythonDroneReferenceFunction &reference,
+                            const DroneState &x0, AdaptiveODEOptions odeopt) {
+            return drone.simulate(controller, reference, x0, odeopt);
+        });
+
+    pydronemodule.def("plot",
+                      pybind11::overload_cast<const DronePlottable &, float,
+                                              float, int, std::string>(&plot));
+    pydronemodule.def("plot",
+                      [](const Drone::ControllerSimulationResult &result,
+                         float w = 1920, float h = 1080, int colors = 0,
+                         std::string title = "") {
+                          return plot(result, w, h, colors, title);
+                      },
+                      pybind11::arg("result"), pybind11::arg("w") = 1920,
+                      pybind11::arg("h") = 1080, pybind11::arg("colors") = 0,
+                      pybind11::arg("title") = "");
 }
