@@ -28,7 +28,7 @@ target_link_libraries(drone
         Simulation::simulation
     PRIVATE
         FileLoader::fileloader
-        CControllers::CControllers
+        CControllers
 )
 
 # add_subdirectory(test) # TODO

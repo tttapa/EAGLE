@@ -6,7 +6,7 @@ target_link_libraries(tilt_correction_test
     gtest_main
     TiltCorrection::tilt-correction
     util
-    CControllers::CControllers # Siel's tilt correction
+    CControllers # Siel's tilt correction
 )
 
 # Add the tests to Google Test

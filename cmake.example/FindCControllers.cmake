@@ -4,7 +4,7 @@ find_path(CCONTROLLERS_INCLUDE_DIR
         altitude-controller.h
     PATHS 
         $ENV{HOME}/PO-EAGLE/Groups/ANC/Cleanup-Pieter/Code-Generators/
-        # TODO: Bas, add your EAGLE path
+        # Change this path
     PATH_SUFFIXES
         Controllers/include
 )
@@ -21,9 +21,9 @@ get_filename_component(CCONTROLLERS_LIBRARIES
 message("CControllers include ${CCONTROLLERS_INCLUDE_DIR}")
 message("CControllers libraries ${CCONTROLLERS_LIBRARIES}")
 
-if(NOT TARGET CControllers::CControllers)
-    add_library(CControllers::CControllers INTERFACE IMPORTED)
-    set_target_properties(CControllers::CControllers PROPERTIES
+if(NOT TARGET CControllers)
+    add_library(CControllers INTERFACE IMPORTED)
+    set_target_properties(CControllers PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${CCONTROLLERS_INCLUDE_DIR}"
         INTERFACE_LINK_LIBRARIES "${CCONTROLLERS_LIBRARIES}"
     )
