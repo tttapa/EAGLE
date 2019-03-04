@@ -171,7 +171,16 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
                             const ColVector<4> &u) { return d(x, u); })
         .def("getOutput", &Drone::getOutput)
         .def("getStableState", &Drone::getStableState)
-        .def("getController", &Drone::getController)
+        .def("getController",
+             pybind11::overload_cast<const Matrix<Nx_att - 1, Nx_att - 1> &,
+                                     const Matrix<Nu_att, Nu_att> &,
+                                     const Matrix<1, 4> &, double>(
+                 &Drone::getController))
+        .def("getController",
+             pybind11::overload_cast<const Matrix<Nx_att - 1, Nx_att - 1> &,
+                                     const Matrix<Nu_att, Nu_att> &,
+                                     const Matrix<3, 3> &, const Matrix<1, 1> &,
+                                     double>(&Drone::getController))
         .def("simulate", [](Drone &drone, Drone::Controller &controller,
                             PythonDroneReferenceFunction &reference,
                             const DroneState &x0, AdaptiveODEOptions odeopt) {
