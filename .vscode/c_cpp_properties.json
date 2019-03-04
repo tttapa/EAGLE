@@ -21,7 +21,8 @@
                 "${workspaceFolder}/matrix/include",
                 "${workspaceFolder}/ode/include",
                 "${workspaceFolder}/applications/tuner",
-                "${workspaceFolder}/genetic-tuner/include"
+                "${workspaceFolder}/genetic-tuner/include",
+                "/home/pieter/PO-EAGLE/Groups/ANC/Cleanup-Pieter/Code-Generators/Controllers/include/"
             ]
         }
     ],
