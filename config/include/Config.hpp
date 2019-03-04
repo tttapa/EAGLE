@@ -22,8 +22,8 @@ namespace Attitude {
 extern const Matrix<9, 9> Q;
 extern const Matrix<3, 3> R;
 
-extern const RowVector<12> varDynamics;
-extern const RowVector<6> varSensors;
+extern const RowVector<3> varDynamics;
+extern const RowVector<7> varSensors;
 }  // namespace Attitude
 
 /* ------ Altitude PI controller and LQE ------------------------------------ */

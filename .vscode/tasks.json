@@ -6,17 +6,35 @@
         {
             "type": "shell",
             "label": "Make & Test",
-            "command": "cd build && make -j$(nproc) && make test",
+            "command": "make all -j$(nproc) && make test",
+            "options": {
+                "cwd": "build"
+            },
             "problemMatcher": "$gcc",
-            "group": {
-                "kind": "test",
-                "isDefault": true
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
             }
         },
         {
             "type": "shell",
             "label": "Make & Plot Simulation",
             "command": "cd build && make -j$(nproc) plot-simulation && ./bin/plot-simulation --out /tmp",
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Make & Python Plot Simulation",
+            "command": "cd build && make -j$(nproc) py-plot-simulation && ./bin/py-plot-simulation --out /tmp",
             "problemMatcher": "$gcc",
             "group": {
                 "kind": "build",

@@ -29,7 +29,6 @@ Drone::VecX_t Drone::operator()(const VecX_t &x, const VecU_t &u) {
     double F_local_z = p.ct * p.rho * sq(sq(p.Dp)) * p.Nm *
                        (sq(n_thrust + p.nh) + sq(n[0]) + sq(n[1]) + sq(n[2]));
     ColVector<3> F_local = {0, 0, F_local_z};
-    // Quatconjugate: Linksdraaiend assenstelsel
     ColVector<3> F_world = quatrotate(quatconjugate(q), F_local);
     ColVector<3> a_world = F_world / p.m;
     ColVector<3> a_grav  = {0, 0, -p.g};
@@ -37,7 +36,7 @@ Drone::VecX_t Drone::operator()(const VecX_t &x, const VecU_t &u) {
 
     x_dot.setVelocity(a);
     x_dot.setPosition(v);
-    x_dot.setThrustMotorSpeed(p.k2 * (p.k1 * (u_thrust - p.uh) - n_thrust));
+    x_dot.setThrustMotorSpeed(p.k2 * (p.k1 * (u_thrust - 0) - n_thrust));
 
     return x_dot;
 }
@@ -100,24 +99,24 @@ Drone::AttitudeModel::VecY_t Drone::AttitudeModel::getOutput(const VecX_t &x,
 Drone::Controller::VecU_t Drone::Controller::
 operator()(const Drone::Controller::VecX_t &x,
            const Drone::Controller::VecR_t &r) {
-    DroneState xx     = {x};
-    DroneReference rr = {r};
+    const DroneState xx     = {x};
+    const DroneReference rr = {r};
     DroneControl uu;
 
     if (subsampleCounter == 0) {
         auto u_alt_raw =
             altitudeController->getOutput(xx.getAltitude(), rr.getAltitude());
-        u_alt            = uh + clampThrust(u_alt_raw);
+        u_alt            = clampThrust(u_alt_raw);
         subsampleCounter = subsampleAlt;
     }
     --subsampleCounter;
 
     auto u_att =
         attitudeController->getOutput(xx.getAttitude(), rr.getAttitude());
-    u_att = clampAttitude(u_att, u_alt);
+    u_att = clampAttitude(u_att, u_alt + uh);
     uu.setAttitudeControl(u_att);
     uu.setThrustControl(u_alt);
-    checkControlSignal(uu);
+    checkControlSignal(uu, uh);
     return uu;
 }
 
@@ -163,13 +162,14 @@ Drone::Observer::VecX_t Drone::Observer::getStateChange(const VecX_t &x_hat,
     DroneControl uu   = {u};
 
     if (subsampleCounter == 0) {
-        xx_hat.setAltitude(altObsv->getStateChange(
-            xx_hat.getAltitude(), yy.getAltitude(), {uu.getThrustControl()}));
+        auto new_x_alt = altitudeObserver->getStateChange(
+            xx_hat.getAltitude(), yy.getAltitude(), uu.getThrustControl());
+        xx_hat.setAltitude(new_x_alt);
         subsampleCounter = subsampleAlt;
     }
     --subsampleCounter;
 
-    xx_hat.setAttitude(attObsv->getStateChange(
+    xx_hat.setAttitude(attitudeObserver->getStateChange(
         xx_hat.getAttitude(), yy.getAttitude(), uu.getAttitudeControl()));
     return xx_hat;
 }

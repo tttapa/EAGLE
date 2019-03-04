@@ -333,9 +333,11 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      */
     Matrix<Nx_att - 1, Ny_att - 1>
     getAttitudeObserverMatrixL(const RowVector<Nu_att> &varDynamics,
-                               const RowVector<Ny_att - 1> &varSensors) const {
+                               const RowVector<Ny_att> &varSensors) const {
+        RowVector<Ny_att - 1> varSensors_r =
+            getBlock<0, 1, 1, Ny_att>(varSensors);
         return dlqe(p.Ad_att_r, p.Bd_att_r, p.Cd_att_r, diag(varDynamics),
-                    diag(varSensors))
+                    diag(varSensors_r))
             .L;
     }
 
@@ -344,7 +346,7 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
      */
     Attitude::KalmanObserver
     getAttitudeObserver(const RowVector<Nu_att> &varDynamics,
-                        const RowVector<Ny_att - 1> &varSensors) const {
+                        const RowVector<Ny_att> &varSensors) const {
         auto L_red = getAttitudeObserverMatrixL(varDynamics, varSensors);
         return {p.Ad_att_r, p.Bd_att_r, p.Cd_att, L_red, p.Ts_att};
     }
@@ -393,34 +395,39 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     class Observer : public DiscreteObserver<Nx, Nu, Ny> {
       public:
-        Observer(
-            std::unique_ptr<DiscreteObserver<Nx_att, Nu_att, Ny_att>> attObsv,
-            std::unique_ptr<DiscreteObserver<Nx_alt, Nu_alt, Ny_alt>> altObsv)
-            : DiscreteObserver<Nx, Nu, Ny>{attObsv->Ts},
-              attObsv{std::move(attObsv)}, altObsv{std::move(altObsv)},
-              subsampleAlt{
-                  size_t(round(this->altObsv->Ts / this->attObsv->Ts))} {
-            assert(this->attObsv->Ts < this->altObsv->Ts);
+        using p_attitude_observer_t =
+            std::unique_ptr<DiscreteObserver<Nx_att, Nu_att, Ny_att>>;
+        using p_altitude_observer_t =
+            std::unique_ptr<DiscreteObserver<Nx_alt, Nu_alt, Ny_alt>>;
+
+        Observer(p_attitude_observer_t attitudeObserver,
+                 p_altitude_observer_t altitudeObserver)
+            : DiscreteObserver<Nx, Nu, Ny>{attitudeObserver->Ts},
+              attitudeObserver{std::move(attitudeObserver)},
+              altitudeObserver{std::move(altitudeObserver)},
+              subsampleAlt{size_t(round(this->altitudeObserver->Ts /
+                                        this->attitudeObserver->Ts))} {
+            assert(this->attitudeObserver->Ts < this->altitudeObserver->Ts);
         }
 
         void reset() override {
             subsampleCounter = 0;
-            attObsv->reset();
-            altObsv->reset();
+            attitudeObserver->reset();
+            altitudeObserver->reset();
         }
 
         VecX_t getStateChange(const VecX_t &x_hat, const VecY_t &y_sensor,
                               const VecU_t &u) override;
 
       private:
-        std::unique_ptr<DiscreteObserver<Nx_att, Nu_att, Ny_att>> attObsv;
-        std::unique_ptr<DiscreteObserver<Nx_alt, Nu_alt, Ny_alt>> altObsv;
+        p_attitude_observer_t attitudeObserver;
+        p_altitude_observer_t altitudeObserver;
         const size_t subsampleAlt;
         size_t subsampleCounter = 0;
     };
 
     Observer getObserver(const RowVector<Nu_att> &varDynamics_att,
-                         const RowVector<Ny_att - 1> &varSensors_att,
+                         const RowVector<Ny_att> &varSensors_att,
                          const RowVector<Nu_alt> &varDynamics_alt,
                          const RowVector<Ny_alt> &varSensors_alt) {
         return {std::make_unique<Attitude::KalmanObserver>(

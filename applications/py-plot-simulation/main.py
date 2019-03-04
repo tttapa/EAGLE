@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from math import pi
 
 p = drone.DroneParamsAndMatrices()
 p.load("/home/pieter/PO-EAGLE/Groups/ANC/Cleanup-Pieter/Code-Generators/ParamsAndMatrices/Output")
@@ -21,10 +22,16 @@ maxIntegralInfluence = 0.1
 
 controller = d.getController(Q_att, R_att, K_pi_alt, maxIntegralInfluence)
 
-ref = drone.DroneReference()
-ref.setOrientation((1, 0, 0, 0))
+reference = drone.DroneReference()
+reference.setOrientation(drone.eul2quat((0, pi/6, 0)))
 
-reff = drone.DroneReferenceFunction (lambda t: ref.asColVector())
+print(reference)
+print(locals())
+
+ref_lambda = lambda t: reference.asColVector()
+print(ref_lambda(1))
+ref_function = drone.DroneReferenceFunction (ref_lambda)
+
 
 odeopt = drone.AdaptiveODEOptions()
 odeopt.t_start = 0
@@ -34,7 +41,7 @@ odeopt.h_start = 1e-6
 odeopt.h_min   = 1e-8
 odeopt.maxiter = int(1e6)
 
-result = d.simulate(controller, reff, x0, odeopt)
+result = d.simulate(controller, ref_function, x0, odeopt)
 drone.plot(result)
 plt.tight_layout()
 plt.show()

@@ -58,7 +58,6 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
         : public ControllerSimulationResult {
         std::vector<VecX_t> estimatedSolution;
         std::vector<VecY_t> output;
-        std::vector<double> quatnorms;
     };
 
     /**
@@ -287,28 +286,43 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
              VecX_t x_start, const AdaptiveODEOptions &opt) {
         ControllerSimulationResult result = {};
         double Ts                         = controller.Ts;
-        size_t N = floor((opt.t_end - opt.t_start) / Ts) + 1;
+        size_t N = numberOfSamplesInTimeRange(opt.t_start, Ts, opt.t_end);
+        // pre-allocate memory for result vectors
         result.sampledTime.reserve(N);
         result.control.reserve(N);
         result.reference.reserve(N);
+
+        // actual state = inital state
         VecX_t curr_x               = x_start;
         AdaptiveODEOptions curr_opt = opt;
+        // For each time step
         for (size_t i = 0; i < N; ++i) {
+            // current time, and integration range
             double t         = opt.t_start + Ts * i;
             curr_opt.t_start = t;
             curr_opt.t_end   = t + Ts;
-            VecR_t curr_ref  = r(t);
-            VecU_t curr_u    = controller(curr_x, curr_ref);
             curr_opt.maxiter = opt.maxiter - result.iterations;
+            // reference signal
+            VecR_t curr_ref = r(t);
+            // calculate the control signal, based on current state
+            // and current reference
+            VecU_t curr_u = controller(curr_x, curr_ref);
+            // add the time, control signal and reference to the
+            // result vectors
             result.sampledTime.push_back(t);
             result.control.push_back(curr_u);
             result.reference.push_back(curr_ref);
+            // simulate the continuous system over this time step [t, t + Ts]
+            // and add the time points and states to the result
             auto curr_result = this->simulate(
                 std::back_inserter(result.time),
                 std::back_inserter(result.solution), curr_u, curr_x, curr_opt);
             result.resultCode |= curr_result.first;
             result.iterations += curr_result.second;
+            // update the actual state using the result of the continuous
+            // simulation at t + Ts
             curr_x = result.solution.back();
+            // start and end point are included by `simulate`, so remove doubles
             result.time.pop_back();
             result.solution.pop_back();
         }
@@ -386,26 +400,25 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
         ObserverControllerSimulationResult result = {};
         double Ts                                 = controller.Ts;
         size_t N = numberOfSamplesInTimeRange(opt.t_start, Ts, opt.t_end);
-
         // pre-allocate memory for result vectors
         result.sampledTime.reserve(N);
-        result.estimatedSolution.reserve(N);
         result.control.reserve(N);
+        result.reference.reserve(N);
+        result.estimatedSolution.reserve(N);
         result.output.reserve(N);
-        result.quatnorms.reserve(N);
 
         // actual state = inital state
         VecX_t curr_x = x_start;
         // estimated state = inital state
-        VecX_t curr_x_hat           = x_start;
-        AdaptiveODEOptions curr_opt = opt;
+        VecX_t curr_x_hat = x_start;
         // For each time step
+        AdaptiveODEOptions curr_opt = opt;
         for (size_t k = 0; k < N; ++k) {
             // current time, and integration range
             double t         = opt.t_start + Ts * k;
             curr_opt.t_start = t;
             curr_opt.t_end   = t + Ts;
-            curr_opt.maxiter -= result.iterations;
+            curr_opt.maxiter = opt.maxiter - result.iterations;
             // reference signal
             VecR_t curr_ref = r(t);
             // calculate the control signal, based on current estimated state
@@ -422,7 +435,7 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             result.estimatedSolution.push_back(curr_x_hat);
             result.control.push_back(curr_u);
             result.output.push_back(y);
-            result.quatnorms.push_back(norm(getBlock<0, 4, 0, 1>(curr_x)));
+            result.reference.push_back(curr_ref);
 
             // calculate the estimated state for the next time step
             //  k+1                                   k      k    k
@@ -432,10 +445,12 @@ class ContinuousModel : public Model<Nx, Nu, Ny> {
             VecU_t disturbed_u = randFnW(t, curr_u);
             // simulate the continuous system over this time step [t, t + Ts]
             // and add the time points and states to the result
-            result.resultCode |=
+            auto curr_result =
                 this->simulate(std::back_inserter(result.time),
                                std::back_inserter(result.solution), disturbed_u,
                                curr_x, curr_opt);
+            result.resultCode |= curr_result.first;
+            result.iterations += curr_result.second;
             // update the actual state using the result of the continuous
             // simulation at t + Ts
             curr_x = result.solution.back();

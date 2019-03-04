@@ -5,14 +5,12 @@ namespace py = pybind11;
 using namespace std;
 
 /**
- * @brief   Load the Python Plot module, and the main.py module in the current
- *          folder.  
- *          They will be available in Python as global variables `plot` and 
- *          `main`.  
- *          It also defines the global variable `path`, which is the folder of
- *          this file.
+ * @brief   Load the Python Plot module, and the Drone module.
+ * 
+ * @return  A dict containing the Plot module as `plot` and the Drone module as 
+ *          `drone`.
  */
-void loadModules();
+pybind11::dict getModules();
 
 filesystem::path getSourceFolder() {
     std::filesystem::path filepath = __FILE__;
@@ -21,19 +19,22 @@ filesystem::path getSourceFolder() {
 
 int main() {
     py::scoped_interpreter guard{};  // Start the Python interpreter
-    loadModules();
+    auto locals  = getModules();
     auto main_py = getSourceFolder() / "main.py";
-    py::eval_file(main_py.c_str());
+    pybind11::globals().attr("update")(locals);
+    py::eval_file(main_py.c_str(), pybind11::globals());
 }
 
-void loadModules() {
+pybind11::dict getModules() {
     using namespace py::literals;
 
-    // Plot
-    loadPythonPlotModule();
+    return pybind11::dict{
+        // Plot
+        "plot"_a = getPythonPlotModule(),
 
-    // PyDrone
-    py::globals()["drone"] = py::module::import("PyDrone");
+        // PyDrone
+        "drone"_a = py::module::import("PyDrone"),
+    };
 
     // // Main.py
     // std::filesystem::path filepath = __FILE__;
@@ -43,5 +44,5 @@ void loadModules() {
     //     import sys
     //     sys.path.append(path)
     // )");
-    // py::globals()["main"] = py::module::import("main");
+    // auto mainmodule = py::module::import("main");
 }

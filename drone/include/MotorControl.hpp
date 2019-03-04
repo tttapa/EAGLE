@@ -55,7 +55,8 @@ inline ColVector<3> clampMotorControlSignal(const ColVector<3> &u_model_raw,
         clampMotorControlSignal(vcat(u_c * eye<1>(), u_model_raw)));
 }
 
-inline void checkControlSignal(const ColVector<4> &u_model_raw) {
+inline void checkControlSignal(ColVector<4> u_model_raw, double uh) {
+    u_model_raw[3] += uh;
     auto u_motors = convertControlSignalToMotorOutputs(u_model_raw);
     for (double u_i : u_motors) {
         if (u_i > 1.0 || u_i < 0.0) {

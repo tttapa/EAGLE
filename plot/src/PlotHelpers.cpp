@@ -40,6 +40,7 @@ pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {
     using namespace pybind11::literals;
     using pybind11::dict;
     return dict{
+        "includes_estimated_states"_a = !result.stateEstimates.empty(),
         "reference_orientation"_a =
             dict{
                 "z"_a = Drone::extractSignal(
@@ -68,6 +69,15 @@ pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {
                 "x"_a = Drone::extractSignal(
                     result.states, &DroneState::getOrientationEuler, 2),
             },
+        "orientation_estimate"_a =
+            dict{
+                "z"_a = Drone::extractSignal(
+                    result.stateEstimates, &DroneState::getOrientationEuler, 0),
+                "y"_a = Drone::extractSignal(
+                    result.stateEstimates, &DroneState::getOrientationEuler, 1),
+                "x"_a = Drone::extractSignal(
+                    result.stateEstimates, &DroneState::getOrientationEuler, 2),
+            },
         "position"_a =
             dict{
                 "x"_a = Drone::extractSignal(result.states,
@@ -75,6 +85,15 @@ pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {
                 "y"_a = Drone::extractSignal(result.states,
                                              &DroneState::getPosition, 1),
                 "z"_a = Drone::extractSignal(result.states,
+                                             &DroneState::getPosition, 2),
+            },
+        "position_estimate"_a =
+            dict{
+                "x"_a = Drone::extractSignal(result.stateEstimates,
+                                             &DroneState::getPosition, 0),
+                "y"_a = Drone::extractSignal(result.stateEstimates,
+                                             &DroneState::getPosition, 1),
+                "z"_a = Drone::extractSignal(result.stateEstimates,
                                              &DroneState::getPosition, 2),
             },
 
@@ -87,6 +106,15 @@ pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {
                 "z"_a = Drone::extractSignal(
                     result.states, &DroneState::getAngularVelocity, 2),
             },
+        "angular_velocity_estimate"_a =
+            dict{
+                "x"_a = Drone::extractSignal(
+                    result.stateEstimates, &DroneState::getAngularVelocity, 0),
+                "y"_a = Drone::extractSignal(
+                    result.stateEstimates, &DroneState::getAngularVelocity, 1),
+                "z"_a = Drone::extractSignal(
+                    result.stateEstimates, &DroneState::getAngularVelocity, 2),
+            },
         "linear_velocity"_a =
             dict{
                 "x"_a = Drone::extractSignal(result.states,
@@ -94,6 +122,15 @@ pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {
                 "y"_a = Drone::extractSignal(result.states,
                                              &DroneState::getVelocity, 1),
                 "z"_a = Drone::extractSignal(result.states,
+                                             &DroneState::getVelocity, 2),
+            },
+        "linear_velocity_estimate"_a =
+            dict{
+                "x"_a = Drone::extractSignal(result.stateEstimates,
+                                             &DroneState::getVelocity, 0),
+                "y"_a = Drone::extractSignal(result.stateEstimates,
+                                             &DroneState::getVelocity, 1),
+                "z"_a = Drone::extractSignal(result.stateEstimates,
                                              &DroneState::getVelocity, 2),
             },
 
@@ -106,10 +143,24 @@ pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {
                 "z"_a = Drone::extractSignal(result.states,
                                              &DroneState::getMotorSpeed, 2),
             },
+        "torque_motor_velocity_estimate"_a =
+            dict{
+                "x"_a = Drone::extractSignal(result.stateEstimates,
+                                             &DroneState::getMotorSpeed, 0),
+                "y"_a = Drone::extractSignal(result.stateEstimates,
+                                             &DroneState::getMotorSpeed, 1),
+                "z"_a = Drone::extractSignal(result.stateEstimates,
+                                             &DroneState::getMotorSpeed, 2),
+            },
         "thrust_motor_velocity"_a =
             dict{
                 "z"_a = Drone::extractSignal(
                     result.states, &DroneState::getThrustMotorSpeed, 0),
+            },
+        "thrust_motor_velocity_estimate"_a =
+            dict{
+                "z"_a = Drone::extractSignal(
+                    result.stateEstimates, &DroneState::getThrustMotorSpeed, 0),
             },
 
         "torque_control"_a =

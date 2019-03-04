@@ -5,7 +5,7 @@ import numpy as np
 matplotlib.rcParams['lines.linewidth'] = 0.9
 
 
-def plot(time, dtime, states: dict, w: float, h: float, colorset: int, title: str):
+def plot(time, dtime, data: dict, w: float, h: float, colorset: int, title: str):
     dpi = 90
     fig, (
         #
@@ -31,85 +31,122 @@ def plot(time, dtime, states: dict, w: float, h: float, colorset: int, title: st
 
     # ROW 0
     ax_ref_ori.plot(
-        dtime, states['reference_orientation']['x'], color=c['x'], label='x')
+        dtime, data['reference_orientation']['x'], color=c['x'], label='x')
     ax_ref_ori.plot(
-        dtime, states['reference_orientation']['y'], color=c['y'], label='y')
+        dtime, data['reference_orientation']['y'], color=c['y'], label='y')
     ax_ref_ori.plot(
-        dtime, states['reference_orientation']['z'], color=c['z'], label='z')
+        dtime, data['reference_orientation']['z'], color=c['z'], label='z')
     ax_ref_ori.set_title("Reference orientation")
     ax_ref_ori.set_ylabel("Euler Angles [$\\mathrm{rad}$]")
     ax_ref_ori.set_xlim(time[0], time[-1])
-    ax_ref_ori.legend()
+    if not data['includes_estimated_states']:
+        ax_ref_ori.legend()
     #
     #
-    ax_ref_pos.plot(dtime, states['reference_position']['x'], color=c['x'])
-    ax_ref_pos.plot(dtime, states['reference_position']['y'], color=c['y'])
-    ax_ref_pos.plot(dtime, states['reference_position']['z'], color=c['z'])
+    ax_ref_pos.plot(dtime, data['reference_position']['x'], color=c['x'])
+    ax_ref_pos.plot(dtime, data['reference_position']['y'], color=c['y'])
+    ax_ref_pos.plot(dtime, data['reference_position']['z'], color=c['z'])
     ax_ref_pos.set_title("Reference position")
     ax_ref_pos.set_ylabel("Position [$m$]")
     ax_ref_pos.set_xlim(time[0], time[-1])
     #
     #
     # ROW 1
-    ax_ori.plot(time, states['orientation']['x'], color=c['x'])
-    ax_ori.plot(time, states['orientation']['y'], color=c['y'])
-    ax_ori.plot(time, states['orientation']['z'], color=c['z'])
+    ax_ori.plot(time, data['orientation']['x'], color=c['x'], label='x')
+    ax_ori.plot(time, data['orientation']['y'], color=c['y'], label='y')
+    ax_ori.plot(time, data['orientation']['z'], color=c['z'], label='z')
+    if data['includes_estimated_states']:
+        ax_ori.plot(dtime, data['orientation_estimate']['x'], '--', color=c['x'],
+                    label='x (est.)')
+        ax_ori.plot(dtime, data['orientation_estimate']['y'], '--', color=c['y'],
+                    label='y (est.)')
+        ax_ori.plot(dtime, data['orientation_estimate']['z'], '--', color=c['z'],
+                    label='z (est.)')
+        ax_ori.legend()
     ax_ori.set_title("Orientation")
     ax_ori.set_ylabel("Euler Angles [$\\mathrm{rad}$]")
     ax_ori.set_xlim(time[0], time[-1])
     #
     #
-    ax_pos.plot(time, states['position']['x'], color=c['x'])
-    ax_pos.plot(time, states['position']['y'], color=c['y'])
-    ax_pos.plot(time, states['position']['z'], color=c['z'])
+    ax_pos.plot(time, data['position']['x'], color=c['x'])
+    ax_pos.plot(time, data['position']['y'], color=c['y'])
+    ax_pos.plot(time, data['position']['z'], color=c['z'])
+    if data['includes_estimated_states']:
+        ax_pos.plot(dtime, data['position_estimate']['x'], '--', color=c['x'])
+        ax_pos.plot(dtime, data['position_estimate']['y'], '--', color=c['y'])
+        ax_pos.plot(dtime, data['position_estimate']['z'], '--', color=c['z'])
     ax_pos.set_title("Position")
     ax_pos.set_ylabel("Position [$m$]")
     ax_pos.set_xlim(time[0], time[-1])
     #
     #
     # ROW 2
-    ax_ang_vel.plot(time, states['angular_velocity']['x'], color=c['x'])
-    ax_ang_vel.plot(time, states['angular_velocity']['y'], color=c['y'])
-    ax_ang_vel.plot(time, states['angular_velocity']['z'], color=c['z'])
+    ax_ang_vel.plot(time, data['angular_velocity']['x'], color=c['x'])
+    ax_ang_vel.plot(time, data['angular_velocity']['y'], color=c['y'])
+    ax_ang_vel.plot(time, data['angular_velocity']['z'], color=c['z'])
+    if data['includes_estimated_states']:
+        ax_ang_vel.plot(dtime, data['angular_velocity_estimate']
+                        ['x'], '--', color=c['x'])
+        ax_ang_vel.plot(dtime, data['angular_velocity_estimate']
+                        ['y'], '--', color=c['y'])
+        ax_ang_vel.plot(dtime, data['angular_velocity_estimate']
+                        ['z'], '--', color=c['z'])
     ax_ang_vel.set_title("Angular velocity")
     ax_ang_vel.set_ylabel("Angular velocity [$\\mathrm{rad}/s$]")
     ax_ang_vel.set_xlim(time[0], time[-1])
     #
     #
-    ax_lin_vel.plot(time, states['linear_velocity']['x'], color=c['x'])
-    ax_lin_vel.plot(time, states['linear_velocity']['y'], color=c['y'])
-    ax_lin_vel.plot(time, states['linear_velocity']['z'], color=c['z'])
+    ax_lin_vel.plot(time, data['linear_velocity']['x'], color=c['x'])
+    ax_lin_vel.plot(time, data['linear_velocity']['y'], color=c['y'])
+    ax_lin_vel.plot(time, data['linear_velocity']['z'], color=c['z'])
+    if data['includes_estimated_states']:
+        ax_lin_vel.plot(
+            dtime, data['linear_velocity_estimate']['x'], '--', color=c['x'])
+        ax_lin_vel.plot(
+            dtime, data['linear_velocity_estimate']['y'], '--', color=c['y'])
+        ax_lin_vel.plot(
+            dtime, data['linear_velocity_estimate']['z'], '--', color=c['z'])
     ax_lin_vel.set_title("Velocity")
     ax_lin_vel.set_ylabel("Velocity [$m/s$]")
     ax_lin_vel.set_xlim(time[0], time[-1])
     #
     #
     # ROW 3
-    ax_torque.plot(time, states['torque_motor_velocity']['x'], color=c['x'])
-    ax_torque.plot(time, states['torque_motor_velocity']['y'], color=c['y'])
-    ax_torque.plot(time, states['torque_motor_velocity']['z'], color=c['z'])
+    ax_torque.plot(time, data['torque_motor_velocity']['x'], color=c['x'])
+    ax_torque.plot(time, data['torque_motor_velocity']['y'], color=c['y'])
+    ax_torque.plot(time, data['torque_motor_velocity']['z'], color=c['z'])
+    if data['includes_estimated_states']:
+        ax_torque.plot(dtime, data['torque_motor_velocity_estimate']
+                       ['x'], '--', color=c['x'])
+        ax_torque.plot(dtime, data['torque_motor_velocity_estimate']
+                       ['y'], '--', color=c['y'])
+        ax_torque.plot(dtime, data['torque_motor_velocity_estimate']
+                       ['z'], '--', color=c['z'])
     ax_torque.set_title("Torque motor velocity")
     ax_torque.set_ylabel("Angular velocity [$?$]")
     ax_torque.set_xlim(time[0], time[-1])
     #
     #
-    ax_thrust.plot(time, states['thrust_motor_velocity']['z'], color=c['z'])
+    ax_thrust.plot(time, data['thrust_motor_velocity']['z'], color=c['z'])
+    if data['includes_estimated_states']:
+        ax_thrust.plot(dtime, data['thrust_motor_velocity_estimate']
+                       ['z'], '--', color=c['z'])
     ax_thrust.set_title("Thrust motor velocity")
     ax_thrust.set_ylabel("Angular velocity [$?$]")
     ax_thrust.set_xlim(time[0], time[-1])
     #
     #
     # ROW 4
-    ax_torque_ctrl.plot(dtime, states['torque_control']['x'], color=c['x'])
-    ax_torque_ctrl.plot(dtime, states['torque_control']['y'], color=c['y'])
-    ax_torque_ctrl.plot(dtime, states['torque_control']['z'], color=c['z'])
+    ax_torque_ctrl.plot(dtime, data['torque_control']['x'], color=c['x'])
+    ax_torque_ctrl.plot(dtime, data['torque_control']['y'], color=c['y'])
+    ax_torque_ctrl.plot(dtime, data['torque_control']['z'], color=c['z'])
     ax_torque_ctrl.set_title("Torque motor control")
     ax_torque_ctrl.set_ylabel("Control signal [-]")
     ax_torque_ctrl.set_xlabel("Time [$s$]")
     ax_torque_ctrl.set_xlim(time[0], time[-1])
     #
     #
-    ax_thrust_ctrl.plot(dtime, states['thrust_control']['z'], color=c['z'])
+    ax_thrust_ctrl.plot(dtime, data['thrust_control']['z'], color=c['z'])
     ax_thrust_ctrl.set_title("Thrust motor control")
     ax_thrust_ctrl.set_ylabel("Control signal [-]")
     ax_thrust_ctrl.set_xlabel("Time [$s$]")
@@ -186,7 +223,7 @@ def plot_attitude(time, dtime, states: dict, w: float, h: float, colorset: int, 
     ax_torque_ctrl.set_xlabel("Time [$s$]")
     ax_torque_ctrl.set_xlim(time[0], time[-1])
     #
-    
+
     fig.tight_layout()
     return fig
 

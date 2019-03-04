@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 # SET (CMAKE_CXX_COMPILER "clang++")
 SET (CMAKE_C_COMPILER "gcc-8")
 SET (CMAKE_CXX_COMPILER "g++-8")
+SET (CMAKE_CXX_STANDARD 17)
 
 project(eagle)
 

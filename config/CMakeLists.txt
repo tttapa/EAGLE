@@ -23,7 +23,7 @@ target_link_libraries(config
     PUBLIC 
         stdc++fs
     PRIVATE 
-        Matrix::matrix
+        Quaternion::quaternion
         ODE::ode
 )
 

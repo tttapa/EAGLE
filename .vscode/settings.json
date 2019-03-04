@@ -103,7 +103,9 @@
     },
     "search.location": "panel",
     "search.smartCase": true,
-    "C_Cpp.default.cppStandard": "c++11",
+    "C_Cpp.default.cppStandard": "c++17",
     "editor.scrollBeyondLastColumn": 0,
     "terminal.integrated.cwd": "build",
+    "C_Cpp.default.intelliSenseMode": "gcc-x64",
+    "terminal.integrated.cursorBlinking": true,
 }

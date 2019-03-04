@@ -190,4 +190,16 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
                       pybind11::arg("result"), pybind11::arg("w") = 1920,
                       pybind11::arg("h") = 1080, pybind11::arg("colors") = 0,
                       pybind11::arg("title") = "");
+
+    pybind11::class_<DronePlottable>(pydronemodule, "DronePlottable")
+        .def(pybind11::init<>())
+        .def(pybind11::init<const Drone::ControllerSimulationResult &>())
+        .def(pybind11::init<const DroneLogLoader>())
+        .def_readwrite("time", &DronePlottable::time)
+        .def_readwrite("sampledTime", &DronePlottable::sampledTime)
+        .def_readwrite("states", &DronePlottable::states)
+        .def_readwrite("control", &DronePlottable::control)
+        .def_readwrite("reference", &DronePlottable::reference);
+
+    pydronemodule.def("eul2quat", eul2quat);
 }

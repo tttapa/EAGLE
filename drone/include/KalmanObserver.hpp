@@ -63,6 +63,7 @@ class KalmanObserver : public DiscreteObserver<Nx, Nu, Ny> {
 
 }  // namespace Attitude
 
+#include <iostream> // TODO
 namespace Altitude {
 
 /**
@@ -72,7 +73,21 @@ class KalmanObserver : public DiscreteObserver<Nx, Nu, Ny> {
   public:
     KalmanObserver(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                    const Matrix<Ny, Nx> &C, const Matrix<Nx, Ny> &L, double Ts)
-        : DiscreteObserver<Nx, Nu, Ny>{Ts}, A{A}, B{B}, C{C}, L{L} {}
+        : DiscreteObserver<Nx, Nu, Ny>{Ts}, A{A}, B{B}, C{C}, L{L} {
+
+        std::cout << "A_alt = ";
+        printMATLAB(std::cout, A);
+        std::cout << std::endl;
+        std::cout << "B_alt = ";
+        printMATLAB(std::cout, B);
+        std::cout << std::endl;
+        std::cout << "C_alt = ";
+        printMATLAB(std::cout, C);
+        std::cout << std::endl;
+        std::cout << "L_alt = ";
+        printMATLAB(std::cout, L);
+        std::cout << std::endl;
+    }
 
     /**
      * @brief   Get the state change, given the previous estimated state, the

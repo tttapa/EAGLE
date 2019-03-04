@@ -205,6 +205,13 @@ TEST(Matrix, getBlock) {
     ASSERT_EQ(result, expected);
 }
 
+TEST(Matrix, getBlockRowVector) {
+    RowVector<4> r        = {{1, 2, 3, 4}};
+    RowVector<3> result   = getBlock<0, 1, 1, 4>(r);
+    RowVector<3> expected = {{2, 3, 4}};
+    ASSERT_EQ(result, expected);
+}
+
 TEST(Matrix, hcat) {
     TMatrix<int, 3, 2> l        = {{
         {11, 12},

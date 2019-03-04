@@ -49,7 +49,7 @@ class DroneState {
     void setAltitude(const ColVector<3> &a) {
         x[16] = a[0];  // n
         x[15] = a[1];  // z
-        x[12] = a[3];  // v_z
+        x[12] = a[2];  // v_z
     }
     operator ColVector<17>() const { return x; }
 };

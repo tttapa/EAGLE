@@ -1,4 +1,5 @@
 #include "Config.hpp"
+#include <Quaternion.hpp>
 
 namespace Config {
 
@@ -37,23 +38,23 @@ const Matrix<9, 9> Q = diag(Qdiag);
 const Matrix<3, 3> R = diag(Rdiag);
 
 /** @todo   Tune */
-const RowVector<12> varDynamics = {{
-    1e-2,
-    1e-2,
-    1e-2,
-    1e-2,
-    1e-2,
-    1e-2,
-    1e-2,
-    1e-2,
-    1e-2,
+const RowVector<3> varDynamics = {{
+    //    1e-2,
+    //    1e-2,
+    //    1e-2,
+    //    1e-2,
+    //    1e-2,
+    //    1e-2,
+    //    1e-2,
+    //    1e-2,
+    //    1e-2,
     1e-4,
     1e-4,
     1e-6,
 }};
-const RowVector<6> varSensors   = hcat(  //
-    M_PI / 180.0 * ones<1, 3>(),       //
-    0.005 * ones<1, 3>()               //
+const RowVector<7> varSensors  = hcat(                  //
+    transpose(eul2quat(M_PI / 180.0 * ones<3, 1>())),  //
+    0.005 * ones<1, 3>()                               //
 );
 }  // namespace Attitude
 
@@ -61,16 +62,16 @@ const RowVector<6> varSensors   = hcat(  //
 
 namespace Altitude {
 /** Proporional altitude controller */
-const Matrix<1, 3> K_p = {0.0, 0.9, 0.5};  // n, z, v
+const Matrix<1, 3> K_p = {0.0, 0.3, 0.2};  // n, z, v
 /** Integral altitude controller */
-const Matrix<1, 1> K_i = {-0.01};
+const Matrix<1, 1> K_i = {-0.001};
 /** Complete altitude controller */
 const Matrix<1, 4> K_pi = hcat(K_p, K_i);
 /** Anti-windup for integral controller */
 const double maxIntegralInfluence = 0.1;
 
-const RowVector<1> varDynamics = {0.01};
-const RowVector<1> varSensors  = {0.02};  // 2 cm
+const RowVector<1> varDynamics = {1e-1};
+const RowVector<1> varSensors  = {1e-2};  // 1 cm
 }  // namespace Altitude
 
 /* ------ Simulation options (for ODE solver) ------------------------------- */

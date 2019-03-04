@@ -57,17 +57,33 @@ int main(int argc, char const *argv[]) {
         Config::Attitude::Q, Config::Attitude::R, Config::Altitude::K_pi,
         Config::Altitude::maxIntegralInfluence);
 
-    // Drone::Observer observer = drone.getObserver( // TODO
-    //     Config::Attitude::varDynamics, Config::Attitude::varSensors,
-    //     Config::Altitude::varDynamics, Config::Altitude::varSensors);
+    Drone::Observer observer = drone.getObserver(
+        Config::Attitude::varDynamics, Config::Attitude::varSensors,
+        Config::Altitude::varDynamics, Config::Altitude::varSensors);
 
     DroneState x0             = drone.getStableState();
     TestReferenceFunction ref = {};
 
+    GaussianNoiseGenerator randFnW = hcat(Config::Attitude::varDynamics,
+                                          Config::Altitude::varDynamics / 100);
+
+    GaussianNoiseGenerator randFnV =
+        hcat(Config::Attitude::varSensors, Config::Altitude::varSensors,
+             zeros<1, Ny_nav>());
+
+    // NoNoiseGenerator<Nu> randFnW;
+    // NoNoiseGenerator<Ny> randFnV;
+
     /* ------ Simulate the drone with the controller ------------------------ */
 
     PerfTimer pt;
-    auto result = drone.simulate(controller, ref, x0, Config::odeopt);
+    Drone::ObserverControllerSimulationResult result;
+    try {
+        result = drone.simulate(controller, observer, randFnW, randFnV, ref, x0,
+                                Config::odeopt);
+    } catch (std::exception &e) {
+        cerr << ANSIColors::red << e.what() << ANSIColors::reset << endl;
+    }
     result.resultCode.verbose();
     cout << "Simulation took " << pt.getDuration() << " µs" << endl;
 
@@ -83,7 +99,7 @@ int main(int argc, char const *argv[]) {
 
         // Plot and/or save the step response
         EulerAngles e_ref = {0_deg, 30_deg, 30_deg};
-        Quaternion q_ref = eul2quat(e_ref);
+        Quaternion q_ref  = eul2quat(e_ref);
         ostringstream title;
         title << "Step Response $" << asEulerAngles(e_ref, degreesTeX) << "$";
         auto ax = axes(w, h);

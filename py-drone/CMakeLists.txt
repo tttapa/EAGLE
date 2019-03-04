@@ -32,6 +32,7 @@ target_link_libraries(py-drone
     INTERFACE 
         py-matrix
         drone
+        plot
 )
 
 # Run CMake again in the `test` folder, to discover the CMakeLists.txt file that
