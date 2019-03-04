@@ -29,9 +29,9 @@ extern const RowVector<7> varSensors;
 /* ------ Altitude PI controller and LQE ------------------------------------ */
 
 namespace Altitude {
-extern const Matrix<1, 3> K_p;
+extern const Matrix<1, 3> Qdiag;
+extern const Matrix<3, 3> Q;
 extern const Matrix<1, 1> K_i;
-extern const Matrix<1, 4> K_pi;
 extern const double maxIntegralInfluence;
 
 extern const RowVector<1> varDynamics;

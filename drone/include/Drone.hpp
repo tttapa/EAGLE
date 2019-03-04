@@ -264,6 +264,14 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         return {p.G_alt, p.Cd_alt, K_pi, p.Ts_alt, maxIntegralInfluence};
     }
 
+    Altitude::LQRController getAltitudeController(const Matrix<3, 3> &Q,
+                                                  const Matrix<1, 1> &K_i,
+                                                  double maxIntegralInfluence) {
+        auto K_lqr = dlqr(p.Ad_alt, p.Bd_alt, Q, {{1}}).K;
+        auto K_pi  = hcat(K_lqr, K_i);
+        return {p.G_alt, p.Cd_alt, K_pi, p.Ts_alt, maxIntegralInfluence};
+    }
+
     Altitude::CLQRController getCAltitudeController() { return {p.Ts_alt}; }
 
     class Controller : public DiscreteController<Nx, Nu, Ny> {
@@ -317,6 +325,20 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
                 getAttitudeController(Q_att, R_att)),
             std::make_unique<Altitude::LQRController>(
                 getAltitudeController(K_pi_alt, maxIntegralInfluence)),
+            p.uh,
+        };
+    }
+
+    Controller getController(const Matrix<Nx_att - 1, Nx_att - 1> &Q_att,
+                             const Matrix<Nu_att, Nu_att> &R_att,
+                             const Matrix<3, 3> &Q_alt,
+                             const Matrix<1, 1> &K_i_alt,
+                             double maxIntegralInfluence) {
+        return {
+            std::make_unique<Attitude::LQRController>(
+                getAttitudeController(Q_att, R_att)),
+            std::make_unique<Altitude::LQRController>(
+                getAltitudeController(Q_alt, K_i_alt, maxIntegralInfluence)),
             p.uh,
         };
     }

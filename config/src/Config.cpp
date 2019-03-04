@@ -62,13 +62,12 @@ const RowVector<7> varSensors  = hcat(                  //
 
 namespace Altitude {
 /** Proporional altitude controller */
-const Matrix<1, 3> K_p = {0.0, 0.3, 0.2};  // n, z, v
+const Matrix<1, 3> Qdiag = {0.001, 1, 0.5};  // n, z, v
+const Matrix<3, 3> Q = diag(Qdiag);
 /** Integral altitude controller */
-const Matrix<1, 1> K_i = {-0.001};
-/** Complete altitude controller */
-const Matrix<1, 4> K_pi = hcat(K_p, K_i);
+const Matrix<1, 1> K_i = {-0.01};
 /** Anti-windup for integral controller */
-const double maxIntegralInfluence = 0.1;
+const double maxIntegralInfluence = 0.03;
 
 const RowVector<1> varDynamics = {1e-1};
 const RowVector<1> varSensors  = {1e-2};  // 1 cm

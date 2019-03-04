@@ -54,8 +54,8 @@ int main(int argc, char const *argv[]) {
     Drone drone = {loadPath};
 
     Drone::Controller controller = drone.getController(
-        Config::Attitude::Q, Config::Attitude::R, Config::Altitude::K_pi,
-        Config::Altitude::maxIntegralInfluence);
+        Config::Attitude::Q, Config::Attitude::R, Config::Altitude::Q,
+        Config::Altitude::K_i, Config::Altitude::maxIntegralInfluence);
 
     Drone::Observer observer = drone.getObserver(
         Config::Attitude::varDynamics, Config::Attitude::varSensors,
