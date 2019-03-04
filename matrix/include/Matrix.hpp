@@ -288,7 +288,7 @@ template <class T, size_t C>
 constexpr double normsq(const TColVector<T, C> &colvector) {
     double sumsq = 0;
     for (size_t c = 0; c < C; ++c)
-        sumsq += colvector[0][c] * colvector[0][c];
+        sumsq += colvector[c] * colvector[c];
     return sumsq;
 }
 

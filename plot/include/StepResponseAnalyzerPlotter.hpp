@@ -67,19 +67,21 @@ void StepResponseAnalyzerPlotter<N>::plot(pybind11::object axes, IndexRange idx,
         states.push_back(Drone::extractSignal(this->x_v, i));
 
     auto data = dict{
-        "times"_a  = this->t_v,
-        "states"_a = states,
-        "references"_a =
-            std::vector<double>(&this->x_ref[idx.start], &this->x_ref[idx.end]),
-        "thresholds"_a =
-            std::vector<double>(&this->x_thr[idx.start], &this->x_thr[idx.end]),
-        "overshoots"_a = std::vector<double>(&result.overshoot[idx.start],
-                                             &result.overshoot[idx.end]),
+        "times"_a      = this->t_v,
+        "states"_a     = states,
+        "references"_a = std::vector<double>(this->x_ref.begin() + idx.start,
+                                             this->x_ref.begin() + idx.end),
+        "thresholds"_a = std::vector<double>(this->x_thr.begin() + idx.start,
+                                             this->x_thr.begin() + idx.end),
+        "overshoots"_a =
+            std::vector<double>(result.overshoot.begin() + idx.start,
+                                result.overshoot.begin() + idx.end),
 
-        "risetimes"_a   = std::vector<double>(&result.risetime[idx.start],
-                                            &result.risetime[idx.end]),
-        "settletimes"_a = std::vector<double>(&result.settletime[idx.start],
-                                              &result.settletime[idx.end]),
+        "risetimes"_a = std::vector<double>(result.risetime.begin() + idx.start,
+                                            result.risetime.begin() + idx.end),
+        "settletimes"_a =
+            std::vector<double>(result.settletime.begin() + idx.start,
+                                result.settletime.begin() + idx.end),
     };
 
     auto pm                    = getPythonPlotModule();

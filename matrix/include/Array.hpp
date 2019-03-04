@@ -1,10 +1,15 @@
 #pragma once
 
+#define SAFE_ARRAY_INDICES
+
 #include <algorithm>  // copy
 #include <cmath>      // isfinite
 #include <cstddef>
 #include <numeric>  // accumulate
 #include <type_traits>
+#ifdef SAFE_ARRAY_INDICES
+#include <cassert>
+#endif
 
 template <class T, size_t N>
 struct Array;
@@ -35,8 +40,18 @@ template <class T, size_t N>
 struct Array {
     T data[N];
 
-    constexpr T &operator[](size_t index) { return data[index]; }
-    constexpr const T &operator[](size_t index) const { return data[index]; }
+    constexpr T &operator[](size_t index) {
+#ifdef SAFE_ARRAY_INDICES
+        assert(index < N);
+#endif
+        return data[index];
+    }
+    constexpr const T &operator[](size_t index) const {
+#ifdef SAFE_ARRAY_INDICES
+        assert(index < N);
+#endif
+        return data[index];
+    }
     constexpr T *begin() { return &data[0]; }
     constexpr const T *begin() const { return &data[0]; }
     constexpr T *end() { return &data[N]; }

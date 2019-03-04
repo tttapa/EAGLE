@@ -63,7 +63,8 @@ class KalmanObserver : public DiscreteObserver<Nx, Nu, Ny> {
 
 }  // namespace Attitude
 
-#include <iostream> // TODO
+#include <iostream>  // TODO
+
 namespace Altitude {
 
 /**
@@ -74,7 +75,7 @@ class KalmanObserver : public DiscreteObserver<Nx, Nu, Ny> {
     KalmanObserver(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                    const Matrix<Ny, Nx> &C, const Matrix<Nx, Ny> &L, double Ts)
         : DiscreteObserver<Nx, Nu, Ny>{Ts}, A{A}, B{B}, C{C}, L{L} {
-
+#if 0
         std::cout << "A_alt = ";
         printMATLAB(std::cout, A);
         std::cout << std::endl;
@@ -87,6 +88,7 @@ class KalmanObserver : public DiscreteObserver<Nx, Nu, Ny> {
         std::cout << "L_alt = ";
         printMATLAB(std::cout, L);
         std::cout << std::endl;
+#endif
     }
 
     /**
