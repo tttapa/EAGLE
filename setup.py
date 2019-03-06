@@ -60,13 +60,11 @@ class CMakeBuild(build_ext):
 
 setup(
     name='py_drone_module',
-    version='0.0.1',
+    version='0.0.2',
     author='Pieter Pas',
     author_email='pieter.pas@outlook.com',
     description='The Python Drone Module',
     long_description='',
     ext_modules=[CMakeExtension('py_drone_module')],
     cmdclass=dict(build_ext=CMakeBuild),
-    zip_safe=False,
-    packages=find_packages(), #fix
 )

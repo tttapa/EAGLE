@@ -8,16 +8,17 @@ SET (CMAKE_CXX_STANDARD 17)
 
 project(eagle)
 
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-# TODO
-# set (CMAKE_CXX_STANDARD 17)
-# set (CMAKE_C_STANDARD 90) # ANSI
-
-# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+if(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif()
+if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif()
+if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+endif()
 
 ################################################################################
 ##############################   GOOGLE TEST   #################################
@@ -102,37 +103,6 @@ add_subdirectory("genetic-tuner")
 add_subdirectory("tilt-correction")
 add_subdirectory("py-drone")
 
-################################################################################
-################################ PYTHON MODULE #################################
-################################################################################
-
-find_package(pybind11 REQUIRED)
-
-# Create a Python module
-pybind11_add_module(py_drone_module py-drone/src/PyDrone.module.cpp)
-
-# Set target include directories 
-#   These are the folders where the compiler will search for included header 
-#   files.
-#   The include files in the `include` folder are part of the public API of the
-#   library, users of the library need to be able to include them in their code. 
-target_include_directories(py_drone_module
-    PUBLIC
-        $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/py-drone/include>
-    PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/py-drone/src>
-)
-
-# Link the library with its dependencies.
-#   This manages both the include directories of the dependencies, as well as  
-#   the actual linking of the other libraries.
-target_link_libraries(py_drone_module
-    PUBLIC 
-        pybind11::module
-        py-matrix
-        drone-plottable
-)
 
 ################################################################################
 ###############################   APPLICATIONS   ###############################
@@ -146,5 +116,11 @@ add_subdirectory("applications")
 ################################################################################
 
 # Add Doxygen target
-add_custom_target(documentation rm -rf html && doxygen
-                  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/../doc/")
+add_custom_target(documentation
+                  rm -rf html && doxygen
+                  WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/doc")
+
+# Builds a Python Wheel package and installs it using Pip
+add_custom_target(python
+                  Scripts/Install-Python.sh "${PYTHON_EXECUTABLE}"
+                  WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")

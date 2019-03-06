@@ -20,3 +20,7 @@ LastTest.log
 tasks.json
 .vscode/tags
 build/Testing/Temporary/LastTest.log
+build/lib.linux*/*
+build/temp.linux*/*
+dist
+*.egg-info
