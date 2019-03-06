@@ -19,7 +19,7 @@ target_compile_options(matrix INTERFACE ${LAPACK_LINKER_FLAGS})
 
 target_link_libraries(matrix
     INTERFACE
-        lapacke.a
+        lapacke
         ${LAPACK_LIBRARIES}
 )
 

@@ -31,7 +31,8 @@ target_link_libraries(plot
     PUBLIC 
         Drone::drone
         StepResponse::step-response
-        DroneLogLoader::drone-log-loader 
+        DronePlottable::drone-plottable
+        DroneLogLoader::drone-log-loader
         pybind11::embed
         # Threads::Threads # TODO
         # dl # TODO

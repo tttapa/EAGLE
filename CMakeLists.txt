@@ -15,9 +15,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 # set (CMAKE_CXX_STANDARD 17)
 # set (CMAKE_C_STANDARD 90) # ANSI
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ################################################################################
 ##############################   GOOGLE TEST   #################################
@@ -75,6 +75,8 @@ SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} \
 -O3 -g3 \
 -Wall -Wextra -Werror -pedantic")
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 ################################################################################
 #################################   LIBRARIES   ################################
 ################################################################################
@@ -92,12 +94,45 @@ add_subdirectory("simulation")
 add_subdirectory("drone")
 add_subdirectory("step-response")
 add_subdirectory("drone-log-loader")
+add_subdirectory("drone-plottable")
 add_subdirectory("plot")
 add_subdirectory("csv")
 add_subdirectory("config")
 add_subdirectory("genetic-tuner")
 add_subdirectory("tilt-correction")
 add_subdirectory("py-drone")
+
+################################################################################
+################################ PYTHON MODULE #################################
+################################################################################
+
+find_package(pybind11 REQUIRED)
+
+# Create a Python module
+pybind11_add_module(py_drone_module py-drone/src/PyDrone.module.cpp)
+
+# Set target include directories 
+#   These are the folders where the compiler will search for included header 
+#   files.
+#   The include files in the `include` folder are part of the public API of the
+#   library, users of the library need to be able to include them in their code. 
+target_include_directories(py_drone_module
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/py-drone/include>
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/py-drone/src>
+)
+
+# Link the library with its dependencies.
+#   This manages both the include directories of the dependencies, as well as  
+#   the actual linking of the other libraries.
+target_link_libraries(py_drone_module
+    PUBLIC 
+        pybind11::module
+        py-matrix
+        drone-plottable
+)
 
 ################################################################################
 ###############################   APPLICATIONS   ###############################

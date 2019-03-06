@@ -2,10 +2,15 @@
 
 #include <Drone.hpp>
 #include <Matrix.hpp>
-#include <Plot.hpp>
 #include <PyMatrix.hpp>
 #include <iostream>  // cerr
+#include <DronePlot.hpp>
+#ifndef EXTERNAL_PY_MODULE
+#include <Plot.hpp>
 #include <pybind11/embed.h>
+#else
+#include <pybind11/pybind11.h>
+#endif
 
 class __attribute__((visibility("hidden"))) PythonDroneReferenceFunction
     : public Drone::ReferenceFunction {
@@ -21,7 +26,11 @@ class __attribute__((visibility("hidden"))) PythonDroneReferenceFunction
     pybind11::object callable;
 };
 
+#ifdef EXTERNAL_PY_MODULE
+PYBIND11_MODULE(py_drone_module, pydronemodule) {
+#else
 PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
+#endif
     pybind11::class_<DroneParamsAndMatrices>(pydronemodule,
                                              "DroneParamsAndMatrices")
         .def(pybind11::init<>())
@@ -187,6 +196,7 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
             return drone.simulate(controller, reference, x0, odeopt);
         });
 
+#ifndef EXTERNAL_PY_MODULE
     pydronemodule.def("plot",
                       pybind11::overload_cast<const DronePlottable &, float,
                                               float, int, std::string>(&plot));
@@ -199,6 +209,7 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
                       pybind11::arg("result"), pybind11::arg("w") = 1920,
                       pybind11::arg("h") = 1080, pybind11::arg("colors") = 0,
                       pybind11::arg("title") = "");
+#endif
 
     pybind11::class_<DronePlottable>(pydronemodule, "DronePlottable")
         .def(pybind11::init<>())
