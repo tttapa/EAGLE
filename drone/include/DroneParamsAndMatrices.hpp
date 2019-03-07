@@ -12,6 +12,15 @@ struct DroneParamsAndMatrices {
      */
     void load(const std::filesystem::path &loadPath);
 
+    /**
+     * @brief   Calculate the equilibrium matrix G
+     * 
+     * @see     ::calculateG
+     */
+    void calculateG();
+
+    void calculateReducedAttitudeSystemMatrices();
+
 #pragma region System matrices Attitude.........................................
     /** 
      * ```
@@ -174,9 +183,9 @@ struct DroneParamsAndMatrices {
     double k1;
     double k2;
 
-    const int Nm     = 4;      ///< -            number of motors
-    const double g   = 9.81;   ///< m/s2         gravitational acceleration
-    const double rho = 1.225;  ///< kg/m3        air density (nominal, at 15C,
+    int Nm     = 4;            ///< -            number of motors
+    double g   = 9.81;         ///< m/s2         gravitational acceleration
+    double rho = 1.225;        ///< kg/m3        air density (nominal, at 15C,
                                ///               sea level)
     double m;                  ///< kg           total mass
     double ct;                 ///< -            thrust coefficient

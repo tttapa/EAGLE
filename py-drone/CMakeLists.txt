@@ -69,4 +69,5 @@ target_link_libraries(py_drone_module
         pybind11::module
         py-matrix
         drone-plottable
+        plot
 )

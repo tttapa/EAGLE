@@ -40,6 +40,8 @@ pybind11::dict dronePlottableToPythonDict(const DronePlottable &result) {
     using namespace pybind11::literals;
     using pybind11::dict;
     return dict{
+        "time"_a  = result.time,
+        "dtime"_a = result.sampledTime,
         "includes_estimated_states"_a = !result.stateEstimates.empty(),
         "reference_orientation"_a =
             dict{
@@ -185,6 +187,8 @@ droneAttitudePlottableToPythonDict(const DroneAttitudePlottable &result) {
     using namespace pybind11::literals;
     using pybind11::dict;
     return dict{
+        "time"_a  = result.time,
+        "dtime"_a = result.sampledTime,
         "reference_orientation"_a =
             dict{
                 "z"_a = Drone::extractSignal(

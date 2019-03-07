@@ -8,7 +8,6 @@
 
 using namespace std;
 
-#if 1
 void DroneParamsAndMatrices::load(const filesystem::path &loadPath) {
 
     PerfTimer timer;
@@ -25,11 +24,8 @@ void DroneParamsAndMatrices::load(const filesystem::path &loadPath) {
     Cd_att = loadMatrix<Ny_att, Nx_att>(loadPath / "attitude" / "Cd");
     Dd_att = loadMatrix<Ny_att, Nu_att>(loadPath / "attitude" / "Dd");
 
-    G_att = calculateG(Ad_att, Bd_att, Cd_att, Dd_att);
 
-    Ad_att_r = getBlock<1, Nx_att, 1, Nx_att>(Ad_att);
-    Bd_att_r = getBlock<1, Nx_att, 0, Nu_att>(Bd_att);
-    Cd_att_r = getBlock<1, Ny_att, 1, Nx_att>(Cd_att);
+    calculateReducedAttitudeSystemMatrices();
 
     Ts_att = loadDouble(loadPath / "attitude" / "Ts");
 
@@ -48,9 +44,12 @@ void DroneParamsAndMatrices::load(const filesystem::path &loadPath) {
     Cd_alt = loadMatrix<Ny_alt, Nx_alt>(loadPath / "altitude" / "Cd");
     Dd_alt = loadMatrix<Ny_alt, Nu_alt>(loadPath / "altitude" / "Dd");
 
-    G_alt = calculateG(Ad_alt, Bd_alt, Cd_alt, Dd_alt);
 
     Ts_alt = loadDouble(loadPath / "altitude" / "Ts");
+
+    /* Equilibrium */
+
+    calculateG();
 
     /* General */
 
@@ -85,4 +84,13 @@ void DroneParamsAndMatrices::load(const filesystem::path &loadPath) {
     assert(isAlmostEqual(Id_inv, inv(Id), 1e-12));
 }
 
-#endif 
+void DroneParamsAndMatrices::calculateG() {
+    G_att = ::calculateG(Ad_att, Bd_att, Cd_att, Dd_att);
+    G_alt = ::calculateG(Ad_alt, Bd_alt, Cd_alt, Dd_alt);
+}
+
+void DroneParamsAndMatrices::calculateReducedAttitudeSystemMatrices() {
+    Ad_att_r = getBlock<1, Nx_att, 1, Nx_att>(Ad_att);
+    Bd_att_r = getBlock<1, Nx_att, 0, Nu_att>(Bd_att);
+    Cd_att_r = getBlock<1, Ny_att, 1, Nx_att>(Cd_att);
+}

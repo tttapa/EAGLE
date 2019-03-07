@@ -1,10 +1,11 @@
 #pragma once
 
 #include <Drone.hpp>
+#include <DronePlot.hpp>
 #include <Matrix.hpp>
 #include <PyMatrix.hpp>
 #include <iostream>  // cerr
-#include <DronePlot.hpp>
+#include <PlotHelpers.hpp>
 #ifndef EXTERNAL_PY_MODULE
 #include <Plot.hpp>
 #include <pybind11/embed.h>
@@ -82,9 +83,9 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
         .def_readwrite("k1", &DroneParamsAndMatrices::k1)
         .def_readwrite("k2", &DroneParamsAndMatrices::k2)
         //
-        .def_readonly("Nm", &DroneParamsAndMatrices::Nm)
-        .def_readonly("g", &DroneParamsAndMatrices::g)
-        .def_readonly("rho", &DroneParamsAndMatrices::rho)
+        .def_readwrite("Nm", &DroneParamsAndMatrices::Nm)
+        .def_readwrite("g", &DroneParamsAndMatrices::g)
+        .def_readwrite("rho", &DroneParamsAndMatrices::rho)
         //
         .def_readwrite("m", &DroneParamsAndMatrices::m)
         .def_readwrite("ct", &DroneParamsAndMatrices::ct)
@@ -93,8 +94,13 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
         .def_readwrite("uh", &DroneParamsAndMatrices::uh)
         //
         // METHODS
-        .def("load", [](DroneParamsAndMatrices &d, const std::string &path) {
-            d.load(std::filesystem::path(path));
+        .def("load",
+             [](DroneParamsAndMatrices &d, const std::string &path) {
+                 d.load(std::filesystem::path(path));
+             })
+        .def("calculate", [](DroneParamsAndMatrices &d) {
+            d.calculateReducedAttitudeSystemMatrices();
+            d.calculateG();
         });
 
     pybind11::class_<DroneState>(pydronemodule, "DroneState")
@@ -120,7 +126,11 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
         .def("setAltitude", &DroneState::setAltitude)
         // cast to vector
         .def("asColVector",
-             [](const DroneState &d) { return ColVector<17>(d); });
+             [](const DroneState &d) { return ColVector<17>(d); })
+        // string conversion
+        .def("__str__", [](const DroneState &d) {
+            return pybind11::str(pybind11::cast(ColVector<17>(d)));
+        });
 
     pybind11::class_<DroneReference>(pydronemodule, "DroneReference")
         .def(pybind11::init<>())
@@ -136,7 +146,11 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
         .def("setPosition", &DroneReference::setPosition)
         // cast to vector
         .def("asColVector",
-             [](const DroneReference &d) { return ColVector<10>(d); });
+             [](const DroneReference &d) { return ColVector<10>(d); })
+        // string conversion
+        .def("__str__", [](const DroneReference &d) {
+            return pybind11::str(pybind11::cast(ColVector<10>(d)));
+        });
 
     pybind11::class_<Drone::ControllerSimulationResult>(
         pydronemodule, "DroneControllerSimulationResult")
@@ -219,7 +233,12 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
         .def_readwrite("sampledTime", &DronePlottable::sampledTime)
         .def_readwrite("states", &DronePlottable::states)
         .def_readwrite("control", &DronePlottable::control)
-        .def_readwrite("reference", &DronePlottable::reference);
+        .def_readwrite("reference", &DronePlottable::reference)
+        .def("toDict", [](const DronePlottable &d) {
+            return dronePlottableToPythonDict(d);
+        });
 
     pydronemodule.def("eul2quat", eul2quat);
+    pydronemodule.def("quatmultiply", quatmultiply);
+    pydronemodule.def("quatconjugate", quatconjugate);
 }
