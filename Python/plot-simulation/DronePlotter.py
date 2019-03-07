@@ -7,17 +7,28 @@ matplotlib.rcParams['lines.linewidth'] = 0.9
 
 
 def plot(plottable: DronePlottable, w: float = 1920, h: float = 1080,
-         colorset: int = 0, title: str = ""):
+         colorset: int = 0, title: str = "", **kwargs):
+
     dpi = 90
-    fig, (
-        #
-        (ax_ref_ori,      ax_ref_pos),
-        (ax_ori,          ax_pos),
-        (ax_ang_vel,      ax_lin_vel),
-        (ax_torque,       ax_thrust),
-        (ax_torque_ctrl,  ax_thrust_ctrl)
-        #
-    ) = plt.subplots(nrows=5, ncols=2, figsize=(w/dpi, h/dpi), dpi=dpi)
+    fig = plt.figure(figsize=(w/dpi, h/dpi), dpi=dpi)
+    grid = (5 + kwargs['extra_subplots_below'], 2)
+
+    gs = fig.add_gridspec(*grid)
+    
+    ax_ref_ori = fig.add_subplot(gs[0, 0])
+    ax_ref_pos = fig.add_subplot(gs[0, 1])
+
+    ax_ori = fig.add_subplot(gs[1, 0])
+    ax_pos = fig.add_subplot(gs[1, 1])
+
+    ax_ang_vel = fig.add_subplot(gs[2, 0])
+    ax_lin_vel = fig.add_subplot(gs[2, 1])
+
+    ax_torque = fig.add_subplot(gs[3, 0])
+    ax_thrust = fig.add_subplot(gs[3, 1])
+    
+    ax_torque_ctrl = fig.add_subplot(gs[4, 0])
+    ax_thrust_ctrl = fig.add_subplot(gs[4, 1])
 
     colors = [
         {'x': 'red', 'y': 'green', 'z': 'blue'},
@@ -35,12 +46,31 @@ def plot(plottable: DronePlottable, w: float = 1920, h: float = 1080,
     time = data['time']
     dtime = data['dtime']
 
+    lines = {
+        'reference_orientation': dict(),
+        'reference_position': dict(),
+        'orientation': dict(),
+        'orientation_estimate': dict(),
+        'position': dict(),
+        'position_estimate': dict(),
+        'angular_velocity': dict(),
+        'angular_velocity_estimate': dict(),
+        'linear_velocity': dict(),
+        'linear_velocity_estimate': dict(),
+        'torque_motor_velocity': dict(),
+        'torque_motor_velocity_estimate': dict(),
+        'thrust_motor_velocity': dict(),
+        'thrust_motor_velocity_estimate': dict(),
+        'torque_control': dict(),
+        'thrust_control': dict(),
+    }
+
     # ROW 0
-    ax_ref_ori.plot(
+    lines['reference_orientation']['x'], = ax_ref_ori.plot(
         dtime, data['reference_orientation']['x'], color=c['x'], label='x')
-    ax_ref_ori.plot(
+    lines['reference_orientation']['y'], = ax_ref_ori.plot(
         dtime, data['reference_orientation']['y'], color=c['y'], label='y')
-    ax_ref_ori.plot(
+    lines['reference_orientation']['z'], = ax_ref_ori.plot(
         dtime, data['reference_orientation']['z'], color=c['z'], label='z')
     ax_ref_ori.set_title("Reference orientation")
     ax_ref_ori.set_ylabel("Euler Angles [$\\mathrm{rad}$]")
@@ -49,68 +79,89 @@ def plot(plottable: DronePlottable, w: float = 1920, h: float = 1080,
         ax_ref_ori.legend()
     #
     #
-    ax_ref_pos.plot(dtime, data['reference_position']['x'], color=c['x'])
-    ax_ref_pos.plot(dtime, data['reference_position']['y'], color=c['y'])
-    ax_ref_pos.plot(dtime, data['reference_position']['z'], color=c['z'])
+    lines['reference_position']['x'], = ax_ref_pos.plot(
+        dtime, data['reference_position']['x'], color=c['x'])
+    lines['reference_position']['y'], = ax_ref_pos.plot(
+        dtime, data['reference_position']['y'], color=c['y'])
+    lines['reference_position']['z'], = ax_ref_pos.plot(
+        dtime, data['reference_position']['z'], color=c['z'])
     ax_ref_pos.set_title("Reference position")
     ax_ref_pos.set_ylabel("Position [$m$]")
     ax_ref_pos.set_xlim(time[0], time[-1])
     #
     #
     # ROW 1
-    ax_ori.plot(time, data['orientation']['x'], color=c['x'], label='x')
-    ax_ori.plot(time, data['orientation']['y'], color=c['y'], label='y')
-    ax_ori.plot(time, data['orientation']['z'], color=c['z'], label='z')
+    lines['orientation']['x'], = ax_ori.plot(
+        time, data['orientation']['x'], color=c['x'], label='x')
+    lines['orientation']['y'], = ax_ori.plot(
+        time, data['orientation']['y'], color=c['y'], label='y')
+    lines['orientation']['z'], = ax_ori.plot(
+        time, data['orientation']['z'], color=c['z'], label='z')
     if data['includes_estimated_states']:
-        ax_ori.plot(dtime, data['orientation_estimate']['x'], '--', color=c['x'],
-                    label='x (est.)')
-        ax_ori.plot(dtime, data['orientation_estimate']['y'], '--', color=c['y'],
-                    label='y (est.)')
-        ax_ori.plot(dtime, data['orientation_estimate']['z'], '--', color=c['z'],
-                    label='z (est.)')
+        lines['orientation_estimate']['x'], = ax_ori.plot(
+            dtime, data['orientation_estimate']['x'], '--', color=c['x'],
+            label='x (est.)')
+        lines['orientation_estimate']['y'], = ax_ori.plot(
+            dtime, data['orientation_estimate']['y'], '--', color=c['y'],
+            label='y (est.)')
+        lines['orientation_estimate']['z'], = ax_ori.plot(
+            dtime, data['orientation_estimate']['z'], '--', color=c['z'],
+            label='z (est.)')
         ax_ori.legend()
     ax_ori.set_title("Orientation")
     ax_ori.set_ylabel("Euler Angles [$\\mathrm{rad}$]")
     ax_ori.set_xlim(time[0], time[-1])
     #
     #
-    ax_pos.plot(time, data['position']['x'], color=c['x'])
-    ax_pos.plot(time, data['position']['y'], color=c['y'])
-    ax_pos.plot(time, data['position']['z'], color=c['z'])
+    lines['position']['x'], = ax_pos.plot(
+        time, data['position']['x'], color=c['x'])
+    lines['position']['y'], = ax_pos.plot(
+        time, data['position']['y'], color=c['y'])
+    lines['position']['z'], = ax_pos.plot(
+        time, data['position']['z'], color=c['z'])
     if data['includes_estimated_states']:
-        ax_pos.plot(dtime, data['position_estimate']['x'], '--', color=c['x'])
-        ax_pos.plot(dtime, data['position_estimate']['y'], '--', color=c['y'])
-        ax_pos.plot(dtime, data['position_estimate']['z'], '--', color=c['z'])
+        lines['position_estimate']['x'], = ax_pos.plot(
+            dtime, data['position_estimate']['x'], '--', color=c['x'])
+        lines['position_estimate']['y'], = ax_pos.plot(
+            dtime, data['position_estimate']['y'], '--', color=c['y'])
+        lines['position_estimate']['z'], = ax_pos.plot(
+            dtime, data['position_estimate']['z'], '--', color=c['z'])
     ax_pos.set_title("Position")
     ax_pos.set_ylabel("Position [$m$]")
     ax_pos.set_xlim(time[0], time[-1])
     #
     #
     # ROW 2
-    ax_ang_vel.plot(time, data['angular_velocity']['x'], color=c['x'])
-    ax_ang_vel.plot(time, data['angular_velocity']['y'], color=c['y'])
-    ax_ang_vel.plot(time, data['angular_velocity']['z'], color=c['z'])
+    lines['angular_velocity']['x'], = ax_ang_vel.plot(
+        time, data['angular_velocity']['x'], color=c['x'])
+    lines['angular_velocity']['y'], = ax_ang_vel.plot(
+        time, data['angular_velocity']['y'], color=c['y'])
+    lines['angular_velocity']['z'], = ax_ang_vel.plot(
+        time, data['angular_velocity']['z'], color=c['z'])
     if data['includes_estimated_states']:
-        ax_ang_vel.plot(dtime, data['angular_velocity_estimate']
-                        ['x'], '--', color=c['x'])
-        ax_ang_vel.plot(dtime, data['angular_velocity_estimate']
-                        ['y'], '--', color=c['y'])
-        ax_ang_vel.plot(dtime, data['angular_velocity_estimate']
-                        ['z'], '--', color=c['z'])
+        lines['angular_velocity_estimate']['x'], = ax_ang_vel.plot(
+            dtime, data['angular_velocity_estimate']['x'], '--', color=c['x'])
+        lines['angular_velocity_estimate']['y'], = ax_ang_vel.plot(
+            dtime, data['angular_velocity_estimate']['y'], '--', color=c['y'])
+        lines['angular_velocity_estimate']['z'], = ax_ang_vel.plot(
+            dtime, data['angular_velocity_estimate']['z'], '--', color=c['z'])
     ax_ang_vel.set_title("Angular velocity")
     ax_ang_vel.set_ylabel("Angular velocity [$\\mathrm{rad}/s$]")
     ax_ang_vel.set_xlim(time[0], time[-1])
     #
     #
-    ax_lin_vel.plot(time, data['linear_velocity']['x'], color=c['x'])
-    ax_lin_vel.plot(time, data['linear_velocity']['y'], color=c['y'])
-    ax_lin_vel.plot(time, data['linear_velocity']['z'], color=c['z'])
+    lines['linear_velocity']['x'], = ax_lin_vel.plot(
+        time, data['linear_velocity']['x'], color=c['x'])
+    lines['linear_velocity']['y'], = ax_lin_vel.plot(
+        time, data['linear_velocity']['y'], color=c['y'])
+    lines['linear_velocity']['z'], = ax_lin_vel.plot(
+        time, data['linear_velocity']['z'], color=c['z'])
     if data['includes_estimated_states']:
-        ax_lin_vel.plot(
+        lines['linear_velocity_estimate']['x'], = ax_lin_vel.plot(
             dtime, data['linear_velocity_estimate']['x'], '--', color=c['x'])
-        ax_lin_vel.plot(
+        lines['linear_velocity_estimate']['y'], = ax_lin_vel.plot(
             dtime, data['linear_velocity_estimate']['y'], '--', color=c['y'])
-        ax_lin_vel.plot(
+        lines['linear_velocity_estimate']['z'], = ax_lin_vel.plot(
             dtime, data['linear_velocity_estimate']['z'], '--', color=c['z'])
     ax_lin_vel.set_title("Velocity")
     ax_lin_vel.set_ylabel("Velocity [$m/s$]")
@@ -118,48 +169,209 @@ def plot(plottable: DronePlottable, w: float = 1920, h: float = 1080,
     #
     #
     # ROW 3
-    ax_torque.plot(time, data['torque_motor_velocity']['x'], color=c['x'])
-    ax_torque.plot(time, data['torque_motor_velocity']['y'], color=c['y'])
-    ax_torque.plot(time, data['torque_motor_velocity']['z'], color=c['z'])
+    lines['torque_motor_velocity']['x'], = ax_torque.plot(
+        time, data['torque_motor_velocity']['x'], color=c['x'])
+    lines['torque_motor_velocity']['y'], = ax_torque.plot(
+        time, data['torque_motor_velocity']['y'], color=c['y'])
+    lines['torque_motor_velocity']['z'], = ax_torque.plot(
+        time, data['torque_motor_velocity']['z'], color=c['z'])
     if data['includes_estimated_states']:
-        ax_torque.plot(dtime, data['torque_motor_velocity_estimate']
-                       ['x'], '--', color=c['x'])
-        ax_torque.plot(dtime, data['torque_motor_velocity_estimate']
-                       ['y'], '--', color=c['y'])
-        ax_torque.plot(dtime, data['torque_motor_velocity_estimate']
-                       ['z'], '--', color=c['z'])
+        lines['torque_motor_velocity_estimate']['x'], = ax_torque.plot(
+            dtime, data['torque_motor_velocity_estimate']['x'], '--', 
+            color=c['x'])
+        lines['torque_motor_velocity_estimate']['y'], = ax_torque.plot(
+            dtime, data['torque_motor_velocity_estimate']['y'], '--', 
+            color=c['y'])
+        lines['torque_motor_velocity_estimate']['z'], = ax_torque.plot(
+            dtime, data['torque_motor_velocity_estimate']['z'], '--', 
+            color=c['z'])
     ax_torque.set_title("Torque motor velocity")
     ax_torque.set_ylabel("Angular velocity [$?$]")
     ax_torque.set_xlim(time[0], time[-1])
     #
     #
-    ax_thrust.plot(time, data['thrust_motor_velocity']['z'], color=c['z'])
+    lines['thrust_motor_velocity']['z'], = ax_thrust.plot(
+        time, data['thrust_motor_velocity']['z'], color=c['z'])
     if data['includes_estimated_states']:
-        ax_thrust.plot(dtime, data['thrust_motor_velocity_estimate']
-                       ['z'], '--', color=c['z'])
+        lines['thrust_motor_velocity_estimate']['z'], = ax_thrust.plot(
+            dtime, data['thrust_motor_velocity_estimate']['z'], '--', 
+            color=c['z'])
     ax_thrust.set_title("Thrust motor velocity")
     ax_thrust.set_ylabel("Angular velocity [$?$]")
     ax_thrust.set_xlim(time[0], time[-1])
     #
     #
     # ROW 4
-    ax_torque_ctrl.plot(dtime, data['torque_control']['x'], color=c['x'])
-    ax_torque_ctrl.plot(dtime, data['torque_control']['y'], color=c['y'])
-    ax_torque_ctrl.plot(dtime, data['torque_control']['z'], color=c['z'])
+    lines['torque_control']['x'], = ax_torque_ctrl.plot(
+        dtime, data['torque_control']['x'], color=c['x'])
+    lines['torque_control']['y'], = ax_torque_ctrl.plot(
+        dtime, data['torque_control']['y'], color=c['y'])
+    lines['torque_control']['z'], = ax_torque_ctrl.plot(
+        dtime, data['torque_control']['z'], color=c['z'])
     ax_torque_ctrl.set_title("Torque motor control")
     ax_torque_ctrl.set_ylabel("Control signal [-]")
     ax_torque_ctrl.set_xlabel("Time [$s$]")
     ax_torque_ctrl.set_xlim(time[0], time[-1])
     #
     #
-    ax_thrust_ctrl.plot(dtime, data['thrust_control']['z'], color=c['z'])
+    lines['thrust_control']['z'], = ax_thrust_ctrl.plot(
+        dtime, data['thrust_control']['z'], color=c['z'])
     ax_thrust_ctrl.set_title("Thrust motor control")
     ax_thrust_ctrl.set_ylabel("Control signal [-]")
     ax_thrust_ctrl.set_xlabel("Time [$s$]")
     ax_thrust_ctrl.set_xlim(time[0], time[-1])
 
     fig.tight_layout()
-    return fig
+    return fig, lines, gs
+
+from py_drone_module import DronePlottable
+
+
+def update_plot(lines: dict, plottable: DronePlottable):
+    data = DronePlottable(plottable).toDict()
+    time = data['time']
+    dtime = data['dtime']
+
+    # ( *)lines(\['\w+'\]\['\w+'\])\s*=\s*\w+\.plot\(\s*(\w+),\s+([^,]+)[^)]+\)
+    # $1lines$2.set_ydata($4)\n$1lines$2.set_xdata($3)
+
+    # ROW 0
+    lines['reference_orientation']['x'].set_ydata(
+        data['reference_orientation']['x'])
+    lines['reference_orientation']['x'].set_xdata(dtime)
+    lines['reference_orientation']['y'].set_ydata(
+        data['reference_orientation']['y'])
+    lines['reference_orientation']['y'].set_xdata(dtime)
+    lines['reference_orientation']['z'].set_ydata(
+        data['reference_orientation']['z'])
+    lines['reference_orientation']['z'].set_xdata(dtime)
+    #
+    #
+    lines['reference_position']['x'].set_ydata(data['reference_position']['x'])
+    lines['reference_position']['x'].set_xdata(dtime)
+    lines['reference_position']['y'].set_ydata(data['reference_position']['y'])
+    lines['reference_position']['y'].set_xdata(dtime)
+    lines['reference_position']['z'].set_ydata(data['reference_position']['z'])
+    lines['reference_position']['z'].set_xdata(dtime)
+    #
+    #
+    # ROW 1
+    lines['orientation']['x'].set_ydata(data['orientation']['x'])
+    lines['orientation']['x'].set_xdata(time)
+    lines['orientation']['y'].set_ydata(data['orientation']['y'])
+    lines['orientation']['y'].set_xdata(time)
+    lines['orientation']['z'].set_ydata(data['orientation']['z'])
+    lines['orientation']['z'].set_xdata(time)
+    if data['includes_estimated_states']:
+        lines['orientation_estimate']['x'].set_ydata(
+            data['orientation_estimate']['x'])
+        lines['orientation_estimate']['x'].set_xdata(dtime)
+        lines['orientation_estimate']['y'].set_ydata(
+            data['orientation_estimate']['y'])
+        lines['orientation_estimate']['y'].set_xdata(dtime)
+        lines['orientation_estimate']['z'].set_ydata(
+            data['orientation_estimate']['z'])
+        lines['orientation_estimate']['z'].set_xdata(dtime)
+    #
+    #
+    lines['position']['x'].set_ydata(data['position']['x'])
+    lines['position']['x'].set_xdata(time)
+    lines['position']['y'].set_ydata(data['position']['y'])
+    lines['position']['y'].set_xdata(time)
+    lines['position']['z'].set_ydata(data['position']['z'])
+    lines['position']['z'].set_xdata(time)
+    if data['includes_estimated_states']:
+        lines['position_estimate']['x'].set_ydata(
+            data['position_estimate']['x'])
+        lines['position_estimate']['x'].set_xdata(dtime)
+        lines['position_estimate']['y'].set_ydata(
+            data['position_estimate']['y'])
+        lines['position_estimate']['y'].set_xdata(dtime)
+        lines['position_estimate']['z'].set_ydata(
+            data['position_estimate']['z'])
+        lines['position_estimate']['z'].set_xdata(dtime)
+    #
+    #
+    # ROW 2
+    lines['angular_velocity']['x'].set_ydata(data['angular_velocity']['x'])
+    lines['angular_velocity']['x'].set_xdata(time)
+    lines['angular_velocity']['y'].set_ydata(data['angular_velocity']['y'])
+    lines['angular_velocity']['y'].set_xdata(time)
+    lines['angular_velocity']['z'].set_ydata(data['angular_velocity']['z'])
+    lines['angular_velocity']['z'].set_xdata(time)
+    if data['includes_estimated_states']:
+        lines['angular_velocity_estimate']['x'].set_ydata(
+            data['angular_velocity_estimate']['x'])
+        lines['angular_velocity_estimate']['x'].set_xdata(dtime)
+        lines['angular_velocity_estimate']['y'].set_ydata(
+            data['angular_velocity_estimate']['y'])
+        lines['angular_velocity_estimate']['y'].set_xdata(dtime)
+        lines['angular_velocity_estimate']['z'].set_ydata(
+            data['angular_velocity_estimate']['z'])
+        lines['angular_velocity_estimate']['z'].set_xdata(dtime)
+    #
+    #
+    lines['linear_velocity']['x'].set_ydata(data['linear_velocity']['x'])
+    lines['linear_velocity']['x'].set_xdata(time)
+    lines['linear_velocity']['y'].set_ydata(data['linear_velocity']['y'])
+    lines['linear_velocity']['y'].set_xdata(time)
+    lines['linear_velocity']['z'].set_ydata(data['linear_velocity']['z'])
+    lines['linear_velocity']['z'].set_xdata(time)
+    if data['includes_estimated_states']:
+        lines['linear_velocity_estimate']['x'].set_ydata(
+            data['linear_velocity_estimate']['x'])
+        lines['linear_velocity_estimate']['x'].set_xdata(dtime)
+        lines['linear_velocity_estimate']['y'].set_ydata(
+            data['linear_velocity_estimate']['y'])
+        lines['linear_velocity_estimate']['y'].set_xdata(dtime)
+        lines['linear_velocity_estimate']['z'].set_ydata(
+            data['linear_velocity_estimate']['z'])
+        lines['linear_velocity_estimate']['z'].set_xdata(dtime)
+    #
+    #
+    # ROW 3
+    lines['torque_motor_velocity']['x'].set_ydata(
+        data['torque_motor_velocity']['x'])
+    lines['torque_motor_velocity']['x'].set_xdata(time)
+    lines['torque_motor_velocity']['y'].set_ydata(
+        data['torque_motor_velocity']['y'])
+    lines['torque_motor_velocity']['y'].set_xdata(time)
+    lines['torque_motor_velocity']['z'].set_ydata(
+        data['torque_motor_velocity']['z'])
+    lines['torque_motor_velocity']['z'].set_xdata(time)
+    if data['includes_estimated_states']:
+        lines['torque_motor_velocity_estimate']['x'].set_ydata(
+            data['torque_motor_velocity_estimate']['x'])
+        lines['torque_motor_velocity_estimate']['x'].set_xdata(dtime)
+        lines['torque_motor_velocity_estimate']['y'].set_ydata(
+            data['torque_motor_velocity_estimate']['y'])
+        lines['torque_motor_velocity_estimate']['y'].set_xdata(dtime)
+        lines['torque_motor_velocity_estimate']['z'].set_ydata(
+            data['torque_motor_velocity_estimate']['z'])
+        lines['torque_motor_velocity_estimate']['z'].set_xdata(dtime)
+    #
+    #
+    lines['thrust_motor_velocity']['z'].set_ydata(
+        data['thrust_motor_velocity']['z'])
+    lines['thrust_motor_velocity']['z'].set_xdata(time)
+    if data['includes_estimated_states']:
+        lines['thrust_motor_velocity_estimate']['z'].set_ydata(
+            data['thrust_motor_velocity_estimate']['z'])
+        lines['thrust_motor_velocity_estimate']['z'].set_xdata(dtime)
+    #
+    #
+    # ROW 4
+    lines['torque_control']['x'].set_ydata(data['torque_control']['x'])
+    lines['torque_control']['x'].set_xdata(dtime)
+    lines['torque_control']['y'].set_ydata(data['torque_control']['y'])
+    lines['torque_control']['y'].set_xdata(dtime)
+    lines['torque_control']['z'].set_ydata(data['torque_control']['z'])
+    lines['torque_control']['z'].set_xdata(dtime)
+    #
+    #
+    lines['thrust_control']['z'].set_ydata(data['thrust_control']['z'])
+    lines['thrust_control']['z'].set_xdata(dtime)
+
 
 
 def plot_attitude(time, dtime, states: dict, w: float, h: float, colorset: int, title: str):
