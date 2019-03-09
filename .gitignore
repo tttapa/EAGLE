@@ -24,3 +24,4 @@ build/lib.linux*/*
 build/temp.linux*/*
 dist
 *.egg-info
+.ipynb_checkpoints

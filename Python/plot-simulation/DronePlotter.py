@@ -6,30 +6,45 @@ from py_drone_module import DronePlottable
 matplotlib.rcParams['lines.linewidth'] = 0.9
 
 
-def plot(plottable: DronePlottable, w: float = 1920, h: float = 1080,
-         colorset: int = 0, title: str = "", **kwargs):
+def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
+         h: float = 1080, colorset: int = 0, title: str = ""):
 
     dpi = 90
     fig = plt.figure(figsize=(w/dpi, h/dpi), dpi=dpi)
-    extrarows = kwargs['extra_subplots_below'] if 'extra_subplots_below' in kwargs else 0
-    grid = (5 + extrarows, 2)
 
-    gs = fig.add_gridspec(*grid)
-    
-    ax_ref_ori = fig.add_subplot(gs[0, 0])
-    ax_ref_pos = fig.add_subplot(gs[0, 1])
+    if vertical:
+        grid = (10, 1)
+        gs = fig.add_gridspec(*grid)
 
-    ax_ori = fig.add_subplot(gs[1, 0])
-    ax_pos = fig.add_subplot(gs[1, 1])
+        ax_ref_ori = fig.add_subplot(gs[0, 0])
+        ax_ori = fig.add_subplot(gs[1, 0])
+        ax_ang_vel = fig.add_subplot(gs[2, 0])
+        ax_torque = fig.add_subplot(gs[3, 0])
+        ax_torque_ctrl = fig.add_subplot(gs[4, 0])
 
-    ax_ang_vel = fig.add_subplot(gs[2, 0])
-    ax_lin_vel = fig.add_subplot(gs[2, 1])
+        ax_ref_pos = fig.add_subplot(gs[5, 0])
+        ax_pos = fig.add_subplot(gs[6, 0])
+        ax_lin_vel = fig.add_subplot(gs[7, 0])
+        ax_thrust = fig.add_subplot(gs[8, 0])
+        ax_thrust_ctrl = fig.add_subplot(gs[9, 0])
+    else:
+        grid = (5, 2)
+        gs = fig.add_gridspec(*grid)
 
-    ax_torque = fig.add_subplot(gs[3, 0])
-    ax_thrust = fig.add_subplot(gs[3, 1])
-    
-    ax_torque_ctrl = fig.add_subplot(gs[4, 0])
-    ax_thrust_ctrl = fig.add_subplot(gs[4, 1])
+        ax_ref_ori = fig.add_subplot(gs[0, 0])
+        ax_ref_pos = fig.add_subplot(gs[0, 1])
+
+        ax_ori = fig.add_subplot(gs[1, 0])
+        ax_pos = fig.add_subplot(gs[1, 1])
+
+        ax_ang_vel = fig.add_subplot(gs[2, 0])
+        ax_lin_vel = fig.add_subplot(gs[2, 1])
+
+        ax_torque = fig.add_subplot(gs[3, 0])
+        ax_thrust = fig.add_subplot(gs[3, 1])
+
+        ax_torque_ctrl = fig.add_subplot(gs[4, 0])
+        ax_thrust_ctrl = fig.add_subplot(gs[4, 1])
 
     colors = [
         {'x': 'red', 'y': 'green', 'z': 'blue'},
@@ -223,7 +238,7 @@ def plot(plottable: DronePlottable, w: float = 1920, h: float = 1080,
     ax_thrust_ctrl.set_xlim(time[0], time[-1])
 
     fig.tight_layout()
-    return fig, lines, gs
+    return fig, lines
 
 from py_drone_module import DronePlottable
 
