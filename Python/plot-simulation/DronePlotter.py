@@ -9,8 +9,11 @@ matplotlib.rcParams['lines.linewidth'] = 0.9
 def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
          h: float = 1080, colorset: int = 0, title: str = ""):
 
-    dpi = 90
-    fig = plt.figure(figsize=(w/dpi, h/dpi), dpi=dpi)
+    if (w is None or h is None):
+        fig = plt.figure()
+    else:
+        dpi = 90
+        fig = plt.figure(figsize=(w/dpi, h/dpi), dpi=dpi)
 
     if vertical:
         grid = (10, 1)
