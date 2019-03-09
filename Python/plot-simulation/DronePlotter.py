@@ -11,7 +11,8 @@ def plot(plottable: DronePlottable, w: float = 1920, h: float = 1080,
 
     dpi = 90
     fig = plt.figure(figsize=(w/dpi, h/dpi), dpi=dpi)
-    grid = (5 + kwargs['extra_subplots_below'], 2)
+    extrarows = kwargs['extra_subplots_below'] if 'extra_subplots_below' in kwargs else 0
+    grid = (5 + extrarows, 2)
 
     gs = fig.add_gridspec(*grid)
     

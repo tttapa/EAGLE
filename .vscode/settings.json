@@ -67,7 +67,8 @@
         "controllers.h": "c",
         "attitude-controller.h": "c",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "real_t.h": "c"
     },
     "files.exclude": {
         "**/.git": true,

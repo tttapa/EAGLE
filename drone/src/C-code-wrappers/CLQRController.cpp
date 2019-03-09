@@ -1,6 +1,7 @@
-#include <CLQRController.hpp>
+#include <C-code-wrappers/CLQRController.hpp>
 #include <altitude-controller.h>
 #include <attitude-controller.h>
+#include <DroneStateControlOutput.hpp>
 
 namespace Attitude {
 CLQRController::VecU_t

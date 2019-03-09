@@ -2,11 +2,12 @@
 
 #include "Def.hpp"
 #include <DiscreteController.hpp>
+#include <LeastSquares.hpp>
 #include <QuaternionStateAddSub.hpp>
 #include <ReducedQuaternion.hpp>
 #include <cassert>
+#include <cmath>  // std::abs
 #include <iostream>
-#include <cmath>        // std::abs
 
 /**
  *  Solves the system of equations

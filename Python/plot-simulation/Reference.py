@@ -36,5 +36,5 @@ def get_reference(t):
 
     rr = DroneReference()
     rr.setOrientation(q)
-    rr.setPosition((0, 0, 1.0 * (t >= m * 24)))
+    rr.setPosition((0, 0, 1.0 * (t >= m * 16)))
     return rr.asColVector()

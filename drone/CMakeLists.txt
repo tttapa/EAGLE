@@ -4,6 +4,8 @@
 add_library(drone
     src/Drone.cpp
     src/DroneParamsAndMatrices.cpp
+    src/C-code-wrappers/CKalmanObserver.cpp
+    src/C-code-wrappers/CLQRController.cpp
 )
 
 #Add an alias so that library can be used inside the build tree, e.g. when testing

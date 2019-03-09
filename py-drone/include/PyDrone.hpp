@@ -204,6 +204,7 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
                                      const Matrix<Nu_att, Nu_att> &,
                                      const Matrix<3, 3> &, const Matrix<1, 1> &,
                                      double>(&Drone::getController))
+        .def("getCController", &Drone::getCController)
         .def("simulate", [](Drone &drone, Drone::Controller &controller,
                             PythonDroneReferenceFunction &reference,
                             const DroneState &x0, AdaptiveODEOptions odeopt) {
