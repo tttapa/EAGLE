@@ -234,7 +234,9 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
                                      const Matrix<Nu_att, Nu_att> &,
                                      const Matrix<3, 3> &, const Matrix<1, 1> &,
                                      double>(&Drone::getController))
-        .def("getCController", &Drone::getCController)
+        .def("getCController", &Drone::getCController,
+             pybind11::arg("config")         = 1,
+             pybind11::arg("enableIntegral") = true)
         .def("getObserver", &Drone::getObserver)
         .def("simulate",
              [](Drone &drone, Drone::Controller &controller,

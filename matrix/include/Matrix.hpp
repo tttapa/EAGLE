@@ -124,6 +124,14 @@ constexpr Matrix<1, 1> diag(const Matrix<1, 1> &diagElements) {
     return diagElements;
 }
 
+template <class T, size_t R, size_t C>
+constexpr Array<T, std::min(R, C)> diagElements(const TMatrix<T, R, C> &m) {
+    Array<T, std::min(R, C)> result = {};
+    for (size_t i = 0; i < std::min(R, C); ++i)
+        result[i] = m[i][i];
+    return result;
+}
+
 // Identity matrix
 template <class T, size_t N>
 constexpr TMatrix<T, N, N> Teye() {

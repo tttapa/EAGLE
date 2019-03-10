@@ -33,4 +33,4 @@ target_link_libraries(drone
         CControllers
 )
 
-# add_subdirectory(test) # TODO
+add_subdirectory(test)

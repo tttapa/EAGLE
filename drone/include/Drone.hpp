@@ -343,9 +343,13 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
         };
     }
 
-    Controller getCController() {
-        return {std::make_unique<Attitude::CLQRController>(p.Ts_att),
-                std::make_unique<Altitude::CLQRController>(p.Ts_alt), p.uh};
+    Controller getCController(int config = 1, bool enableIntegral = true) {
+        return {
+            std::make_unique<Attitude::CLQRController>(p.Ts_att, config),
+            std::make_unique<Altitude::CLQRController>(p.Ts_alt, config,
+                                                       enableIntegral),
+            p.uh,
+        };
     }
 
 #pragma region Observers........................................................

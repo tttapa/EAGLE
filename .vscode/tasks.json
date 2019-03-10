@@ -64,7 +64,7 @@
         {
             "type": "shell",
             "label": "Jupyter Notebook",
-            "command": "cd Python/plot-simulation/ && BROWSER=google-chrome && python3 -m jupyter notebook",
+            "command": "cd Python/ && export BROWSER=google-chrome && python3 -m jupyter notebook",
             "group": "build",
             "problemMatcher": []
         }

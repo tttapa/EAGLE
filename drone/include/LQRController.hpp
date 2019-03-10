@@ -41,6 +41,7 @@ Matrix<Nx + Nu, Ny> calculateG(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
     );
     Matrix<Nx + Ny, Ny> OI     = vcat(zeros<Nx, Ny>(), eye<Ny>());
     Matrix<Nx + Nu, Ny> G      = solveLeastSquares(W, OI);
+    // G = round(G, 12);
     return G;
 }
 
@@ -188,24 +189,17 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
 
         // error
         VecX_t x_err = xeq - x;
-        VecR_t y_err = y - r;
+        VecR_t y_err = r - y;
 
         // controller
         VecU_t u_ctrl = K_pi * vcat(x_err, integral);
         VecU_t u      = u_ctrl + ueq;
 
-        // TODO: should the controller be based on the new integral?
         // integral
-        double newIntegral = integral + y_err * Ts;
-#if 0
-        // TODO: is this better?
-        if (abs(newIntegral) > maxIntegral)
-            newIntegral = copysign(maxIntegral, newIntegral);
-        integral = {newIntegral};
-#else
-        if (abs(newIntegral) <= maxIntegral)
-            integral = {newIntegral};
-#endif
+        integral += y_err * Ts;
+        if (abs(integral) > maxIntegral)
+            integral = {copysign(maxIntegral, integral)};
+
         return u;
     }
 
@@ -217,6 +211,9 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
 
     const double maxIntegral;
 
+    VecR_t getIntegral() const { return integral; }
+
+  private:
     VecR_t integral = {};
 };
 

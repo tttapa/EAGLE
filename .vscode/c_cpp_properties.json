@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "defines": [
-                "IDE"
+                "IDE",
+                "PARAMS_AND_MATRICES_PATH=\"/tmp/\""
             ],
             "compilerPath": "/usr/bin/gcc-8",
             "cStandard": "c11",

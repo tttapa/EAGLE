@@ -117,6 +117,18 @@ TEST(Matrix, diag) {
     ASSERT_EQ(result, expected);
 }
 
+TEST(Matrix, diagElements) {
+    TMatrix<int, 4, 5> m        = {{
+        {11, 12, 13, 14, 15},
+        {21, 22, 23, 24, 25},
+        {31, 32, 33, 34, 35},
+        {41, 42, 43, 44, 45},
+    }};
+    auto result = diagElements(m);
+    Array<int, 4> expected = {{11, 22, 33, 44}};
+    ASSERT_EQ(result, expected);
+}
+
 TEST(Matrix, add) {
     TMatrix<int, 2, 3> a = {{
         {11, 12, 13},
