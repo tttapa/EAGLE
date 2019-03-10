@@ -218,6 +218,7 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
     ax_thrust.set_title("Thrust motor velocity")
     ax_thrust.set_ylabel("Angular velocity [$?$]")
     ax_thrust.set_xlim(time[0], time[-1])
+    ax_thrust.margins(y=0.5)
     #
     #
     # ROW 4
@@ -239,6 +240,7 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
     ax_thrust_ctrl.set_ylabel("Control signal [-]")
     ax_thrust_ctrl.set_xlabel("Time [$s$]")
     ax_thrust_ctrl.set_xlim(time[0], time[-1])
+    ax_thrust_ctrl.margins(y=0.5)
 
     fig.tight_layout()
     return fig, lines

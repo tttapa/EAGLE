@@ -13,7 +13,7 @@ template <size_t N>
 class GaussianNoiseGenerator : public NoiseGenerator<N> {
   public:
     GaussianNoiseGenerator(const Array<double, N> &variances, uint32_t seed = 1)
-        : distributions(varianceToDistributions(variances)) {
+        : distributions(varianceToDistributions(variances)), seed(seed) {
         rgen.seed(seed);
     }
     GaussianNoiseGenerator(const RowVector<N> &variances, uint32_t seed = 1)
@@ -41,10 +41,14 @@ class GaussianNoiseGenerator : public NoiseGenerator<N> {
                        });
         return result;
     }
+    void reset() {
+        rgen.seed(seed);
+    }
 
   private:
     std::default_random_engine rgen;
     Array<std::normal_distribution<double>, N> distributions;
+    const uint32_t seed; 
 };
 
 template <size_t N>

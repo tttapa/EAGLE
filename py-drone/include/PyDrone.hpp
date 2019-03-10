@@ -3,9 +3,9 @@
 #include <Drone.hpp>
 #include <DronePlot.hpp>
 #include <Matrix.hpp>
+#include <PlotHelpers.hpp>
 #include <PyMatrix.hpp>
 #include <iostream>  // cerr
-#include <PlotHelpers.hpp>
 #ifndef EXTERNAL_PY_MODULE
 #include <Plot.hpp>
 #include <pybind11/embed.h>
@@ -26,6 +26,11 @@ class __attribute__((visibility("hidden"))) PythonDroneReferenceFunction
   private:
     pybind11::object callable;
 };
+
+using PythonGaussianNoiseGeneratorInput =
+    GaussianNoiseGenerator<Drone::VecU_t::length()>;
+using PythonGaussianNoiseGeneratorOutput =
+    GaussianNoiseGenerator<Drone::VecY_t::length()>;
 
 #ifdef EXTERNAL_PY_MODULE
 PYBIND11_MODULE(py_drone_module, pydronemodule) {
@@ -167,9 +172,34 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
         .def_readonly("reference",
                       &Drone::ControllerSimulationResult::reference);
 
+    pybind11::class_<Drone::ObserverControllerSimulationResult>(
+        pydronemodule, "DroneObserverControllerSimulationResult")
+        .def(pybind11::init<>())
+        .def_readonly("time", &Drone::ObserverControllerSimulationResult::time)
+        .def_readonly("solution",
+                      &Drone::ObserverControllerSimulationResult::solution)
+        .def_readonly("resultCode",
+                      &Drone::ObserverControllerSimulationResult::resultCode)
+        .def_readonly("iterations",
+                      &Drone::ObserverControllerSimulationResult::iterations)
+        .def_readonly("sampledTime",
+                      &Drone::ObserverControllerSimulationResult::sampledTime)
+        .def_readonly("control",
+                      &Drone::ObserverControllerSimulationResult::control)
+        .def_readonly("reference",
+                      &Drone::ObserverControllerSimulationResult::reference)
+        .def_readonly("estimatedSolution",
+                      &Drone::ObserverControllerSimulationResult::reference)
+        .def_readonly("output",
+                      &Drone::ObserverControllerSimulationResult::reference);
+
     pybind11::class_<Drone::Controller>(pydronemodule, "DroneController")
         .def("__call__", &Drone::Controller::operator())
         .def("reset", &Drone::Controller::reset);
+
+    pybind11::class_<Drone::Observer>(pydronemodule, "DroneObserver")
+        .def("getStateChange", &Drone::Observer::getStateChange)
+        .def("reset", &Drone::Observer::reset);
 
     pybind11::class_<PythonDroneReferenceFunction>(pydronemodule,
                                                    "DroneReferenceFunction")
@@ -205,11 +235,23 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
                                      const Matrix<3, 3> &, const Matrix<1, 1> &,
                                      double>(&Drone::getController))
         .def("getCController", &Drone::getCController)
-        .def("simulate", [](Drone &drone, Drone::Controller &controller,
-                            PythonDroneReferenceFunction &reference,
-                            const DroneState &x0, AdaptiveODEOptions odeopt) {
-            return drone.simulate(controller, reference, x0, odeopt);
-        });
+        .def("getObserver", &Drone::getObserver)
+        .def("simulate",
+             [](Drone &drone, Drone::Controller &controller,
+                PythonDroneReferenceFunction &reference, const DroneState &x0,
+                AdaptiveODEOptions odeopt) {
+                 return drone.simulate(controller, reference, x0, odeopt);
+             })
+        .def("simulate",
+             [](Drone &drone, Drone::Controller &controller,
+                Drone::Observer &observer,
+                PythonGaussianNoiseGeneratorInput &randFnW,
+                PythonGaussianNoiseGeneratorOutput &randFnV,
+                PythonDroneReferenceFunction &reference, const DroneState &x0,
+                const AdaptiveODEOptions &odeopt) {
+                 return drone.simulate(controller, observer, randFnW, randFnV,
+                                       reference, x0, odeopt);
+             });
 
 #ifndef EXTERNAL_PY_MODULE
     pydronemodule.def("plot",
@@ -229,6 +271,8 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
     pybind11::class_<DronePlottable>(pydronemodule, "DronePlottable")
         .def(pybind11::init<>())
         .def(pybind11::init<const Drone::ControllerSimulationResult &>())
+        .def(
+            pybind11::init<const Drone::ObserverControllerSimulationResult &>())
         .def(pybind11::init<const DroneLogLoader>())
         .def_readwrite("time", &DronePlottable::time)
         .def_readwrite("sampledTime", &DronePlottable::sampledTime)
@@ -242,4 +286,16 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
     pydronemodule.def("eul2quat", eul2quat);
     pydronemodule.def("quatmultiply", quatmultiply);
     pydronemodule.def("quatconjugate", quatconjugate);
+
+    pybind11::class_<PythonGaussianNoiseGeneratorInput>(
+        pydronemodule, "GaussianNoiseGeneratorInput")
+        .def(pybind11::init<const RowVector<Drone::VecU_t::length()> &>())
+        .def("__call__", &PythonGaussianNoiseGeneratorInput::operator())
+        .def("reset", &PythonGaussianNoiseGeneratorInput::reset);
+
+    pybind11::class_<PythonGaussianNoiseGeneratorOutput>(
+        pydronemodule, "GaussianNoiseGeneratorOutput")
+        .def(pybind11::init<const RowVector<Drone::VecY_t::length()> &>())
+        .def("__call__", &PythonGaussianNoiseGeneratorOutput::operator())
+        .def("reset", &PythonGaussianNoiseGeneratorOutput::reset);
 }
