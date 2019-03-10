@@ -42,11 +42,11 @@ TEST_F(CControllersTest, attitude) {
     auto resultCpp = controller(x, r);
     auto resultC   = ccontroller(x, r);
 
-    ASSERT_TRUE(isAlmostEqual(resultCpp, resultC, 1e-11));
-
     cout << "  - C++  :\t" << asrowvector(resultCpp, " ", 16) << endl;
     cout << "  - C    :\t" << asrowvector(resultC, " ", 16) << endl;
     cout << "  - diff :\t" << asrowvector(resultCpp - resultC, " ", 16) << endl;
+
+    ASSERT_TRUE(isAlmostEqual(resultCpp, resultC, 1e-11));
 }
 
 TEST_F(CControllersTest, altitude) {
@@ -59,10 +59,6 @@ TEST_F(CControllersTest, altitude) {
 
     auto resultCpp = controller(x, r);
     auto resultC   = ccontroller(x, r);
-
-    ASSERT_TRUE(isAlmostEqual(resultCpp, resultC, 1e-11));
-    ASSERT_TRUE(isAlmostEqual(controller.getIntegral(),
-                              ccontroller.getIntegral(), 1e-11));
 
     cout << "Control:" << endl;
     cout << "  - C++  :\t" << std::setprecision(16) << double(resultCpp)
@@ -78,4 +74,70 @@ TEST_F(CControllersTest, altitude) {
     cout << "  - diff :\t" << std::setprecision(16)
          << double(controller.getIntegral() - ccontroller.getIntegral())
          << endl;
+
+    ASSERT_TRUE(isAlmostEqual(resultCpp, resultC, 1e-11));
+    ASSERT_TRUE(isAlmostEqual(controller.getIntegral(),
+                              ccontroller.getIntegral(), 1e-11));
+}
+
+TEST_F(CControllersTest, altitudeMaxIntegralPositive) {
+    Altitude::LQRController controller =
+        drone.getAltitudeController(K_alt, maxIntegral);
+    Altitude::CLQRController ccontroller = {drone.p.Ts_alt, config, true};
+
+    ColVector<3> x = {{0.5, 2, 1}};
+    ColVector<1> r = {{13 / drone.p.Ts_alt}};
+
+    auto resultCpp = controller(x, r);
+    auto resultC   = ccontroller(x, r);
+
+    cout << "Control:" << endl;
+    cout << "  - C++  :\t" << std::setprecision(16) << double(resultCpp)
+         << endl;
+    cout << "  - C    :\t" << std::setprecision(16) << double(resultC) << endl;
+    cout << "  - diff :\t" << std::setprecision(16)
+         << double(resultCpp - resultC) << endl;
+    cout << "Integral:" << endl;
+    cout << "  - C++  :\t" << std::setprecision(16)
+         << double(controller.getIntegral()) << endl;
+    cout << "  - C    :\t" << std::setprecision(16)
+         << double(ccontroller.getIntegral()) << endl;
+    cout << "  - diff :\t" << std::setprecision(16)
+         << double(controller.getIntegral() - ccontroller.getIntegral())
+         << endl;
+
+    ASSERT_TRUE(isAlmostEqual(resultCpp, resultC, 1e-11));
+    ASSERT_TRUE(isAlmostEqual(controller.getIntegral(),
+                              ccontroller.getIntegral(), 1e-11));
+}
+
+TEST_F(CControllersTest, altitudeMaxIntegralNegative) {
+    Altitude::LQRController controller =
+        drone.getAltitudeController(K_alt, maxIntegral);
+    Altitude::CLQRController ccontroller = {drone.p.Ts_alt, config, true};
+
+    ColVector<3> x = {{0.5, 2, 1}};
+    ColVector<1> r = {{-13 / drone.p.Ts_alt}};
+
+    auto resultCpp = controller(x, r);
+    auto resultC   = ccontroller(x, r);
+
+    cout << "Control:" << endl;
+    cout << "  - C++  :\t" << std::setprecision(16) << double(resultCpp)
+         << endl;
+    cout << "  - C    :\t" << std::setprecision(16) << double(resultC) << endl;
+    cout << "  - diff :\t" << std::setprecision(16)
+         << double(resultCpp - resultC) << endl;
+    cout << "Integral:" << endl;
+    cout << "  - C++  :\t" << std::setprecision(16)
+         << double(controller.getIntegral()) << endl;
+    cout << "  - C    :\t" << std::setprecision(16)
+         << double(ccontroller.getIntegral()) << endl;
+    cout << "  - diff :\t" << std::setprecision(16)
+         << double(controller.getIntegral() - ccontroller.getIntegral())
+         << endl;
+
+    ASSERT_TRUE(isAlmostEqual(resultCpp, resultC, 1e-11));
+    ASSERT_TRUE(isAlmostEqual(controller.getIntegral(),
+                              ccontroller.getIntegral(), 1e-11));
 }

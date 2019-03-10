@@ -143,9 +143,9 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
      */
     LQRController(const Matrix<Nx + Nu, Ny> &G, const Matrix<Ny, Nx> &C,
                   const Matrix<Nu, Nx + Ny> &K_pi, double Ts,
-                  double maxIntegralInfluence)
+                  double maxIntegral)
         : DiscreteController<Nx, Nu, Ny>{Ts}, K_pi{K_pi}, G{G}, C{C},
-          maxIntegral{std::abs(maxIntegralInfluence / K_pi[0][Nx])} {}
+          maxIntegral{std::abs(maxIntegral)} {}
 
     /** 
      * @brief   Construct a new instance of LQRController with the 
@@ -170,10 +170,9 @@ class LQRController : public DiscreteController<Nx, Nu, Ny> {
     LQRController(const Matrix<Nx, Nx> &A, const Matrix<Nx, Nu> &B,
                   const Matrix<Ny, Nx> &C, const Matrix<Ny, Nu> &D,
                   const Matrix<Nu, Nx + Ny> &K_pi, double Ts,
-                  double maxIntegralInfluence)
+                  double maxIntegral)
         : DiscreteController<Nx, Nu, Ny>{Ts}, K_pi{K_pi},
-          G(calculateG(A, B, C, D)), C{C},
-          maxIntegral{fabs(maxIntegralInfluence / K_pi[0][Nx])} {}
+          G(calculateG(A, B, C, D)), C{C}, maxIntegral{std::abs(maxIntegral)} {}
 
     VecU_t operator()(const VecX_t &x, const VecR_t &r) override {
         return getRawControllerOutput(x, r);

@@ -208,6 +208,7 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
 
     pybind11::class_<AdaptiveODEOptions>(pydronemodule, "AdaptiveODEOptions")
         .def(pybind11::init<>())
+        .def(pybind11::init<const AdaptiveODEOptions &>())
         .def_readwrite("t_start", &AdaptiveODEOptions::t_start)
         .def_readwrite("t_end", &AdaptiveODEOptions::t_end)
         .def_readwrite("epsilon", &AdaptiveODEOptions::epsilon)
