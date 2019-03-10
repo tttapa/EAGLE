@@ -60,6 +60,13 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "shell",
+            "label": "Jupyter Notebook",
+            "command": "cd Python/plot-simulation/ && BROWSER=google-chrome && python3 -m jupyter notebook",
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }

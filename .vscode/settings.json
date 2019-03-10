@@ -109,4 +109,5 @@
     "terminal.integrated.cwd": "build",
     "C_Cpp.default.intelliSenseMode": "gcc-x64",
     "terminal.integrated.cursorBlinking": true,
+    "python.dataScience.jupyterServerURI": "local",
 }

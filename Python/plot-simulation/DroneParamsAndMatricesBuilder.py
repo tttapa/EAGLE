@@ -1,15 +1,13 @@
 from py_drone_module import DroneParamsAndMatrices
-from quat_params import quat_params
 from numpy.linalg import inv
 from numpy import array, zeros, eye, hstack, vstack
 from scipy.signal import cont2discrete
 
 
-def buildDroneParamsAndMatrices(**kwargs):
+def buildDroneParamsAndMatrices(quat_params):
+    p = quat_params
     d = DroneParamsAndMatrices()
-
     # Parameters
-    p = quat_params(**kwargs)
     d.Ts_att = 1.0 / 238
     d.Ts_alt = d.Ts_att * 24
     d.gamma_n = p['gamma_n']

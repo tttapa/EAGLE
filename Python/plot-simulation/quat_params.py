@@ -12,7 +12,7 @@ def quat_params(**kwargs):
         'Nm': 4,               # - ....... number of motors
         'm': 1.850,            # kg ...... total mass
         'L': 0.27,             # m ....... arm length
-        'rho': 1.225,          # kg/m3 ... air density 
+        'rho': 1.225,          # kg/m3 ... air density
         'g': 9.81,             # m/s2 .... gravitational acceleration
 
         # Propellers
@@ -42,6 +42,7 @@ def quat_params(**kwargs):
 
     p['nh'] = sqrt((p['m'] * p['g']) /   # rps ... Hovering motor speed
                    (p['ct'] * p['rho'] * p['Dp']**4 * p['Nm']))
+    p.update(kwargs)  # override them again to allow overriding `nh`
 
     # Very rough estimation of moments of inertia
     p['Ip'] = p['mp'] * p['Dp']**2 / 12  # kgm² ... Propeller moment of inertia
@@ -49,6 +50,7 @@ def quat_params(**kwargs):
     p['I'] = np.diag([p['Ixx'],          # kgm³ ... Inertia matrix
                       p['Iyy'],
                       p['Izz']])
+    p.update(kwargs)  # override them again to allow overriding `Ip` and `Im`
 
     # Model constants
     p['k1'] = p['Kv']*(p['Vmax']-p['Vmin'])/60
@@ -62,6 +64,7 @@ def quat_params(**kwargs):
     p['k4'] = np.diag([0,
                        0,
                        2 * pi * p['Nm'] * (p['Im'] + p['Ip']) / p['Izz']])
+    p.update(kwargs)  # override them again to allow overriding `k*`
 
     # Matrix Gamma_n
     p['gamma_n'] = p['k3'] - p['k2']*p['k4']
@@ -74,5 +77,7 @@ def quat_params(**kwargs):
     # Own constants
     p['kt'] = 4 * p['ct'] * p['rho'] * p['Dp']**4 / p['m']
     p['uh'] = p['nh'] / p['k1']
+
+    p.update(kwargs)  # override them again to allow overriding `kt` and `uh`
 
     return p
