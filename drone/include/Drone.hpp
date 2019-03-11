@@ -401,6 +401,14 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
     /** 
      * @brief   TODO
      */
+    Attitude::KalmanObserver
+    getAttitudeObserver(const Matrix<Nx_att - 1, Ny_att - 1> &L_red) const {
+        return {p.Ad_att_r, p.Bd_att_r, p.Cd_att, L_red, p.Ts_att};
+    }
+
+    /** 
+     * @brief   TODO
+     */
     Matrix<Nx_alt, Ny_alt>
     getAltitudeObserverMatrixL(const RowVector<Nu_alt> &varDynamics,
                                const RowVector<Ny_alt> &varSensors) const {
@@ -411,11 +419,44 @@ struct Drone : public ContinuousModel<Nx, Nu, Ny> {
 
     /** 
      * @brief   TODO
+     * 
+     * @param   varDynamics
+     *          [ varDynX, varDynU ]
+     * @param   varSensors
+     */
+    Matrix<Nx_alt, Ny_alt>
+    getAltitudeObserverMatrixL(const RowVector<Nx_alt + Nu_alt> &varDynamics,
+                               const RowVector<Ny_alt> &varSensors) const {
+        return dlqe(p.Ad_alt, hcat(eye<Nx_alt>(), p.Bd_alt), p.Cd_alt,
+                    diag(varDynamics), diag(varSensors))
+            .L;
+    }
+
+    /** 
+     * @brief   TODO
      */
     Altitude::KalmanObserver
     getAltitudeObserver(const RowVector<Nu_alt> &varDynamics,
                         const RowVector<Ny_alt> &varSensors) const {
         auto L = getAltitudeObserverMatrixL(varDynamics, varSensors);
+        return {p.Ad_alt, p.Bd_alt, p.Cd_alt, L, p.Ts_alt};
+    }
+
+    /** 
+     * @brief   TODO
+     */
+    Altitude::KalmanObserver
+    getAltitudeObserver(const RowVector<Nx_alt + Nu_alt> &varDynamics,
+                        const RowVector<Ny_alt> &varSensors) const {
+        auto L = getAltitudeObserverMatrixL(varDynamics, varSensors);
+        return {p.Ad_alt, p.Bd_alt, p.Cd_alt, L, p.Ts_alt};
+    }
+    
+    /** 
+     * @brief   TODO
+     */
+    Altitude::KalmanObserver
+    getAltitudeObserver(const Matrix<Nx_alt, Ny_alt> &L) const {
         return {p.Ad_alt, p.Bd_alt, p.Cd_alt, L, p.Ts_alt};
     }
 
