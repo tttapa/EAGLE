@@ -286,6 +286,11 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
             return dronePlottableToPythonDict(d);
         });
 
+    pybind11::class_<DroneLogLoader>(pydronemodule, "DroneLogLoader")
+        .def(pybind11::init<const std::string &>())
+        .def("slice", &DroneLogLoader::slice)
+        .def("__len__", &DroneLogLoader::size);
+
     pydronemodule.def("eul2quat", eul2quat);
     pydronemodule.def("quatmultiply", quatmultiply);
     pydronemodule.def("quatconjugate", quatconjugate);

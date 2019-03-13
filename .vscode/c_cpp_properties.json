@@ -23,7 +23,8 @@
                 "${workspaceFolder}/ode/include",
                 "${workspaceFolder}/applications/tuner",
                 "${workspaceFolder}/genetic-tuner/include",
-                "/home/pieter/PO-EAGLE/Groups/ANC/Cleanup-Pieter/Code-Generators/Controllers/include/"
+                "/home/pieter/PO-EAGLE/Groups/ANC/Cleanup-Pieter/Code-Generators/Controllers/include/",
+                "/home/pieter/PO-EAGLE/Groups/ANC/Cleanup-Pieter/Code-Generators/Logger/Output/include/"
             ]
         }
     ],

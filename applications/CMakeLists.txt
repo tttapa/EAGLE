@@ -6,6 +6,14 @@ target_link_libraries(plot-simulation PRIVATE argparser
                                               plot
                                               config)
 
+
+file(GLOB_RECURSE SRCS_plot_log "plot-log/*.cpp")
+add_executable(plot-log ${SRCS_plot_log})
+target_link_libraries(plot-log PRIVATE argparser 
+                                              plot
+                                              config
+                                              drone-log-loader)
+
 ### Tuner
 
 find_package(OpenMP REQUIRED)

@@ -17,12 +17,15 @@ target_include_directories(drone-log-loader
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+find_package(Logger)
+
 # target_compile_features(drone-log-loader PRIVATE cxx_std_17)
 # target_compile_options(drone-log-loader PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Werror -pedantic>)
 target_link_libraries(drone-log-loader 
     PUBLIC 
         Drone::drone 
         stdc++fs
+        logger
 )
 
 # add_subdirectory(test) # TODO

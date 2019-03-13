@@ -17,9 +17,13 @@ struct DroneAttitudePlottable {
 };
 
 struct DronePlottable {
+    DronePlottable()                       = default;
+    DronePlottable(const DronePlottable &) = default;
+
     DronePlottable(const Drone::ControllerSimulationResult &d)
         : time{d.time}, sampledTime{d.sampledTime}, states{d.solution},
           control{d.control}, reference{d.reference} {}
+
     DronePlottable(const Drone::ObserverControllerSimulationResult &d)
         : time{d.time}, sampledTime{d.sampledTime}, states{d.solution},
           stateEstimates{d.estimatedSolution}, control{d.control},
@@ -27,9 +31,8 @@ struct DronePlottable {
 
     DronePlottable(const DroneLogLoader &d)
         : time{d.getTimeStamps()}, sampledTime{time}, states{d.getStates()},
-          control{d.getControl()}, reference{d.getReference()} {}
-
-    DronePlottable() = default;
+          stateEstimates{}, control{d.getControl()}, reference{
+                                                         d.getReference()} {}
 
     std::vector<double> time;
     std::vector<double> sampledTime;
