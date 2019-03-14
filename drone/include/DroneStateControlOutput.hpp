@@ -21,11 +21,18 @@ class DroneState {
     ColVector<3> getMotorSpeed() const { return getBlock<7, 10, 0, 1>(x); }
     ColVector<3> getVelocity() const { return getBlock<10, 13, 0, 1>(x); }
     ColVector<3> getPosition() const { return getBlock<13, 16, 0, 1>(x); }
+    ColVector<2> getLocation() const { return getBlock<13, 15, 0, 1>(x); }
     ColVector<1> getThrustMotorSpeed() const { return {x[16]}; }
     ColVector<3> getAltitude() const {
         return vcat(getBlock<16, 17, 0, 1>(x),  // n
                     getBlock<15, 16, 0, 1>(x),  // z
                     getBlock<12, 13, 0, 1>(x)   // v_z
+        );
+    }
+    ColVector<6> getNavigation() const {
+        return vcat(getBlock<1, 3, 0, 1>(x),    // q1, q2
+                    getBlock<13, 15, 0, 1>(x),  // x, y
+                    getBlock<10, 12, 0, 1>(x)   // vx, vy
         );
     }
 
@@ -42,14 +49,25 @@ class DroneState {
     void setVelocity(const ColVector<3> &v) {
         assignBlock<10, 13, 0, 1>(x) = v;
     }
-    void setPosition(const ColVector<3> &z) {
-        assignBlock<13, 16, 0, 1>(x) = z;
+    void setPosition(const ColVector<3> &xyz) {
+        assignBlock<13, 16, 0, 1>(x) = xyz;
+    }
+    void setLocation(const ColVector<2> &xy) {
+        assignBlock<13, 15, 0, 1>(x) = xy;
     }
     void setThrustMotorSpeed(double t) { x[16] = {t}; }
     void setAltitude(const ColVector<3> &a) {
         x[16] = a[0];  // n
         x[15] = a[1];  // z
         x[12] = a[2];  // v_z
+    }
+    void setHeight(double h) {
+        x[15] = h;
+    }
+    void setNavigation(const ColVector<6> &n) {
+        // q1 and q2 ignored
+        assignBlock<13, 15, 0, 1>(x) = getBlock<2, 4, 0, 1>(n);
+        assignBlock<10, 12, 0, 1>(x) = getBlock<4, 6, 0, 1>(n);
     }
     operator ColVector<17>() const { return x; }
 };

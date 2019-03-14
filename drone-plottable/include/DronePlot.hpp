@@ -31,8 +31,8 @@ struct DronePlottable {
 
     DronePlottable(const DroneLogLoader &d)
         : time{d.getTimeStamps()}, sampledTime{time}, states{d.getStates()},
-          stateEstimates{}, control{d.getControl()}, reference{
-                                                         d.getReference()} {}
+          stateEstimates{d.getObserverStates()}, control{d.getControl()},
+          reference{d.getReference()} {}
 
     std::vector<double> time;
     std::vector<double> sampledTime;

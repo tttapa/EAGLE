@@ -40,6 +40,7 @@ class DroneLogLoader {
         return states;
     }
 
+#if 0
     std::vector<ColVector<17>> getStates() const {
         std::vector<ColVector<17>> states(entries.size());
         std::transform(
@@ -53,6 +54,38 @@ class DroneLogLoader {
             });
         return states;
     }
+#else
+
+    std::vector<ColVector<17>> getStates() const {
+        std::vector<ColVector<17>> states(entries.size());
+        std::transform(
+            entries.begin(), entries.end(), states.begin(),
+            [](const LogEntry &dle) -> ColVector<17> {
+                DroneState x;
+                x.setOrientation(ColVectorFromCppArray(dle.getMeasurementOrientation()));
+                x.setAngularVelocity(ColVectorFromCppArray(dle.getMeasurementAngularVelocity()));
+                x.setHeight(dle.getMeasurementHeight());
+                x.setNavigation(ColVectorFromCppArray(dle.getNavigationObserverState()));
+                return x;
+            });
+        return states;
+    }
+
+#endif
+
+    std::vector<ColVector<17>> getObserverStates() const {
+        std::vector<ColVector<17>> states(entries.size());
+        std::transform(
+            entries.begin(), entries.end(), states.begin(),
+            [](const LogEntry &dle) -> ColVector<17> {
+                DroneState x;
+                x.setAttitude(ColVectorFromCppArray(dle.getAttitudeObserverState()));
+                x.setAltitude(ColVectorFromCppArray(dle.getAltitudeObserverState()));
+                x.setNavigation(ColVectorFromCppArray(dle.getNavigationObserverState()));
+                return x;
+            });
+        return states;
+    }
 
     std::vector<ColVector<10>> getReference() const {
         std::vector<ColVector<10>> refs(entries.size());
@@ -62,8 +95,8 @@ class DroneLogLoader {
                 return vcat(
                     ColVectorFromCppArray(dle.getReferenceOrientation()),
                     zeros<3, 1>(),  // angular velocities
-                    ColVector<1>{dle.getReferenceHeight()},
-                    ColVectorFromCppArray(dle.getReferenceLocation()));
+                    ColVectorFromCppArray(dle.getReferenceLocation()),
+                    ColVector<1>{dle.getReferenceHeight()});
             });
         return refs;
     }
