@@ -7,7 +7,7 @@ matplotlib.rcParams['lines.linewidth'] = 0.9
 
 
 def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
-         h: float = 1080, colorset: int = 0, title: str = ""):
+         h: float = 1080, colorset: int = 0, title: str = "", marker=''):
 
     if (w is None or h is None):
         fig = plt.figure()
@@ -86,11 +86,11 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
 
     # ROW 0
     lines['reference_orientation']['x'], = ax_ref_ori.plot(
-        dtime, data['reference_orientation']['x'], color=c['x'], label='x')
+        dtime, data['reference_orientation']['x'], color=c['x'], label='x', marker=marker)
     lines['reference_orientation']['y'], = ax_ref_ori.plot(
-        dtime, data['reference_orientation']['y'], color=c['y'], label='y')
+        dtime, data['reference_orientation']['y'], color=c['y'], label='y', marker=marker)
     lines['reference_orientation']['z'], = ax_ref_ori.plot(
-        dtime, data['reference_orientation']['z'], color=c['z'], label='z')
+        dtime, data['reference_orientation']['z'], color=c['z'], label='z', marker=marker)
     ax_ref_ori.set_title("Reference orientation")
     ax_ref_ori.set_ylabel("Euler Angles [$\\mathrm{rad}$]")
     ax_ref_ori.set_xlim(time[0], time[-1])
@@ -99,11 +99,11 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
     #
     #
     lines['reference_position']['x'], = ax_ref_pos.plot(
-        dtime, data['reference_position']['x'], color=c['x'])
+        dtime, data['reference_position']['x'], color=c['x'], marker=marker)
     lines['reference_position']['y'], = ax_ref_pos.plot(
-        dtime, data['reference_position']['y'], color=c['y'])
+        dtime, data['reference_position']['y'], color=c['y'], marker=marker)
     lines['reference_position']['z'], = ax_ref_pos.plot(
-        dtime, data['reference_position']['z'], color=c['z'])
+        dtime, data['reference_position']['z'], color=c['z'], marker=marker)
     ax_ref_pos.set_title("Reference position")
     ax_ref_pos.set_ylabel("Position [$m$]")
     ax_ref_pos.set_xlim(time[0], time[-1])
@@ -111,21 +111,21 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
     #
     # ROW 1
     lines['orientation']['x'], = ax_ori.plot(
-        time, data['orientation']['x'], color=c['x'], label='x')
+        time, data['orientation']['x'], color=c['x'], label='x', marker=marker)
     lines['orientation']['y'], = ax_ori.plot(
-        time, data['orientation']['y'], color=c['y'], label='y')
+        time, data['orientation']['y'], color=c['y'], label='y', marker=marker)
     lines['orientation']['z'], = ax_ori.plot(
-        time, data['orientation']['z'], color=c['z'], label='z')
+        time, data['orientation']['z'], color=c['z'], label='z', marker=marker)
     if data['includes_estimated_states']:
         lines['orientation_estimate']['x'], = ax_ori.plot(
             dtime, data['orientation_estimate']['x'], '--', color=c['x'],
-            label='x (est.)')
+            label='x (est.)', marker=marker)
         lines['orientation_estimate']['y'], = ax_ori.plot(
             dtime, data['orientation_estimate']['y'], '--', color=c['y'],
-            label='y (est.)')
+            label='y (est.)', marker=marker)
         lines['orientation_estimate']['z'], = ax_ori.plot(
             dtime, data['orientation_estimate']['z'], '--', color=c['z'],
-            label='z (est.)')
+            label='z (est.)', marker=marker)
         ax_ori.legend()
     ax_ori.set_title("Orientation")
     ax_ori.set_ylabel("Euler Angles [$\\mathrm{rad}$]")
@@ -133,18 +133,18 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
     #
     #
     lines['position']['x'], = ax_pos.plot(
-        time, data['position']['x'], color=c['x'])
+        time, data['position']['x'], color=c['x'], marker=marker)
     lines['position']['y'], = ax_pos.plot(
-        time, data['position']['y'], color=c['y'])
+        time, data['position']['y'], color=c['y'], marker=marker)
     lines['position']['z'], = ax_pos.plot(
-        time, data['position']['z'], color=c['z'])
+        time, data['position']['z'], color=c['z'], marker=marker)
     if data['includes_estimated_states']:
         lines['position_estimate']['x'], = ax_pos.plot(
-            dtime, data['position_estimate']['x'], '--', color=c['x'])
+            dtime, data['position_estimate']['x'], '--', color=c['x'], marker=marker)
         lines['position_estimate']['y'], = ax_pos.plot(
-            dtime, data['position_estimate']['y'], '--', color=c['y'])
+            dtime, data['position_estimate']['y'], '--', color=c['y'], marker=marker)
         lines['position_estimate']['z'], = ax_pos.plot(
-            dtime, data['position_estimate']['z'], '--', color=c['z'])
+            dtime, data['position_estimate']['z'], '--', color=c['z'], marker=marker)
     ax_pos.set_title("Position")
     ax_pos.set_ylabel("Position [$m$]")
     ax_pos.set_xlim(time[0], time[-1])
@@ -152,36 +152,36 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
     #
     # ROW 2
     lines['angular_velocity']['x'], = ax_ang_vel.plot(
-        time, data['angular_velocity']['x'], color=c['x'])
+        time, data['angular_velocity']['x'], color=c['x'], marker=marker)
     lines['angular_velocity']['y'], = ax_ang_vel.plot(
-        time, data['angular_velocity']['y'], color=c['y'])
+        time, data['angular_velocity']['y'], color=c['y'], marker=marker)
     lines['angular_velocity']['z'], = ax_ang_vel.plot(
-        time, data['angular_velocity']['z'], color=c['z'])
+        time, data['angular_velocity']['z'], color=c['z'], marker=marker)
     if data['includes_estimated_states']:
         lines['angular_velocity_estimate']['x'], = ax_ang_vel.plot(
-            dtime, data['angular_velocity_estimate']['x'], '--', color=c['x'])
+            dtime, data['angular_velocity_estimate']['x'], '--', color=c['x'], marker=marker)
         lines['angular_velocity_estimate']['y'], = ax_ang_vel.plot(
-            dtime, data['angular_velocity_estimate']['y'], '--', color=c['y'])
+            dtime, data['angular_velocity_estimate']['y'], '--', color=c['y'], marker=marker)
         lines['angular_velocity_estimate']['z'], = ax_ang_vel.plot(
-            dtime, data['angular_velocity_estimate']['z'], '--', color=c['z'])
+            dtime, data['angular_velocity_estimate']['z'], '--', color=c['z'], marker=marker)
     ax_ang_vel.set_title("Angular velocity")
     ax_ang_vel.set_ylabel("Angular velocity [$\\mathrm{rad}/s$]")
     ax_ang_vel.set_xlim(time[0], time[-1])
     #
     #
     lines['linear_velocity']['x'], = ax_lin_vel.plot(
-        time, data['linear_velocity']['x'], color=c['x'])
+        time, data['linear_velocity']['x'], color=c['x'], marker=marker)
     lines['linear_velocity']['y'], = ax_lin_vel.plot(
-        time, data['linear_velocity']['y'], color=c['y'])
+        time, data['linear_velocity']['y'], color=c['y'], marker=marker)
     lines['linear_velocity']['z'], = ax_lin_vel.plot(
-        time, data['linear_velocity']['z'], color=c['z'])
+        time, data['linear_velocity']['z'], color=c['z'], marker=marker)
     if data['includes_estimated_states']:
         lines['linear_velocity_estimate']['x'], = ax_lin_vel.plot(
-            dtime, data['linear_velocity_estimate']['x'], '--', color=c['x'])
+            dtime, data['linear_velocity_estimate']['x'], '--', color=c['x'], marker=marker)
         lines['linear_velocity_estimate']['y'], = ax_lin_vel.plot(
-            dtime, data['linear_velocity_estimate']['y'], '--', color=c['y'])
+            dtime, data['linear_velocity_estimate']['y'], '--', color=c['y'], marker=marker)
         lines['linear_velocity_estimate']['z'], = ax_lin_vel.plot(
-            dtime, data['linear_velocity_estimate']['z'], '--', color=c['z'])
+            dtime, data['linear_velocity_estimate']['z'], '--', color=c['z'], marker=marker)
     ax_lin_vel.set_title("Velocity")
     ax_lin_vel.set_ylabel("Velocity [$m/s$]")
     ax_lin_vel.set_xlim(time[0], time[-1])
@@ -189,32 +189,32 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
     #
     # ROW 3
     lines['torque_motor_velocity']['x'], = ax_torque.plot(
-        time, data['torque_motor_velocity']['x'], color=c['x'])
+        time, data['torque_motor_velocity']['x'], color=c['x'], marker=marker)
     lines['torque_motor_velocity']['y'], = ax_torque.plot(
-        time, data['torque_motor_velocity']['y'], color=c['y'])
+        time, data['torque_motor_velocity']['y'], color=c['y'], marker=marker)
     lines['torque_motor_velocity']['z'], = ax_torque.plot(
-        time, data['torque_motor_velocity']['z'], color=c['z'])
+        time, data['torque_motor_velocity']['z'], color=c['z'], marker=marker)
     if data['includes_estimated_states']:
         lines['torque_motor_velocity_estimate']['x'], = ax_torque.plot(
-            dtime, data['torque_motor_velocity_estimate']['x'], '--', 
-            color=c['x'])
+            dtime, data['torque_motor_velocity_estimate']['x'], '--',
+            color=c['x'], marker=marker)
         lines['torque_motor_velocity_estimate']['y'], = ax_torque.plot(
-            dtime, data['torque_motor_velocity_estimate']['y'], '--', 
-            color=c['y'])
+            dtime, data['torque_motor_velocity_estimate']['y'], '--',
+            color=c['y'], marker=marker)
         lines['torque_motor_velocity_estimate']['z'], = ax_torque.plot(
-            dtime, data['torque_motor_velocity_estimate']['z'], '--', 
-            color=c['z'])
+            dtime, data['torque_motor_velocity_estimate']['z'], '--',
+            color=c['z'], marker=marker)
     ax_torque.set_title("Torque motor velocity")
     ax_torque.set_ylabel("Angular velocity [$?$]")
     ax_torque.set_xlim(time[0], time[-1])
     #
     #
     lines['thrust_motor_velocity']['z'], = ax_thrust.plot(
-        time, data['thrust_motor_velocity']['z'], color=c['z'])
+        time, data['thrust_motor_velocity']['z'], color=c['z'], marker=marker)
     if data['includes_estimated_states']:
         lines['thrust_motor_velocity_estimate']['z'], = ax_thrust.plot(
-            dtime, data['thrust_motor_velocity_estimate']['z'], '--', 
-            color=c['z'])
+            dtime, data['thrust_motor_velocity_estimate']['z'], '--',
+            color=c['z'], marker=marker)
     ax_thrust.set_title("Thrust motor velocity")
     ax_thrust.set_ylabel("Angular velocity [$?$]")
     ax_thrust.set_xlim(time[0], time[-1])
@@ -223,11 +223,11 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
     #
     # ROW 4
     lines['torque_control']['x'], = ax_torque_ctrl.plot(
-        dtime, data['torque_control']['x'], color=c['x'])
+        dtime, data['torque_control']['x'], color=c['x'], marker=marker)
     lines['torque_control']['y'], = ax_torque_ctrl.plot(
-        dtime, data['torque_control']['y'], color=c['y'])
+        dtime, data['torque_control']['y'], color=c['y'], marker=marker)
     lines['torque_control']['z'], = ax_torque_ctrl.plot(
-        dtime, data['torque_control']['z'], color=c['z'])
+        dtime, data['torque_control']['z'], color=c['z'], marker=marker)
     ax_torque_ctrl.set_title("Torque motor control")
     ax_torque_ctrl.set_ylabel("Control signal [-]")
     ax_torque_ctrl.set_xlabel("Time [$s$]")
@@ -235,7 +235,7 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
     #
     #
     lines['thrust_control']['z'], = ax_thrust_ctrl.plot(
-        dtime, data['thrust_control']['z'], color=c['z'])
+        dtime, data['thrust_control']['z'], color=c['z'], marker=marker)
     ax_thrust_ctrl.set_title("Thrust motor control")
     ax_thrust_ctrl.set_ylabel("Control signal [-]")
     ax_thrust_ctrl.set_xlabel("Time [$s$]")
@@ -244,8 +244,6 @@ def plot(plottable: DronePlottable, vertical: bool = False, w: float = 1920,
 
     fig.tight_layout()
     return fig, lines
-
-from py_drone_module import DronePlottable
 
 
 def update_plot(lines: dict, plottable: DronePlottable):
@@ -392,7 +390,6 @@ def update_plot(lines: dict, plottable: DronePlottable):
     #
     lines['thrust_control']['z'].set_ydata(data['thrust_control']['z'])
     lines['thrust_control']['z'].set_xdata(dtime)
-
 
 
 def plot_attitude(time, dtime, states: dict, w: float, h: float, colorset: int, title: str):

@@ -15,12 +15,23 @@ inline X interpolate(double t1, double t2, const X &x1, const X &x2, double t) {
     return (t - t1) / (t2 - t1) * (x2 - x1) + x1;
 }
 
-/** 
- * @brief   Sample a given ODEResult with a specific sample time, over a 
- *          specific time frame.
+/**
+ * @brief   Linearly (re)sample a given vector with a given time step and time
+ *          frame.
  * 
- * @param   result
- *          A struct containing 
+ * @param   tv
+ *          The time vector.
+ * @param   xv
+ *          The vector with data to be (re)sampled.
+ * @param   t_start
+ *          Start time.
+ * @param   Ts
+ *          Time step.
+ * @param   t_end
+ *          End time
+ * 
+ * @return
+ *          A new vector with the linearly interpolated, sampled data.
  */
 template <class X>
 std::vector<X> sampleODEResult(const std::vector<double> &tv,
@@ -53,6 +64,10 @@ std::vector<X> sampleODEResult(const std::vector<double> &tv,
     return sampled;
 }
 
+/** 
+ * @brief   Sample a given ODEResult with a specific sample time, over a 
+ *          specific time frame.
+ */
 template <class X>
 std::vector<X> sampleODEResult(const ODEResultX<X> &result, double t_start,
                                double Ts, double t_end) {

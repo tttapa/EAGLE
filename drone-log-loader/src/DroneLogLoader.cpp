@@ -3,34 +3,42 @@
 #include <cassert>
 #include <fstream>
 #include <iterator>
+#include <sstream>
 
 #include <iostream>
 
 using namespace std;
 
-istream& operator>>(istream &is, LogEntry &logentry) {
-    char *data = reinterpret_cast<char*>(&logentry);
-    for (size_t i = 0; i < sizeof(LogEntry); ++i) 
+static istream &operator>>(istream &is, LogEntry &logentry) {
+    char *data = reinterpret_cast<char *>(&logentry);
+    for (size_t i = 0; i < sizeof(LogEntry); ++i)
         is >> (*(data++));
     return is;
 }
 
 DroneLogLoader::DroneLogLoader(std::filesystem::path loadFile) {
-    cout << "loading file" << endl;
+    if (filesystem::is_directory(loadFile)) {
+        stringstream s;
+        s << ANSIColors::red << "Error opening file: " << loadFile
+          << ": is a directory" << ANSIColors::reset << std::endl;
+        throw runtime_error(s.str());
+    }
+    cout << "loading file " << loadFile << endl;
     std::ifstream file(loadFile, std::ios::binary);
     if (!file) {
-        std::cerr << ANSIColors::red << "Error opening file: `" << loadFile
-                  << "`" << ANSIColors::reset << std::endl;
-        return;
+        stringstream s;
+        s << ANSIColors::red << "Error opening file: " << loadFile
+          << ANSIColors::reset << std::endl;
+        throw runtime_error(s.str());
     }
     file.unsetf(std::ios::skipws);
     file.seekg(0, std::ios::end);
-    std::streampos filesize = file.tellg();
+    auto filesize = file.tellg();
     file.seekg(0, std::ios::beg);
     assert(filesize % sizeof(LogEntry) == 0);
     cout << "creating vector" << endl;
     std::vector<LogEntry> entries;
-    cout << "reserving vector" << endl;
+    cout << "reserving vector, filesize = " << filesize << endl;
     entries.reserve(filesize / sizeof(LogEntry));
     cout << "reading file" << endl;
     // file.read(reinterpret_cast<char *>(entries.data()), filesize);
@@ -40,4 +48,10 @@ DroneLogLoader::DroneLogLoader(std::filesystem::path loadFile) {
     cout << "moving entries" << endl;
     this->entries = entries;
     cout << "loaded file" << endl;
+}
+
+void DroneLogLoader::write(std::string filename) const {
+    auto file = std::fstream(filename, std::ios::out | std::ios::binary);
+    file.write((char *) &entries[0], entries.size() * sizeof(entries[0]));
+    file.close();
 }

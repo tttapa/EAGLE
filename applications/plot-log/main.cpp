@@ -105,7 +105,7 @@ int main(int argc, char const *argv[]) {
     cout << "First: " << test.getFirstFlyingIndex() << endl;
     cout << "Final: " << test.getFinalFlyingIndex() << endl;
 
-    test = {{0, 0, 1, 2, 1, 0, 0}};
+    test = {{0, 0, 1, 0, 2, 0, 1, 0, 0}};
     cout << test.trim() << endl;
 
     cout << "Done." << endl;

@@ -13,6 +13,8 @@ class DroneLogLoader {
         : DroneLogLoader{std::filesystem::path{loadFile}} {}
     DroneLogLoader(std::vector<LogEntry> entries) : entries{entries} {}
 
+    void write(std::string file) const;
+
     explicit operator bool() const { return !entries.empty(); }
 
     const LogEntry &operator[](size_t i) const { return entries[i]; }
@@ -68,45 +70,79 @@ class DroneLogLoader {
 
     std::vector<ColVector<4>> getControl() const {
         std::vector<ColVector<4>> ctrls(entries.size());
-        std::transform(
-            entries.begin(), entries.end(), ctrls.begin(),
-            [](const LogEntry &dle) -> ColVector<4> {
-                return vcat(
-                    ColVectorFromCppArray(dle.getAttitudeControlSignals()),
-                    ColVector<1>{dle.getAltitudeControlSignal()});
-            });
+        std::transform(entries.begin(), entries.end(), ctrls.begin(),
+                       [](const LogEntry &dle) -> ColVector<4> {
+                           return vcat(ColVectorFromCppArray(
+                                           dle.getAttitudeControlSignals()),
+                                       ColVector<1>{dle.getCommonThrust()});
+                       });
         return ctrls;
     }
 
     const std::vector<LogEntry> &getEntries() const { return entries; }
 
-    DroneLogLoader slice(size_t start_index, size_t end_index) {
-        return {std::vector<LogEntry>{
-            getEntries().begin() + start_index,
-            getEntries().begin() + end_index,
-        }};
+    DroneLogLoader slice(size_t start_index, size_t end_index) const {
+        if (start_index <= end_index) {
+            if (start_index >= entries.size())
+                throw std::out_of_range(
+                    "Start index out of range (start_index = " +
+                    std::to_string(start_index) +
+                    ", size = " + std::to_string(entries.size()) + ")");
+            if (end_index > entries.size())
+                throw std::out_of_range(
+                    "End index out of range (end_index = " +
+                    std::to_string(end_index) +
+                    ", size = " + std::to_string(entries.size()) + ")");
+
+            return {std::vector<LogEntry>{
+                getEntries().begin() + start_index,
+                getEntries().begin() + end_index,
+            }};
+        } else {
+            if (start_index > entries.size())
+                throw std::out_of_range(
+                    "Start index out of range (start_index = " +
+                    std::to_string(start_index) +
+                    ", size = " + std::to_string(entries.size()) + ")");
+            if (end_index >= entries.size())
+                throw std::out_of_range(
+                    "End index out of range (end_index = " +
+                    std::to_string(end_index) +
+                    ", size = " + std::to_string(entries.size()) + ")");
+
+            return {std::vector<LogEntry>{
+                getEntries().rbegin() + entries.size() - start_index,
+                getEntries().rbegin() + entries.size() - end_index,
+            }};
+        }
     }
 
     std::vector<LogEntry>::const_iterator getFirstFlyingEntry() const {
-        return std::find_if(
-            entries.begin(), entries.end(),
-            [](const LogEntry &l) { return l.getRcThrottle() > 0; });
+        return std::find_if(entries.begin(), entries.end(),
+                            [](const LogEntry &l) {
+                                return l.getAttitudeObserverState()[0] < 1.0;
+                            });
     }
 
     std::vector<LogEntry>::const_reverse_iterator getFinalFlyingEntry() const {
-        return std::find_if(
-            entries.rbegin(), entries.rend(),
-            [](const LogEntry &l) { return l.getRcThrottle() > 0; });
+        return std::find_if(entries.rbegin(), entries.rend(),
+                            [](const LogEntry &l) {
+                                return l.getAttitudeObserverState()[0] < 1.0;
+                            });
     }
 
     size_t getFirstFlyingIndex() const {
         auto it = getFirstFlyingEntry();
-        return it == entries.end() ? 0 : it - entries.begin();
+        return std::distance(entries.begin(), it);
     }
 
     size_t getFinalFlyingIndex() const {
         auto it = getFinalFlyingEntry();
-        return it == entries.rend() ? 0 : it - entries.rend();
+        return std::distance(it, entries.rend());
+    }
+
+    DroneLogLoader trim() const {
+        return slice(getFirstFlyingIndex(), getFinalFlyingIndex());
     }
 
   private:
