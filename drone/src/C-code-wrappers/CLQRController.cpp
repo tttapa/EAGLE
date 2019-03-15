@@ -9,7 +9,8 @@ CLQRController::getRawControllerOutput(const VecX_t &x, const VecR_t &ref) {
     Quaternion rq = DroneAttitudeOutput{ref}.getOrientation();
     VecU_t u;
     getAttitudeControllerOutput(toCppArray(x), toCppArray(rq), toCppArray(u),
-                                config);
+                                toCppArray(integral), config,
+                                enableIntegral ? 0.5 : -0.5);
     return u;
 }
 }  // namespace Attitude

@@ -289,9 +289,15 @@ PYBIND11_EMBEDDED_MODULE(PyDrone, pydronemodule) {
     pybind11::class_<DroneLogLoader>(pydronemodule, "DroneLogLoader")
         .def(pybind11::init<const std::string &>())
         .def("slice", &DroneLogLoader::slice)
+        .def("sliceTime", &DroneLogLoader::sliceTime)
         .def("trim", &DroneLogLoader::trim)
         .def("getFirstFlyingIndex", &DroneLogLoader::getFirstFlyingIndex)
         .def("getFinalFlyingIndex", &DroneLogLoader::getFinalFlyingIndex)
+        .def("getFirstFlyingTime", &DroneLogLoader::getFirstFlyingTime)
+        .def("getFinalFlyingTime", &DroneLogLoader::getFinalFlyingTime)
+        .def("getStartTime", &DroneLogLoader::getStartTime)
+        .def("getEndTime", &DroneLogLoader::getEndTime)
+        .def("__getitem__", &DroneLogLoader::operator[])
         .def("__len__", &DroneLogLoader::size);
 
     pydronemodule.def("eul2quat", eul2quat);

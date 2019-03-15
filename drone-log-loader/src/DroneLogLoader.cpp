@@ -35,7 +35,7 @@ DroneLogLoader::DroneLogLoader(std::filesystem::path loadFile) {
     file.seekg(0, std::ios::end);
     auto filesize = file.tellg();
     file.seekg(0, std::ios::beg);
-    assert(filesize % sizeof(LogEntry) == 0);
+    assert((filesize % sizeof(LogEntry)) == 0);
     cout << "creating vector" << endl;
     std::vector<LogEntry> entries;
     cout << "reserving vector, filesize = " << filesize << endl;

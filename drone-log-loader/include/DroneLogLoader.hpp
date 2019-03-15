@@ -26,7 +26,7 @@ class DroneLogLoader {
     std::vector<double> getTimeStamps() const {
         std::vector<double> timestamps(entries.size());
         std::transform(entries.begin(), entries.end(), timestamps.begin(),
-                       [](const LogEntry &dle) { return dle.frametime; });
+                       [](const LogEntry &dle) { return dle.getFrametime(); });
         return timestamps;
     }
 
@@ -40,50 +40,36 @@ class DroneLogLoader {
         return states;
     }
 
-#if 0
     std::vector<ColVector<17>> getStates() const {
         std::vector<ColVector<17>> states(entries.size());
-        std::transform(
-            entries.begin(), entries.end(), states.begin(),
-            [](const LogEntry &dle) -> ColVector<17> {
-                return vcat(
-                    ColVectorFromCppArray(dle.getAttitudeObserverState()),
-                    ColVectorFromCppArray(dle.getAltitudeObserverState()),
-                    getBlock<2, 6, 0, 1>(ColVectorFromCppArray(
-                        dle.getNavigationObserverState())));
-            });
+        std::transform(entries.begin(), entries.end(), states.begin(),
+                       [](const LogEntry &dle) -> ColVector<17> {
+                           DroneState x;
+                           x.setOrientation(ColVectorFromCppArray(
+                               dle.getMeasurementOrientation()));
+                           x.setAngularVelocity(ColVectorFromCppArray(
+                               dle.getMeasurementAngularVelocity()));
+                           x.setHeight(dle.getMeasurementHeight());
+                           x.setNavigation(ColVectorFromCppArray(
+                               dle.getNavigationObserverState()));
+                           return x;
+                       });
         return states;
     }
-#else
-
-    std::vector<ColVector<17>> getStates() const {
-        std::vector<ColVector<17>> states(entries.size());
-        std::transform(
-            entries.begin(), entries.end(), states.begin(),
-            [](const LogEntry &dle) -> ColVector<17> {
-                DroneState x;
-                x.setOrientation(ColVectorFromCppArray(dle.getMeasurementOrientation()));
-                x.setAngularVelocity(ColVectorFromCppArray(dle.getMeasurementAngularVelocity()));
-                x.setHeight(dle.getMeasurementHeight());
-                x.setNavigation(ColVectorFromCppArray(dle.getNavigationObserverState()));
-                return x;
-            });
-        return states;
-    }
-
-#endif
 
     std::vector<ColVector<17>> getObserverStates() const {
         std::vector<ColVector<17>> states(entries.size());
-        std::transform(
-            entries.begin(), entries.end(), states.begin(),
-            [](const LogEntry &dle) -> ColVector<17> {
-                DroneState x;
-                x.setAttitude(ColVectorFromCppArray(dle.getAttitudeObserverState()));
-                x.setAltitude(ColVectorFromCppArray(dle.getAltitudeObserverState()));
-                x.setNavigation(ColVectorFromCppArray(dle.getNavigationObserverState()));
-                return x;
-            });
+        std::transform(entries.begin(), entries.end(), states.begin(),
+                       [](const LogEntry &dle) -> ColVector<17> {
+                           DroneState x;
+                           x.setAttitude(ColVectorFromCppArray(
+                               dle.getAttitudeObserverState()));
+                           x.setAltitude(ColVectorFromCppArray(
+                               dle.getAltitudeObserverState()));
+                           x.setNavigation(ColVectorFromCppArray(
+                               dle.getNavigationObserverState()));
+                           return x;
+                       });
         return states;
     }
 
@@ -150,18 +136,41 @@ class DroneLogLoader {
         }
     }
 
+    DroneLogLoader sliceTime(double t_start, double t_end) const {
+        if (t_start >= t_end)
+            throw std::out_of_range(
+                "Start time should be smaller than end time");
+
+        auto cmp = [](const LogEntry &dle, double t) {
+            return dle.getFrametime() < t;
+        };
+
+        return {std::vector<LogEntry>{
+            std::lower_bound(getEntries().begin(), getEntries().end(), t_start,
+                             cmp),
+            std::lower_bound(getEntries().begin(), getEntries().end(), t_end,
+                             cmp),
+        }};
+    }
+
     std::vector<LogEntry>::const_iterator getFirstFlyingEntry() const {
-        return std::find_if(entries.begin(), entries.end(),
-                            [](const LogEntry &l) {
-                                return l.getAttitudeObserverState()[0] < 1.0;
-                            });
+        return std::find_if(
+            entries.begin(), entries.end(),
+            [](const LogEntry &l) { return l.getRcThrottle() > 0.02; });
     }
 
     std::vector<LogEntry>::const_reverse_iterator getFinalFlyingEntry() const {
-        return std::find_if(entries.rbegin(), entries.rend(),
-                            [](const LogEntry &l) {
-                                return l.getAttitudeObserverState()[0] < 1.0;
-                            });
+        return std::find_if(
+            entries.rbegin(), entries.rend(),
+            [](const LogEntry &l) { return l.getRcThrottle() > 0.02; });
+    }
+
+    double getFirstFlyingTime() const {
+        return getFirstFlyingEntry()->getFrametime();
+    }
+
+    double getFinalFlyingTime() const {
+        return getFinalFlyingEntry()->getFrametime();
     }
 
     size_t getFirstFlyingIndex() const {
@@ -177,6 +186,10 @@ class DroneLogLoader {
     DroneLogLoader trim() const {
         return slice(getFirstFlyingIndex(), getFinalFlyingIndex());
     }
+
+    double getStartTime() const { return getEntries()[0].getFrametime(); }
+
+    double getEndTime() const { return getEntries().back().getFrametime(); }
 
   private:
     std::vector<LogEntry> entries;
