@@ -9,7 +9,7 @@ def buildDroneParamsAndMatrices(quat_params):
     d = DroneParamsAndMatrices()
     # Parameters
     d.Ts_att = 1.0 / 238
-    d.Ts_alt = d.Ts_att * 24
+    d.Ts_alt = d.Ts_att * 12
     d.gamma_n = p['gamma_n']
     d.gamma_u = p['gamma_u']
     d.Id = p['I']
