@@ -26,7 +26,9 @@ message("CControllers include ${CCONTROLLERS_INCLUDE_DIR}")
 message("CControllers libraries ${CCONTROLLERS_LIBRARIES}")
 message("CControllers params ${CCONTROLLERS_PARAMS_AND_MATRICES}")
 
-add_custom_target(make-c-controllers make -C "${CCONTROLLERS_INCLUDE_DIR}/../")
+add_custom_target(make-c-controllers 
+                  make
+                  WORKING_DIRECTORY "${CCONTROLLERS_INCLUDE_DIR}/../")
 
 if(NOT TARGET CControllers)
     add_library(CControllers INTERFACE IMPORTED)
