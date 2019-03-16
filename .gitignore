@@ -6,6 +6,7 @@ CMakeFiles/
 Makefile
 *.cmake
 !cmake.example/FindCControllers.cmake
+!cmake.example/FindLogger.cmake
 cmake/
 CMakeCache.txt
 build/googletest/CMakeLists.txt
