@@ -42,18 +42,19 @@ class DroneLogLoader {
 
     std::vector<ColVector<17>> getStates() const {
         std::vector<ColVector<17>> states(entries.size());
-        std::transform(entries.begin(), entries.end(), states.begin(),
-                       [](const LogEntry &dle) -> ColVector<17> {
-                           DroneState x;
-                           x.setOrientation(ColVectorFromCppArray(
-                               dle.getMeasurementOrientation()));
-                           x.setAngularVelocity(ColVectorFromCppArray(
-                               dle.getMeasurementAngularVelocity()));
-                           x.setHeight(dle.getMeasurementHeight());
-                           x.setNavigation(ColVectorFromCppArray(
-                               dle.getNavigationObserverState()));
-                           return x;
-                       });
+        std::transform(
+            entries.begin(), entries.end(), states.begin(),
+            [](const LogEntry &dle) -> ColVector<17> {
+                DroneState x;
+                x.setOrientation(
+                    ColVectorFromCppArray(dle.getMeasurementOrientation()));
+                x.setAngularVelocity(
+                    ColVectorFromCppArray(dle.getMeasurementAngularVelocity()));
+                x.setHeight(dle.getMeasurementHeight());
+                x.setLocation(
+                    0.3 * ColVectorFromCppArray(dle.getMeasurementLocation()));
+                return x;
+            });
         return states;
     }
 
@@ -81,7 +82,7 @@ class DroneLogLoader {
                 return vcat(
                     ColVectorFromCppArray(dle.getReferenceOrientation()),
                     zeros<3, 1>(),  // angular velocities
-                    ColVectorFromCppArray(dle.getReferenceLocation()),
+                    0.3 * ColVectorFromCppArray(dle.getReferenceLocation()),
                     ColVector<1>{dle.getReferenceHeight()});
             });
         return refs;
