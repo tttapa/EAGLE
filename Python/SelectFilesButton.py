@@ -41,6 +41,7 @@ class SelectFilesButton(widgets.Button):
         
         b.file = filedialog.askopenfilename(**b.kwargs)
 
-        b.description = "Log Selected"
-        b.icon = "check-square-o"
-        b.style.button_color = "lightgreen"
+        if b.file:
+            b.description = "Log Selected"
+            b.icon = "check-square-o"
+            b.style.button_color = "lightgreen"
